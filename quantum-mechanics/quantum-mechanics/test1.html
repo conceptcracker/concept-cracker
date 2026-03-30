@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Test</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Mathematical Physics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question:
+                <ul style="list-style:none; padding-left:0; margin-top:10px;">
+                    <li><span style="display:inline-block; width:15px; height:15px; background:#dc3545; border-radius:50%;"></span> You have not answered.</li>
+                    <li><span style="display:inline-block; width:15px; height:15px; background:#28a745; border-radius:50%;"></span> You have answered.</li>
+                    <li><span style="display:inline-block; width:15px; height:15px; background:#6f42c1; border-radius:50%;"></span> Marked for review.</li>
+                </ul>
+            </li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="subC()">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+var qs = [
+// PART A - 3 Marks Each, Negative 0.875
+{
+    q: "The ratio of the de Broglie wavelengths of two electrons moving with speeds of $0.8c$ and $0.6c$ respectively is:",
+    img: "",
+    o: ["$(\\frac{3}{4})^{2}$", "$\\frac{3}{4}$", "1", "$\\frac{4}{3}$"],
+    a: 0, m: 3, n: 0.875
+},
+{
+    q: "Consider a state given in terms of three orthonormal vectors $|\\phi_{1}\\rangle, |\\phi_{2}\\rangle$ and $|\\phi_{3}\\rangle$ as: $|\\psi\\rangle = \\frac{1}{\\sqrt{15}}|\\phi_{1}\\rangle + \\frac{1}{\\sqrt{3}}|\\phi_{2}\\rangle + \\frac{1}{\\sqrt{5}}|\\phi_{3}\\rangle$. If $\\tilde{B}|\\phi_{n}\\rangle = (3n^{2}-1)|\\phi_{n}\\rangle$, the expectation value $\\langle B \\rangle$ in the state $|\\psi\\rangle$ is:",
+    img: "",
+    o: ["0", "$145/15$", "15", "$41/15$"],
+    a: 2, m: 3, n: 0.875
+},
+{
+    q: "A particle of mass $m$ is in the ground state of a 1-D harmonic oscillator with frequency $\\omega$. If the spring constant suddenly quadruples, without initially changing the wave function, then the probability that a measurement of energy would return the value $\\hbar\\omega'$ is:",
+    img: "",
+    o: ["$2\\sqrt{\\frac{2}{3}}$", "$\\frac{2}{3}\\sqrt{2}$", "$\\frac{1}{\\sqrt{3}}$", "$\\sqrt{\\frac{2}{3}}$"],
+    a: 1, m: 3, n: 0.875
+},
+{
+    q: "A particle of mass $m$ is in the ground state of a 1-D symmetric infinite potential box spanning from $-a$ to $a$. The probability of finding the particle between $-a/n$ to $+a/n$ ($n \\ge 1$) is equal to:",
+    img: "",
+    o: ["$\\frac{1}{n}$", "$\\frac{1}{n} - \\frac{1}{\\pi}\\sin(\\frac{\\pi}{n})$", "$\\frac{1}{n} + \\frac{1}{\\pi}\\sin(\\frac{\\pi}{n})$", "$\\frac{1}{n} + \\frac{1}{\\pi}\\cos(\\frac{\\pi}{2n})$"],
+    a: 2, m: 3, n: 0.875
+},
+{
+    q: "Consider two Hermitian operators $\\hat{A}$ and $\\hat{B}$ defined by $\\hat{A} = \\frac{p^{2}}{2} + 2x^{3}$ and $\\hat{B} = p^{2} + x^{2}$. The commutator $[\\hat{A}, \\hat{B}]$ is equal to:",
+    img: "",
+    o: ["$6ixp$", "$3i(xp+px)$", "$\\frac{3}{2}i(xp+px)$", "$-6ixp$"],
+    a: 1, m: 3, n: 0.875
+},
+{
+    q: "A particle of mass $m$ is trapped in a potential of the form $V(x) = V_{0}L \\, \\delta(x^{3}-7x+6)$. If $\\psi(x)$ be the wavefunction of the particle, then $\\frac{d\\psi}{dx}$ will be:",
+    img: "",
+    o: ["Continuous at all points", "Discontinuous at $x=1$ alone", "Discontinuous at only $x=1,2$", "None of the above"],
+    a: 3, m: 3, n: 0.875
+},
+{
+    q: "The angular frequency of a relativistic particle of mass $m$ is related to its wavenumber $k$ by $\\omega^{2} = (ck)^{2} + (\\frac{mc^{2}}{\\hbar})^{2}$. The group velocity of the particle for a phase velocity of $2c$ is:",
+    img: "",
+    o: ["$\\frac{c}{2}$", "$\\frac{c}{4}$", "2c", "None of these"],
+    a: 0, m: 3, n: 0.875
+},
+{
+    q: "The wavefunction of a particle is real and is given by the following figure. Which of the following is correct?",
+    img: "", // Insert image link for graph from Page 4 here
+    o: ["$\\langle x \\rangle = 3a_{0}, \\langle p \\rangle = 2$", "$\\langle x \\rangle = \\frac{3a_{0}}{2}, \\langle p \\rangle = 0$", "$\\langle x \\rangle$ can't be determined because $\\psi(x)$ isn't explicitly given", "$\\langle p \\rangle$ can't be determined and $\\langle x \\rangle = \\frac{3a_{0}}{2}$"],
+    a: 1, m: 3, n: 0.875
+},
+{
+    q: "The normalized position space wave function of a particle is given by $\\Psi(x) = (\\frac{\\alpha}{\\pi})^{1/4} \\exp(-\\frac{\\alpha x^{2}}{2})$. The uncertainty in momentum for this state is equal to:",
+    img: "",
+    o: ["$\\hbar\\sqrt{\\alpha}$", "$\\hbar\\sqrt{\\frac{\\alpha}{2}}$", "$\\hbar\\sqrt{2\\alpha}$", "$2\\hbar\\sqrt{\\alpha}$"],
+    a: 1, m: 3, n: 0.875
+},
+{
+    q: "A Hermitian operator $\\hat{A}$ has eigenvalues $a_{1}$ and $a_{2}$. If $\\langle A \\rangle$ for a state $|\\psi\\rangle$ is $\\frac{a_{1} + 2a_{2}}{3}$, the uncertainty in $\\hat{A}$ for this state will be:",
+    img: "",
+    o: ["$\\frac{1}{\\sqrt{3}}|a_{1}-a_{2}|$", "$\\frac{\\sqrt{2}}{3}|a_{1}-a_{2}|$", "$\\frac{\\sqrt{2}}{3}|a_{1}+a_{2}|$", "$\\frac{1}{\\sqrt{3}}|a_{1}+a_{2}|$"],
+    a: 1, m: 3, n: 0.875
+},
+
+// PART B - 5 Marks Each, Negative 1.25
+{
+    q: "If a lowering operator is defined as $\\hat{a} = \\sqrt{\\frac{m\\omega}{2\\hbar}}\\hat{x} + \\frac{ip}{\\sqrt{2\\hbar m\\omega}}$, then the value of $[\\hat{a}, f(x)]$ is:",
+    img: "",
+    o: ["$\\sqrt{\\frac{\\hbar}{2m\\omega}}f'(\\hat{x})$", "$-\\sqrt{\\frac{\\hbar}{2m\\omega}}f'(\\hat{x})$", "$\\sqrt{\\frac{\\hbar}{2m\\omega}}(\\hat{x}+f'(\\hat{x}))$", "0"],
+    a: 0, m: 5, n: 1.25
+},
+{
+    q: "The ground state energy for a particle of mass $m$ sliding frictionlessly around a circular ring of circumference $L$ is:",
+    img: "",
+    o: ["$\\frac{\\pi^{2}\\hbar^{2}}{2mL^{2}}$", "$\\frac{2\\pi^{2}\\hbar^{2}}{mL^{2}}$", "$\\frac{\\pi^{2}\\hbar^{2}}{mL^{2}}$", "0"],
+    a: 3, m: 5, n: 1.25
+},
+{
+    q: "The normalized wavefunction of a particle in the momentum space is $\\varphi(p) = \\frac{1}{\\sqrt{\\eta}} \\exp(-\\frac{|p|}{\\eta})$. If the probability $|p| < b$ is 0.9, the value of $b$ is:",
+    img: "",
+    o: ["$\\frac{\\eta}{4}\\ln 10$", "$\\frac{\\eta}{2}\\ln 10$", "$\\frac{\\eta}{2}$", "$\\frac{\\eta}{4}$"],
+    a: 1, m: 5, n: 1.25
+},
+{
+    q: "Consider a particle bound in a potential $V(x) = \\alpha x^{4}$. The rate of change of expectation value of an operator $\\hat{O} = cr\\hat{x}$ is given by:",
+    img: "",
+    o: ["$\\alpha\\{\\langle\\hat{x}\\rangle + \\frac{t}{m}\\langle\\hat{p}\\rangle\\}$", "$\\alpha\\{\\langle\\hat{x}\\rangle - \\frac{t}{m}\\langle\\hat{p}\\rangle\\}$", "$\\alpha\\{\\frac{t}{m}\\langle\\hat{p}\\rangle - \\langle\\hat{x}\\rangle\\}$", "$\\frac{\\alpha}{2}\\{\\langle\\hat{x}\\rangle + \\frac{t}{m}\\langle\\hat{p}\\rangle\\}$"],
+    a: 0, m: 5, n: 1.25
+},
+{
+    q: "For a coherent state $|\\lambda\\rangle$ of a 1-D harmonic oscillator where $\\hat{a}|\\lambda\\rangle = \\lambda|\\lambda\\rangle$, the uncertainty in position for the state is:",
+    img: "",
+    o: ["$\\sqrt{\\frac{2\\hbar}{m\\omega}}$", "$\\sqrt{\\frac{\\hbar}{3m\\omega}}$", "$\\sqrt{\\frac{\\hbar}{m\\omega}}$", "$\\sqrt{\\frac{\\hbar}{2m\\omega}}$"],
+    a: 3, m: 5, n: 1.25
+},
+{
+    q: "The classical Hamiltonian is $H = Ax^{2}p^{2}$. Its corresponding quantum Hamiltonian in the momentum representation is:",
+    img: "",
+    o: ["$-\\hbar^{2}A[p^{2}\\frac{d^{2}}{dp^{2}} + 4p\\frac{d}{dp} + 2]$", "$+\\hbar^{2}A[p^{2}\\frac{d^{2}}{dp^{2}} + 2p\\frac{d}{dp} + 1]$", "$-A\\hbar^{2}[p^{2}\\frac{d^{2}}{dp^{2}} + 2p\\frac{d}{dp} + 1]$", "$\\frac{\\hbar^{2}A}{4\\pi^{2}}[p^{2}\\frac{d^{2}}{dp^{2}} + 2p\\frac{d}{dp} + 1]$"],
+    a: 3, m: 5, n: 1.25
+},
+{
+    q: "A photon of wavelength 7.26 fm is incident on a free electron at rest. The maximum recoil energy of the electron is (Given $\\lambda_{c} = 2.42 \\, fm$):",
+    img: "",
+    o: ["$\\frac{1}{15}MeV$", "$\\frac{2}{15}MeV$", "$\\frac{3}{15}MeV$", "$\\frac{4}{15}MeV$"],
+    a: 0, m: 5, n: 1.25
+},
+{
+    q: "A particle starts in state $|x\\rangle = \\frac{1}{\\sqrt{2}}\\binom{1}{1}$ under a Hamiltonian $H = H_{0}\\begin{pmatrix} 2 & 0 \\\\ 0 & +3 \\end{pmatrix}$. The minimum time $t$ after which this state will become orthogonal to the initial state is:",
+    img: "",
+    o: ["$\\frac{\\pi\\hbar}{H_{0}}$", "$\\frac{2\\pi\\hbar}{H_{0}}$", "$\\frac{\\pi\\hbar}{2H_{0}}$", "None of these"],
+    a: 0, m: 5, n: 1.25
+},
+{
+    q: "In a 1-D infinite potential well (0 to 4L), the wavefunction is $w(x) = A \\sin^{3}(\\frac{\\pi x}{L})$. The difference between maximum and minimum possible values of energy is:",
+    img: "",
+    o: ["$\\frac{\\pi^{2}\\hbar^{2}}{mL^{2}}$", "$\\frac{4\\pi^{2}\\hbar^{2}}{mL^{2}}$", "$\\frac{\\pi^{2}\\hbar^{2}}{4mL^{2}}$", "$\\frac{\\pi^{2}\\hbar^{2}}{2mL^{2}}$"],
+    a: 1, m: 5, n: 1.25
+},
+{
+    q: "When 900 particles of energy $E > V_{0}$ hit a barrier of height $V_{0} = \\frac{\\pi^{2}\\hbar^{2}}{8ma^{2}}$, 100 are reflected back. The energy of the incident beam is:",
+    img: "",
+    o: ["$2V_{0}$", "$3V_{0}$", "$\\frac{3V_{0}}{2}$", "$9V_{0}$"],
+    a: 0, m: 5, n: 1.25
+}
+];
+
+
+var cQ=0, uA=[], qS=[], tInt;
+for(var i=0;i<qs.length;i++){ uA.push(null); qS.push('n-vis'); }
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0;i<qs.length;i++){
+        var b=document.createElement('div');
+        b.className='bub'; b.id='b-'+i; b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    document.getElementById('qi').innerHTML=q.img?'<img src="'+q.img+'" class="q-img">':"";
+    var oH='';
+    for(var j=0;j<q.o.length;j++){
+        var ch=uA[cQ]===j?'checked':'';
+        oH+='<li><label><input type="radio" name="o" value="'+j+'" '+ch+'> '+q.o[j]+'</label></li>';
+    }
+    document.getElementById('ol').innerHTML=oH;
+    setTimeout(function(){if(window.MathJax&&MathJax.typeset){try{MathJax.typesetClear();MathJax.typeset();}catch(e){}}},100);
+}
+
+function gO(){var o=document.getElementsByName('o');for(var i=0;i<o.length;i++)if(o[i].checked)return parseInt(o[i].value);return null;}
+function uS(i,s){qS[i]=s;var b=document.getElementById('b-'+i);if(b)b.className='bub '+s;}
+function sav(){var s=gO();if(s!==null){uA[cQ]=s;uS(cQ,'ans');}else uS(cQ,'n-ans');if(cQ<qs.length-1)lQ(cQ+1);}
+function clr(){uA[cQ]=null;var o=document.getElementsByName('o');for(var i=0;i<o.length;i++)o[i].checked=false;uS(cQ,'n-ans');}
+function rev(){uA[cQ]=gO();uS(cQ,'rev');if(cQ<qs.length-1)lQ(cQ+1);}
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10);s=parseInt(t%60,10);
+        m=m<10?"0"+m:m;s=s<10?"0"+s:s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){clearInterval(tInt);subC(true);}
+    },1000);
+}
+var cS="";
+function tCal(){var c=document.getElementById('calc');c.style.display=c.style.display==='block'?'none':'block';}
+function cI(v){cS+=v;document.getElementById('cd').value=cS;}
+function cC(){cS="";document.getElementById('cd').value="";}
+function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;}catch(e){document.getElementById('cd').value="Err";cS="";}}
+
+function subC(force){
+    if(force||confirm("Submit test?")){
+        clearInterval(tInt);document.getElementById('test').style.display='none';document.getElementById('res').style.display='block';
+        var sc=0,ms=0,c=0,ic=0,u=0;
+        for(var i=0;i<qs.length;i++){
+            ms+=qs[i].m;
+            if(uA[i]===null)u++;
+            else if(uA[i]===qs[i].a){c++;sc+=qs[i].m;}
+            else{ic++;sc-=qs[i].n;}
+        }
+        var acc=c+ic===0?0:((c/(c+ic))*100).toFixed(2);
+        document.getElementById('f-sc').innerText=sc.toFixed(3);document.getElementById('m-sc').innerText=ms;
+        document.getElementById('rc-c').innerText=c;document.getElementById('rc-i').innerText=ic;
+        document.getElementById('rc-u').innerText=u;document.getElementById('rc-a').innerText=acc;
+
+        var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+        for(var j=0;j<qs.length;j++){
+            var stat=uA[j]===null?"<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>":(uA[j]===qs[j].a?"<span style='color:green; font-weight:bold;'>[Correct]</span>":"<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+            var yA=uA[j]===null?"None":qs[j].o[uA[j]];
+            var cA=qs[j].o[qs[j].a];
+            var qText=qs[j].q;
+            var qImg=qs[j].img?"<br><img src='"+qs[j].img+"' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>":"";
+            detHtml+="<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'><div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qText+qImg+"</div></div><div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'><span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br><span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span></div></div>";
+        }
+        document.getElementById('detailed-res').innerHTML=detHtml;
+        setTimeout(function(){if(window.MathJax)MathJax.typeset();},500);
+
+        if(window.Chart){
+            new Chart(document.getElementById('rc').getContext('2d'),{
+                type:'doughnut',data:{labels:['Correct','Incorrect','Unattempted'],datasets:[{data:[c,ic,u],backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+            });
+        }
+    }
+}
+window.onload=iT;
+window.onbeforeunload = function() {
+    return "Are you sure you want to refresh? Test progress will be lost.";
+};
+
+</script>
+</body>
+</html>
+
