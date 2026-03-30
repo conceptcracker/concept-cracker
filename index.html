@@ -162,7 +162,7 @@
     function checkAccess() {
         const id = document.getElementById('uid').value;
         const p = document.getElementById('pass').value;
-        if((id === "YASH101" && p === "physics") || (id === "9928051997" && p === "@Yash12345")) {
+        if((id === "YASH101" && p === "physics") || (id === "9928051997" && p === "@Yash12345") || (id === "6376950332" && p === "123456")) {
             window.location.href = "subjects.html";
         } else {
             alert("Oops! Invalid ID or your account is pending activation by Yash Sir.");
@@ -192,7 +192,7 @@
             body: JSON.stringify({ name: name, mobile: mobile, password: password })
         })
         .then(() => {
-            alert("Registration Successful! 🎉 Your request has been received.");
+            alert("Registration Successful! Your request has been received we will contact you soon .");
             document.getElementById('reg-name').value = '';
             document.getElementById('reg-mobile').value = '';
             document.getElementById('reg-pass').value = '';
