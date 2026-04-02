@@ -204,24 +204,30 @@
         }).catch(err => alert("Invalid Email or Password!"));
     }
     
-    function registerEmail() {
+        function registerEmail() {
         const n = document.getElementById('reg-name').value;
         const e = document.getElementById('reg-email').value;
         const p = document.getElementById('reg-pass').value;
-        if(!n || !e || !p) { alert("Please fill all fields"); return; }
         
-                auth.createUserWithEmailAndPassword(e, p).then((cred) => {
-            // NAYA CODE: Naye bacche ka status default "Pending" rahega
+        if(!n || !e || !p) { alert("Please fill all the fields!"); return; }
+        if(p.length < 6) { alert("Password must be at least 6 characters long."); return; }
+        
+        auth.createUserWithEmailAndPassword(e, p).then((cred) => {
+            // NAYA CODE: Ab hum data save hone ka WAIT karenge
             db.collection('students').doc(cred.user.uid).set({ 
                 fullName: n, 
                 email: e,
-                status: "Pending" // Ye line ensure karegi ki direct access na mile
+                status: "Pending"
+            }).then(() => {
+                // Jab Firebase confirm kar dega ki save ho gaya, tab aage badhenge
+                alert("Account Created Successfully! Please wait for Admin approval to access tests.");
+                window.location.href = "index.html"; 
+            }).catch((err) => {
+                alert("Database Save Error: " + err.message);
             });
-            alert("Account Created Successfully! Please wait for Admin approval to access tests.");
-            window.location.href = "index.html"; // Wapas home par bhej do
         }).catch(err => alert("Sign Up Error: " + err.message));
-        
-    }
+        }
+    
 
     // --- PHONE OTP AUTHENTICATION ---
     let confirmationResult;
