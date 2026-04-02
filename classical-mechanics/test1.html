@@ -52,22 +52,34 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         
-        // SABSE PEHLE PAGE HIDE KARO (Taki koi cheating na kar sake)
+        // SABSE PEHLE PAGE HIDE KARO
         document.write("<style>body { display: none; }</style>");
         
-        // TrebEdit/Mobile ke liye Error Fix
         const db = firebase.firestore();
         db.settings({ experimentalForceLongPolling: true });
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                alert("please login to attempt test!");
+                alert("Please login to attempt the test!");
                 window.location.href = "../index.html#login";
             } else {
-                document.body.style.display = "flex"; 
+                // NAYA: Admin Approval Check
+                db.collection('students').doc(user.uid).get().then((doc) => {
+                    if(doc.exists && doc.data().status === "Approved") {
+                        // Agar Yash Sir ne 'Approved' likha hai, tabhi test dikhega
+                        document.body.style.display = "flex"; 
+                    } else {
+                        // Agar Pending hai, toh bahar nikal do
+                        alert("Access denied! please contact for approval");
+                        window.location.href = "../index.html"; 
+                    }
+                }).catch(err => {
+                    console.log("Error checking permission: ", err);
+                    window.location.href = "../index.html";
+                });
             }
         });
-          </script>
+    </script>
     
 </head>
 <body>
