@@ -38,7 +38,6 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -51,22 +50,32 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         
-        // SABSE PEHLE PAGE HIDE KARO (Taki koi cheating na kar sake)
+        // SABSE PEHLE PAGE HIDE KARO
         document.write("<style>body { display: none; }</style>");
         
-        // TrebEdit/Mobile ke liye Error Fix
         const db = firebase.firestore();
         db.settings({ experimentalForceLongPolling: true });
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                alert("please login to attempt test!");
+                alert("Please login to attempt the test!");
                 window.location.href = "../index.html#login";
             } else {
-                document.body.style.display = "flex"; 
+                // SIRF ADMIN APPROVAL CHECK (Kyunki Email verify karke hi yahan aaya hai)
+                db.collection('students').doc(user.uid).get().then((doc) => {
+                    if (doc.exists && doc.data().status === "Approved") {
+                        document.body.style.display = "flex"; 
+                    } else {
+                        alert("🛑 ACCESS DENIED! please contact to accessing test.");
+                        window.location.href = "../index.html"; 
+                    }
+                }).catch(err => {
+                    alert("Database Error: " + err.message);
+                    window.location.href = "../index.html";
+                });
             }
         });
-          </script>
+                    </script>
     
 </head>
 <body>
