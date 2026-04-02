@@ -53,7 +53,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         
         // 2. SABSE PEHLE PAGE HIDE KARO (Taki bina login koi question na dekh sake)
-        document.write("<style>body { display: none !important; }</style>");
+        document.write("<style>body { display: none; }</style>");
         
         // 3. LOGIN CHECK
         const db = firebase.firestore();
