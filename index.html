@@ -228,15 +228,20 @@
         
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'normal' });
         
-        auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
+       auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
             .then((result) => {
                 confirmationResult = result;
                 document.getElementById('send-otp-btn').style.display = 'none';
                 document.getElementById('otp-section').style.display = 'block';
                 alert("OTP Sent Successfully!");
             }).catch((err) => {
-                alert("Error: Ensure you are testing on a Live URL (GitHub Pages) and not local storage.");
+                // Ab ye code Firebase ki ASLI error batayega
+                alert("ASLI ERROR: " + err.message); 
                 console.error(err);
+                
+                // Button wapas dikhaye
+                document.getElementById('send-otp-btn').style.display = 'block';
+                document.getElementById('otp-section').style.display = 'none';
             });
     }
 
