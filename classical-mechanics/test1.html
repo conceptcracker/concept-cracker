@@ -39,7 +39,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
     
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -57,39 +57,30 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         
         const db = firebase.firestore();
         db.settings({ experimentalForceLongPolling: true });
+
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
                 alert("Please login to attempt the test!");
-                window.location.href = "index.html#login";
+                window.location.href = "../index.html#login";
             } else {
-                // DETECTIVE CHECK (X-Ray)
+                // NAYA: Admin Approval Check
                 db.collection('students').doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        let currentStatus = doc.data().status;
-                        
-                        if (currentStatus === "Approved") {
-                            // Agar perfect match hai
-                            document.body.style.display = "flex"; 
-                        } else {
-                            // Mismatch pakda gaya
-                            alert("BIMARI MIL GAYI! \nAapka Firebase mein status ye likha hai: [" + currentStatus + "] \nLekin pass hone ke liye exact [Approved] hona chahiye.");
-                            window.location.href = "index.html"; 
-                        }
+                    if(doc.exists && doc.data().status === "Approved") {
+                        // Agar Yash Sir ne 'Approved' likha hai, tabhi test dikhega
+                        document.body.style.display = "flex"; 
                     } else {
-                        // Document mila hi nahi
-                        alert("BIMARI MIL GAYI! \nAapki ID (" + user.uid + ") ka data Firebase 'students' list mein hai hi nahi!");
-                        window.location.href = "index.html"; 
+                        // Agar Pending hai, toh bahar nikal do
+                        alert("Access Denied! Please contact for accessing test");
+                        window.location.href = "../index.html"; 
                     }
                 }).catch(err => {
-                    // Firestore Database Permission Error
-                    alert("DATABASE ERROR: " + err.message + "\n(Ye shayad Firebase rules ki wajah se hai)");
-                    window.location.href = "index.html";
+                    console.log("Error checking permission: ", err);
+                    window.location.href = "../index.html";
                 });
             }
         });
-        
-        
     </script>
+    
     
 </head>
 <body>
