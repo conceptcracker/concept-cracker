@@ -204,7 +204,25 @@
         }).catch(err => alert("Invalid Email or Password!"));
     }
     
-        function registerEmail() {
+            // --- EMAIL AUTHENTICATION ---
+    function loginEmail() {
+        const e = document.getElementById('login-email').value;
+        const p = document.getElementById('login-pass').value;
+        if(!e || !p) { alert("Please enter your email and password!"); return; }
+        
+        auth.signInWithEmailAndPassword(e, p).then((cred) => {
+            // LOGIN PAR CHECK: Kya Email verify hua hai?
+            if (cred.user.emailVerified === false) {
+                auth.signOut(); // Turant bahar nikal do
+                alert("🛑 EMAIL NOT VERIFIED!\n\nAapne abhi tak apna Email verify nahi kiya hai. Please apna inbox ya spam folder check karein aur link par click karke verify karein.");
+            } else {
+                // Verify hai toh andar aane do
+                window.location.href="subjects.html"; 
+            }
+        }).catch(err => alert("Login Error: " + err.message));
+    }
+    
+    function registerEmail() {
         const n = document.getElementById('reg-name').value;
         const e = document.getElementById('reg-email').value;
         const p = document.getElementById('reg-pass').value;
@@ -213,20 +231,22 @@
         if(p.length < 6) { alert("Password must be at least 6 characters long."); return; }
         
         auth.createUserWithEmailAndPassword(e, p).then((cred) => {
-            // NAYA CODE: Ab hum data save hone ka WAIT karenge
-            db.collection('students').doc(cred.user.uid).set({ 
-                fullName: n, 
-                email: e,
-                status: "Pending"
-            }).then(() => {
-                // Jab Firebase confirm kar dega ki save ho gaya, tab aage badhenge
-                alert("Account Created Successfully! Please wait for Admin approval to access tests.");
-                window.location.href = "index.html"; 
-            }).catch((err) => {
-                alert("Database Save Error: " + err.message);
+            // Account bante hi Verification Mail bhejo
+            cred.user.sendEmailVerification().then(() => {
+                // Database mein status 'Pending' save karo
+                db.collection('students').doc(cred.user.uid).set({ 
+                    fullName: n, 
+                    email: e,
+                    status: "Pending"
+                }).then(() => {
+                    auth.signOut(); // Account banate hi LOGOUT kar do
+                    alert("Account Created! 🎉\n\n please verify your mail, check inbox and spam folder to verify email.");
+                    switchTab('email-login'); // User ko Login screen par bhej do
+                });
             });
         }).catch(err => alert("Sign Up Error: " + err.message));
-        }
+    }
+    
     
 
     // --- PHONE OTP AUTHENTICATION ---
