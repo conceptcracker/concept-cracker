@@ -353,37 +353,7 @@ function sT(d){
     },1000);
 }
 
-function finalSubmit(force){
-    if(!force && !confirm("Are you sure you want to submit the test?")) return;
-    clearInterval(tInt);
-    document.getElementById('test').style.display='none';
-    document.getElementById('res').style.display='block';
-    
-    var sc=0, c=0, w=0, u=0, ms=0;
-    for(var i=0; i<qs.length; i++){
-        ms+=qs[i].m;
-        if(uA[i]===null) u++;
-        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
-        else { sc-=qs[i].n; w++; }
-    }
-    
-    document.getElementById('f-sc').innerText=sc.toFixed(3);
-    document.getElementById('m-sc').innerText=ms;
-    document.getElementById('rc-c').innerText=c;
-    document.getElementById('rc-i').innerText=w;
-    document.getElementById('rc-u').innerText=u;
-    
-    var acc = 0;
-    if(c+w > 0) acc = (c/(c+w)*100);
-    document.getElementById('rc-a').innerText=acc.toFixed(2);
 
-    // ==========================================================
-    // NAYA CODE: SAVE SCORE TO FIREBASE (PROFILE) & GOOGLE SHEET
-    // ==========================================================
-    try {
-        var currentUser = firebase.auth().currentUser;
-        if(currentUser) {
-            var finalScore = sc.toFixed(3);
             
             // DHYAN DEIN: Test 2 mein isko "Quantum Mechanics - Test 2" kar dena
             var testTitle = "Quantum Mechanics - Test 1"; 
@@ -429,23 +399,50 @@ function finalSubmit(force){
     if(c+w > 0) acc = (c/(c+w)*100);
     document.getElementById('rc-a').innerText=acc.toFixed(2);
 
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
     // ==========================================================
-    // NAYA INDEPENDENT CODE: SAVE SCORE
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
     // ==========================================================
     try {
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            var testTitle = "Quantum Mechanics - Test 1"; // Har test mein change karein
+            var testTitle = "Quantum Mechanics - Test 1"; // Test ka naam
             var currentDate = new Date().toLocaleString();
             
-            // User ki pehchaan (Name nahi mila toh Email bhej denge)
-            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
 
-            // --- 1. GOOGLE SHEET PAR BHEJNA (Ye ab sabse pehle hoga) ---
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
             var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
-            
-            // Password wale column mein hum 'Test ka Naam + Score' bhej rahe hain
             var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
 
             fetch(scriptURL, {
@@ -461,7 +458,7 @@ function finalSubmit(force){
                 console.log("✅ Google Sheet mein score chala gaya!");
             }).catch(err => console.log("Google Sheet Error: ", err));
 
-            // --- 2. FIREBASE PROFILE MEIN BHEJNA (Agar DB bana hoga toh save hoga) ---
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
             try {
                 var db = firebase.firestore();
                 db.collection('students').doc(currentUser.uid).collection('marks').add({
@@ -470,9 +467,7 @@ function finalSubmit(force){
                     totalMarks: ms,
                     date: currentDate,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    console.log("✅ Profile mein score save ho gaya!");
-                }).catch(e => console.log("Firebase DB abhi ready nahi hai."));
+                });
             } catch(dbErr) {
                 console.log("Database connection error.");
             }
@@ -511,7 +506,7 @@ function finalSubmit(force){
         });
     }
 }
-                
+    
     
 var cExp="";
 function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
