@@ -40,6 +40,8 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
@@ -49,21 +51,23 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     
+    // TrebEdit/Mobile ke liye Error Fix
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
     // Test page ko turant chupa do jab tak login verify na ho
     document.write("<style>body { display: none; }</style>");
     
     firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
-            // Agar login nahi hai, toh wapas main website ke login par bhej do
-            // Dhyan de: "../" lagaya hai kyunki test file folder ke andar hai
-            alert("Please login to access test!");
+            alert("Aapko test access karne ke liye pehle Login karna hoga!");
             window.location.href = "../index.html#login";
         } else {
-            // Agar asli user hai, toh body dikha do (Test start)
             document.body.style.display = "flex"; 
         }
     });
 </script>
+    
     
 </head>
 <body>
