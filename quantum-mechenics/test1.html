@@ -373,6 +373,52 @@ function finalSubmit(force){
     if(c+w > 0) acc = (c/(c+w)*100);
     document.getElementById('rc-a').innerText=acc.toFixed(2);
 
+    // ==========================================================
+    // NAYA CODE: SAVE SCORE TO FIREBASE (PROFILE) & GOOGLE SHEET
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            
+            // DHYAN DEIN: Test 2 mein isko "Quantum Mechanics - Test 2" kar dena
+            var testTitle = "Quantum Mechanics - Test 1"; 
+            var currentDate = new Date().toLocaleString();
+            var db = firebase.firestore();
+
+            // 1. Firebase (Student Profile) mein save karna
+            db.collection('students').doc(currentUser.uid).collection('marks').add({
+                testName: testTitle,
+                score: finalScore,
+                totalMarks: ms,
+                date: currentDate,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 2. Google Sheet par bhejna
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            
+            db.collection('students').doc(currentUser.uid).get().then(doc => {
+                var stuName = (doc.exists && doc.data().fullName) ? doc.data().fullName : (currentUser.email || currentUser.phoneNumber);
+                
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: stuName, 
+                        mobile: currentUser.email || currentUser.phoneNumber, 
+                        password: testTitle, // Password wale column mein Test ka naam jayega
+                        score: finalScore + " / " + ms // Agar extra column aapne banaya hoga sheet mein toh usme marks jayenge
+                    })
+                }).catch(err => console.log("Google Sheet Error: ", err));
+            });
+        }
+    } catch(e) {
+        console.log("Firebase logic skipped or error: ", e);
+    }
+    // ==========================================================
+
     var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
     for(var j=0; j<qs.length; j++){
         var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
@@ -380,7 +426,7 @@ function finalSubmit(force){
         var cA = qs[j].o[qs[j].a];
         
         var qImgStr = "";
-        if(qs[j].img !== "") {
+        if(qs[j].img && qs[j].img !== "") {
             qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
         }
         
@@ -402,7 +448,7 @@ function finalSubmit(force){
         });
     }
 }
-
+    
 var cExp="";
 function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
 function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
