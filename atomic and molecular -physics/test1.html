@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    
+    // TrebEdit/Mobile ke liye Error Fix
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
+    // Test page ko turant chupa do jab tak login verify na ho
+    document.write("<style>body { display: none; }</style>");
+    
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            alert("please login to attempt test!");
+            window.location.href = "../index.html#login";
+        } else {
+            document.body.style.display = "flex"; 
+        }
+    });
+</script>
+    
+    
+    
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+    // Question upload here 
+    var qs = [
+    // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
+    { 
+        q: "The Doppler half-intensity breadth of the sodium D-lines at $5893\\ \\mathring{A}$ corresponding to a temperature of 500K is approximately [Given that $R=8.31\\ J/mol-K$, $c=3\\times10^{8}m/sec$ and atomic weight of sodium $=22.99\\ g/mol$]", 
+        o: ["$0.03\\ \\mathring{A}$", "$0.02\\ \\mathring{A}$", "$0.002\\ \\mathring{A}$", "$0.003\\ \\mathring{A}$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The spectral width of a spectral line of $5000\\mathring{A}$ wavelength emitted from a energy level of a life time of $10^{-8}$ sec is", 
+        o: ["$1.33\\times10^{-2}\\mathring{A}$", "$1.33\\times10^{-3}\\ eV$", "$1.33\\times10^{-1}\\ eV$", "$1.33\\times10^{-4}\\mathring{A}$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The angle between the directions of $\\vec{L}$ and $\\vec{S}$ for the term ${}^{3}P_{2}$ is:", 
+        o: ["$30^{\\circ}$", "$45^{\\circ}$", "$60^{\\circ}$", "$135^{\\circ}$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "In normal Zeeman effect experiment, spectral splitting of the line at the wavelength 600 nm corresponding to the transition $5\\ {}^{1}D_{2} \\rightarrow 5\\ {}^{1}P_{1}$ of Cadmium atoms to be observed. The spectrometer has the resolution of 0.01 nm. The minimum magnetic field (B) needed to observe this is:", 
+        o: ["1.8 T", "0.9 T", "0.6 T", "1.2 T"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A $\\mu^{-}$ meson (charge -e, $mass=207\\ m_{e}$, where $m_{e}$ is mass of electron) can be captured by a proton to form a hydrogen like mesic (or muonic) atom. The radius of the first Bohr orbit for such an atom is", 
+        o: ["$1.45\\times10^{-2}\\mathring{A}$", "$1.45\\times10^{-3}\\mathring{A}$", "$2.85\\times10^{-3}\\mathring{A}$", "$2.85\\times10^{-2}\\mathring{A}$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The number of possible transitions in Anomalous Zeeman effect for transition ${}^{3}P_{1}\\rightarrow {}^{3}S_{1}$ are", 
+        o: ["5", "6", "7", "9"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Wavelength (in nm) of the Lyman series for an one-electron ion is in the range $24\\le\\lambda\\le30$. The ionization energy of the ion will be closest to $(1J=\\frac{10^{18}}{1.6} eV)$", 
+        o: ["32 eV", "42 eV", "52 eV", "62 eV"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The orbital degeneracy of the level of a one-electron atomic system with $Z=5$ and energy -13.6 eV is", 
+        o: ["1", "5", "25", "36"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The Lande g-factors for ${}^{3}P_{2}$ and ${}^{1}D_{2}$ states are", 
+        o: ["$\\frac{2}{3}$ and 2 respectively", "$\\frac{3}{2}$ and $\\frac{3}{2}$ respectively", "$\\frac{1}{2}$ and 1 respectively", "$\\frac{1}{2}$ and $\\frac{3}{2}$ respectively"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The isotope of oxygen atom has nuclear spin $I=\\frac{5}{2}$. The ratio of number of hyperfine structure components F for P and P", 
+        o: ["5:3", "2:1", "3:1", "3:5"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+
+    // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
+    { 
+        q: "If Zn is bombarded by 5 keV electrons, the wavelength of the shortest X-ray line is given by", 
+        o: ["$2.50\\ \\mathring{A}$", "$10.00\\ \\mathring{A}$", "$1.24\\ \\mathring{A}$", "$2.48\\ \\mathring{A}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A hydrogen atom is placed in a magnetic field of 3T. The energy difference between the $m_{l}=-1$ and $m_{l}=+1$ components in the 2p state is", 
+        o: ["$3.48\\times10^{-2}\\ eV$", "$3.48\\times10^{-3}\\ eV$", "$3.48\\times10^{-4}\\ eV$", "$3.48\\times10^{-5}\\ eV$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The sodium yellow line 5893 $\\mathring{A}$ arises from the transition $3p \\rightarrow 3s$. The 3p level is splitted by spin-orbit interaction into two components separated by $2.1\\times10^{-3}\\ eV$. The wavelength separation between the two components of the yellow line is", 
+        o: ["$5.87\\mathring{A}$", "$6.77\\mathring{A}$", "$4.37\\mathring{A}$", "$2.97\\mathring{A}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The nuclear spin I of bismuth atom is 9/2. By $I-J$ interaction, the term ${}^{2}D_{5/2}$ of bismuth is split into many levels. If the separation of the ${}^{2}D_{5/2}(F=2)$ and ${}^{2}D_{5/2}(F=3)$ levels is $30\\ cm^{-1}$ then the separation between ${}^{2}D_{5/2}(F=5)$ and ${}^{2}D_{5/2}(F=6)$ levels is (F is resultant of I and J)", 
+        o: ["$40\\ cm^{-1}$", "$50\\ cm^{-1}$", "$60\\ cm^{-1}$", "$70\\ cm^{-1}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The possible values of $\\vec{L}\\cdot\\vec{S}$ for $l=1$ and $s=\\frac{1}{2}$ are", 
+        o: ["$\\hbar^{2}$ and $\\hbar^{2}$", "$\\frac{\\hbar^{2}}{2}$ and $-\\frac{3\\hbar^{2}}{2}$", "$\\frac{3\\hbar^{2}}{2}$ and $-\\frac{\\hbar^{2}}{2}$", "$\\frac{\\hbar^{2}}{2}$ and $-\\hbar^{2}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The spectral designation of the term corresponding of the greatest possible total angular momentum of an atom with electronic configuration $1s^{2}2p3d$ is", 
+        o: ["${}^{1}P_{2}$", "${}^{2}F_{4}$", "${}^{3}P_{4}$", "${}^{3}F_{4}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider spectral lines caused by the transitions : (i) ${}^{1}P_{1}\\rightarrow{}^{1}S_{0}$ (ii) ${}^{2}D_{5/2}\\rightarrow{}^{2}P_{3/2}$. The normal Zeeman effect is observed in weak magnetic field in", 
+        o: ["(i)", "(ii)", "Both (i) and (ii)", "None of these"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The ground state terms for ${}^{5}B$, ${}^{6}C$, ${}^{7}N$ and ${}^{8}O$ respectively are", 
+        o: ["${}^{2}P_{3/2}$, ${}^{3}P_{2}$, ${}^{4}S_{3/2}$ and ${}^{3}P_{0}$", "${}^{2}P_{1/2}$, ${}^{3}P_{0}$, ${}^{4}S_{3/2}$ and ${}^{3}P_{0}$", "${}^{2}P_{3/2}$, ${}^{3}P_{2}$, ${}^{2}D_{3/2}$ and ${}^{3}P_{2}$", "${}^{2}P_{1/2}$, ${}^{3}P_{0}$, ${}^{4}S_{3/2}$ and ${}^{3}P_{2}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Energy of the emitted photon when an L-electron drops into the k-state in copper $\\underline{(z=29)}$ is [use $R=109737\\ cm^{-1}$, $1\\ cm^{-1}=1.239\\times10^{-4}\\ eV]$", 
+        o: ["7994.6 eV", "1094.6 eV", "1293.6 eV", "1097.3 eV"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider the transition in heavy atoms which give rise to L line in x-ray spectra. The number of allowed transitions possible under the selection rule $\\Delta l=\\pm1$, $\\Delta j=0,\\pm1$", 
+        o: ["5", "6", "7", "8"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    }
+];
+
+    
+
+
+
+
+
+// LOGIC
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+    function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "Atomic and molecular physics- Test 1"; // Test ka naam
+            var currentDate = new Date().toLocaleString();
+            
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
+
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
+        }
+    } catch(e) {
+        console.log("Login check error: ", e);
+    }
+    // ==========================================================
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+// ==== DELETED HUA CODE WAPAS AAGAYA ====
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    
+    // TrebEdit/Mobile ke liye Error Fix
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
+    // Test page ko turant chupa do jab tak login verify na ho
+    document.write("<style>body { display: none; }</style>");
+    
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            alert("please login to attempt test!");
+            window.location.href = "../index.html#login";
+        } else {
+            document.body.style.display = "flex"; 
+        }
+    });
+</script>
+    
+    
+    
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+    // Question upload here 
+    var qs = [
+    // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
+    { 
+        q: "The orange krypton line $(\\lambda=6058\\mathring{A})$ has a coherence length of 20 cm. The line width, in units of $\\mathring{A}$ is approximately", 
+        o: ["0.018", "0.036", "0.03", "0.025"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The figure (shown below) depicts the energy levels of a 4 level atomic system with the Einstein's coefficients as follows: $A_{32}=2\\times10^{5}sec^{-1}$, $A_{31}=3.5\\times10^{5}sec^{-1}$, $A_{30}=4.5\\times10^{5}sec^{-1}$, $A_{21}=1\\times10^{6}sec^{-1}$, $A_{20}=4\\times10^{6}sec^{-1}$. The life time of the atomic level 3 is:", 
+        o: ["$1\\times10^{-5}$ sec", "$1\\times10^{-7}$ sec", "$1.25\\times10^{-7}$ sec", "$1.25\\times10^{-8}$ sec"], 
+        a: 0, m: 3, n: 0.875, img: "IMAGE_LINK_HERE" 
+    },
+    { 
+        q: "A He-Ne LASER operating at 632.8 nm consists of discharge tube of length 0.4 m with mirrors bonded to the ends. The gain band width of the laser medium is 1.5 GHz. The seperation of the longitudinal modes of the cavity is:", 
+        o: ["375 MHz", "187.5 MHz", "1500 MHz", "750 MHz"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Calculate the number of modes that can exist in laser whose resonator cavity has length $l=1m$ and wavelength is $1\\mu m$.", 
+        o: ["$2\\times10^{6}$", "$10^{6}$", "$4\\times10^{6}$", "$5\\times10^{5}$"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "If we consider a diatomic molecule as a non-rigid rotator, the wave number $\\bar{\\nu}$ for the transition $J=2$ to $J=3$ is given by (where B is rotational constant and D is centrifugal distortion constant)", 
+        o: ["$2B-4D$", "$4B-32D$", "$6B-108D$", "$4B-64D$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The temperature at which the rate of spontaneous emission is equal to the stimulated emission for a wavelength $5000\\ \\mathring{A}$ is", 
+        o: ["64720 K", "34210 K", "41573 K", "5432 K"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Laser line width occurs at 20 Hz. The coherence length is", 
+        o: ["12450 km", "15000 km", "13560 km", "12000 km"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The rotational constant of ${}^{14}N_{2}$ is $2\\ cm^{-1}$. The wave number of incident radiation in a Raman spectrometer is $20487\\ cm^{-1}$. The wave number of first scattered stokes line in $cm^{-1}$ is", 
+        o: ["20479", "20475", "20499", "20495"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "In a vibrational rotational spectra, if we consider molecule as harmonic oscillator and a non-rigid rotator then the wavenumber for the transition $J=3$ to $J=4$ between vibrational levels $v=0$ and $v=1$ is (where $\\omega$ is vibrational constant, B is rotational constant and D is centrifugal distortion constant)", 
+        o: ["$\\omega+8B-108D$", "$\\omega+6B-144D$", "$\\omega+8B-256D$", "$\\frac{\\omega}{2}+6B-208D$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The optical resonator has a length 60 cm operating at an optical frequency of $5\\times10^{14}$ Hz. The number of longitudinal modes in the cavity is", 
+        o: ["$5\\times10^{4}$", "$3\\times10^{4}$", "$3\\times10^{6}$", "$2\\times10^{6}$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+
+    // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
+    { 
+        q: "If the mean internuclear separation of $HCl^{35}$ molecule in the vibrational energy level $v=0$ and $v=1$ is $1.293\\mathring{A}$; then the separation of the lines R(0) and P(1) of the fundamental band is", 
+        o: ["$2066\\ m^{-1}$", "$1033\\ m^{-1}$", "$4132\\ m^{-1}$", "$6198\\ m^{-1}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The temperature, at which the number of molecules in the $v=1$ is 1/e times that in the ground state $v=0$, is [Given that, for $I_{2}$ molecule, $\\bar{\\omega}_{e}=214.6\\ cm^{-1}$ and $\\bar{\\omega}_{e}X_{e}=0.6\\ cm^{-1}$]", 
+        o: ["300 K", "330 K", "400 K", "700 K"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Assume that the $H_{2}$ molecule behaves like a harmonic oscillator with a force constant $k=573\\ N/m$. The vibrational quantum number (v) corresponding to its dissociation energy 4.5 eV is", 
+        o: ["$v=5$", "$v=6$", "$v=7$", "$v=8$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The fundamental mode of HCl occurs at $2886\\ cm^{-1}$. Frequency of the same mode of DCl (Deuterium chloride) is", 
+        o: ["$3069\\ cm^{-1}$", "$2886\\ cm^{-1}$", "$2069\\ cm^{-1}$", "$3205\\ cm^{-1}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "If the separation between two successive vibrational states is $1904\\ cm^{-1}$, then the zero point energy is", 
+        o: ["$1904\\ cm^{-1}$", "$952\\ cm^{-1}$", "$3808\\ cm^{-1}$", "$2856\\ cm^{-1}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The angular rotational velocity of an molecules promoted to the first excited rotational level.", 
+        o: ["$\\omega=\\frac{\\hbar^{2}}{I}$", "$\\omega=\\frac{\\hbar}{I}\\sqrt{2}$", "$\\omega=\\frac{2\\hbar^{2}}{I}$", "$\\omega=\\frac{\\hbar^{2}}{2I}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The wavelength of emission of a laser light is $6000\\ \\mathring{A}$ and the spontaneous emission lifetime of upper level is $\\tau_{sp}=10^{-6}$ sec. The co-efficient of stimulated emission is", 
+        o: ["$2.4\\times10^{16}\\frac{m^{3}}{J\\cdot s^{2}}$", "$1.3\\times10^{19}\\frac{m^{3}}{J\\cdot s^{2}}$", "$6.8\\times10^{18}\\frac{m^{3}}{J\\cdot s^{2}}$", "$7.1\\times10^{18}\\frac{m^{3}}{J\\cdot s^{2}}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "An atomic spectral line is observed to split into twelve components due to Zeeman effect. If the upper state of the atom is ${}^{2}D_{5/2}$, then the lower state will be", 
+        o: ["${}^{2}S_{1/2}$", "${}^{2}P_{1/2}$", "${}^{4}F_{3/2}$", "${}^{2}P_{3/2}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The threshold pumping power per unit volume in case of Ruby laser is [Given: The number of atoms per unit volume are $1.6\\times10^{25}$, pumping frequency is $6.25\\times10^{14}$ Hz and spontaneous relaxation time of upper level is $3\\times10^{-3}$ sec]", 
+        o: ["$4\\times10^{7}W/m^{3}$", "$6\\times10^{8}W/m^{3}$", "$3\\times10^{10}W/m^{3}$", "$11\\times10^{8}W/m^{3}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The spectrum of HCl molecule shows a very intense absorption at $2886\\ cm^{-1}$ and a weaker at $5668\\ cm^{-1}$. The anharmonicity constants $x_{e}$ is", 
+        o: ["0.0274", "0.0174", "0.0017", "0.174"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    }
+];
+
+    
+
+
+
+
+
+// LOGIC
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+    function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "Atomic and molecular physics- Test 2"; // Test ka naam
+            var currentDate = new Date().toLocaleString();
+            
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
+
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
+        }
+    } catch(e) {
+        console.log("Login check error: ", e);
+    }
+    // ==========================================================
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+// ==== DELETED HUA CODE WAPAS AAGAYA ====
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
