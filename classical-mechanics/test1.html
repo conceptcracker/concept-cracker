@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    
+    // TrebEdit/Mobile ke liye Error Fix
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
+    // Test page ko turant chupa do jab tak login verify na ho
+    document.write("<style>body { display: none; }</style>");
+    
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            alert("please login to attempt test!");
+            window.location.href = "../index.html#login";
+        } else {
+            document.body.style.display = "flex"; 
+        }
+    });
+</script>
+    
+    
+    
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+    var qs = [
+    // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
+    { 
+        q: "Consider a dynamical system, defined by a set of equations (in terms of q and p canonical variables) $\\dot{q}=qp\\ \\&\\ \\dot{p}=-qp$. For this system, the Hamiltonian is,", 
+        o: ["$H=\\frac{1}{2}\\dot{q}^{2}+\\frac{1}{2}q^{2}$", "$H=\\frac{p^{2}}{2}+\\frac{q^{2}}{2}$", "$H=qp$", "Does not exists"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle is moving in x-y plane. Its motion is described by the lagrangian $L=\\frac{1}{2}m[\\dot{x}^{2}+\\dot{y}^{2}-\\omega^{2}x^{2}-\\omega^{2}y^{2}]+\\alpha[\\frac{x\\dot{y}-y\\dot{x}}{x^{2}+y^{2}}]$, where $\\omega$ and $\\alpha$ are constants. Equation of motion in polar coordinates (r, $\\theta$) is", 
+        o: ["$m\\ddot{r}+\\frac{p_{\\theta}^{2}}{2mr^{3}}=0$", "$m\\ddot{r}+m\\omega^{2}r-\\frac{p_{\\theta}^{2}}{mr^{3}}=0$", "$m\\ddot{r}+\\omega^{2}r=\\alpha$", "$m\\ddot{r}+m\\omega^{2}r-\\frac{(p_{\\theta}-\\alpha)^{2}}{mr^{3}}=0$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a dynamical system of equations, $\\dot{p}_{x}=x-5$, $\\dot{x}=-p_{x}+1$. The phase space trajectory in $p_{x}-x$ plane should be", 
+        o: ["circle", "ellipse", "cycloid", "catinary"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A bead of mass m slides with speed v along a horizontal curve $y=f(x)$ lying in x-y plane. The force exerted by the curve to the bead is", 
+        o: ["$\\frac{mv^{2}}{f^{\\prime}}$", "$\\frac{mf^{\\prime\\prime}v^{2}}{(1+f^{\\prime2})^{3/2}}$", "$\\frac{mv^{2}}{1+f^{\\prime2}}$", "$\\frac{mv^{2}}{\\sqrt{1+f^{\\prime2}}}$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The potential energy function between two atoms in a diatomic molecule is defined for x > 0 and given by $U(x)=U_{0}[(\\frac{a}{x})^{12}-2(\\frac{a}{x})^{6}]$ where, $U_{0}$ and a are positive constants. Which of the following options is correct?", 
+        o: ["$x=a$ is a point of stable equilibrium.", "$x=2a$ is a point of stable equilibrium.", "$x=a$ is a point of unstable equilibrium", "$x=2a$ is a point of unstable equilibrium."], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "In a system with two degrees of freedom, if (p, q) are the canonical coordinates, then which of the following transformations to (P, Q) is not canonical ?", 
+        o: ["$P=\\frac{1}{2}(p^{2}+q^{2}), Q=\\tan^{-1}(\\frac{q}{p})$", "$P=\\sqrt{2q}e^{-\\alpha}\\sin p, Q=\\sqrt{2q}e^{\\alpha}\\cos p$ ($\\alpha$ is a constant)", "$Q=\\tan p, P=\\log(\\sin q)$", "$Q=p, P=-q$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle of mass m moves in three dimensions under a central potential $V(r)$. Let Lagrangian in spherical polar coordinates is given by $L=\\frac{1}{2}m(\\dot{r}^{2}+r^{2}\\dot{\\theta}^{2}+r^{2}\\sin^{2}\\theta\\dot{\\phi}^{2})-V(r)$. Consider a quantity h defined by $h=mr^{2}\\dot{\\phi}\\sin^{2}\\theta$. Then which of the following is correct? (In the following, t is time)", 
+        o: ["$h\\propto t^{2}$", "$h\\propto t$", "$h\\propto\\sqrt{t}$", "h is a constant of motion"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Lagrangian of a particle is $L=\\frac{1}{2}m\\dot{x}^{2}+bx\\dot{x}$. If at $t=0$, $x=0$, $\\dot{x}=v_{0}$ then the distance covered at $t=\\frac{1}{v_{0}}$ is", 
+        o: ["1", "2", "1/2", "4"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The Poisson bracket of $\\alpha p^{2}+2\\beta pq$ with the Hamiltonian $H=ap^{2}+bq^{2}$ (where $\\alpha$, $\\beta$, a, b, are all constants) is", 
+        o: ["$4\\alpha(ap^{2}+bq^{2})-4pq\\beta a$", "$4\\beta(ap^{2}-bq^{2})-4pq\\alpha b$", "$4\\beta(ap^{2}+bq^{2})-4pq\\alpha b$", "$4\\alpha(ap^{2}+bq^{2})-4pq\\beta a$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle moves under the influence of a potential $V(x,y)=\\lambda(2x+y)$, $\\lambda$ is a positive constant. Which of the following is correct?", 
+        o: ["$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, 2p_{x}+p_{y}=$ constant", "$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, p_{x}+2p_{y}=$ constant", "$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, 2p_{x}-p_{y}=$ constant", "$p_{x}=m\\dot{x}, p_{y}=m\\dot{y}, p_{x}-2p_{y}=$ constant"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+
+    // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
+    { 
+        q: "The time evolution of a 1-D dynamical system is described by, $y_{n+1}=y_{n}^{2}-2y_{n}+2$.", 
+        o: ["$y=2$ is a stable fixed point", "$y=2$ is an unstable fixed point", "$y=3$ is a stable fixed point", "$y=3$ is an unstable fixed point"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Lagrangian of a system is $L=\\frac{1}{2}\\dot{x}^{2}+\\frac{1}{2x^{2}}$. If quantity $\\alpha\\dot{x}+\\beta(\\dot{x}^{2}-\\frac{1}{x^{2}})t$ is conserved then value of $\\alpha+\\beta$", 
+        o: ["-1", "1", "0", "1/2"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider lagrangian of a system of particles to be $L=m[3\\dot{x}^{2}+\\dot{x}\\dot{y}+2\\dot{y}^{2}]-mg(3x+y)$. If system starts from rest then $\\dot{x}$ is always equal to", 
+        o: ["$\\frac{11}{3}y$", "$2\\dot{y}$", "$2g\\dot{y}$", "$\\frac{y}{3}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A particle of mass m is thrown upward under gravity. Its position is explicitly dependent on time as $y(t)=a+bt+ct^{2}$ with boundary condition at $y=0$ at $t=0\\ \\&\\ t=t_{0}$. Action between $t=0$ and $t=t_{0}$ is minimum under the condition", 
+        o: ["$b=-g/3$", "$b=-g/5$", "$c=-g/3$", "None of these"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a particle governed by a lagrangian in x-y plane. $L=\\frac{1}{2}m(\\dot{x}^{2}+\\dot{y}^{2})-\\frac{1}{2}k(x^{2}+y^{2})$. This lagrangian is invariant under which of the following change of coordinates to the first order of $\\in$?", 
+        o: ["$x\\rightarrow x+\\in y\\ \\&\\ y\\rightarrow y+\\in x$", "$x\\rightarrow x+\\in\\ \\&\\ y\\rightarrow y-\\epsilon$", "$x\\rightarrow x+\\in y\\ \\&\\ y\\rightarrow y-\\in x$", "None of these"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The Lagrangian of a system is, $L=\\frac{1}{2}m(\\dot{x}^{2}+\\dot{y}^{2})-\\frac{1}{2}k(x^{2}+y^{2})$. The conserved momentum is given by", 
+        o: ["$m(x\\dot{y}+y\\dot{x})$", "$m(\\dot{x}+\\dot{y})$", "$m(x\\dot{y}-y\\dot{x})$", "$m\\dot{x}$ and $m\\dot{y}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The spherical pendulum is a particle of mass m attached to a fixed point by a light inextensible string of length a and moving under uniform gravity Its Lagrangian in polar angles $\\theta, \\phi$ is given by $L=\\frac{1}{2}ma^{2}(\\dot{\\theta}^{2}+\\sin^{2}\\theta\\dot{\\phi}^{2})+mga\\cos\\theta$. If $p_{\\theta}$ and $p_{\\phi}$ are conjugate momenta corresponding to $\\theta$ and $\\phi$ respectively, then Hamiltonian is", 
+        o: ["$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin\\theta})+mga\\cos\\theta$", "$\\frac{1}{ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin^{2}\\theta})-mga\\cos\\theta$", "$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin^{2}\\theta})-mga\\cos\\theta$", "$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin\\theta})-mga\\cos\\theta$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider the following canonical transformation for a system with one degree of freedom: $Q=q\\cos\\alpha-p\\sin\\alpha$, $P=q\\sin\\alpha+p\\cos\\alpha$. Here $\\alpha$ is the angle by which Q and P is rotated in phase space from q and p. The generating function of this transformation is given by", 
+        o: ["$\\frac{Qq}{\\cot\\alpha}-\\frac{1}{2}(q^{2}+Q^{2})\\sin\\alpha$", "$\\frac{Qq}{\\cot\\alpha}+\\frac{1}{2}(q^{2}+Q^{2})\\sin\\alpha$", "$-\\frac{Qq}{\\sin\\alpha}+\\frac{1}{2}(q^{2}+Q^{2})\\cot\\alpha$", "$\\frac{Qq}{\\sin\\alpha}-\\frac{1}{2}(q^{2}+Q^{2})\\cot\\alpha$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider any two continuous functions of the generalised coordinates and momenta $g(q_{k},p_{k})$ and $h(q_{k},p_{k})$. The poisson bracket is defined by $[g,h]=\\sum_{k}(\\frac{\\partial g}{\\partial q_{k}}\\frac{\\partial h}{\\partial p_{k}}-\\frac{\\partial g}{\\partial p_{k}}\\frac{\\partial h}{\\partial q_{k}})$. Which of the following expressions is incorrect? (in the following H is the Hamiltonian)", 
+        o: ["$\\frac{dg}{dt}=[g,H]+\\frac{\\partial g}{\\partial t}$", "$\\dot{q}_{j}=[q_{j},H]$, $\\dot{p}_{j}=-[p_{j},H]$", "$[p_{i},p_{j}]=0$, $[q_{i},q_{j}]=0$", "$[q_{i},p_{j}]=\\delta_{ij}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a one-dimensional system with the Hamiltonian $H=\\frac{1}{2}(\\frac{1}{q^{2}}+p^{2}q^{4})$. The set of canonical transformation (P, Q) that reduces H to the form of a harmonic oscillator, is", 
+        o: ["$Q=\\frac{1}{q}, P=pq^{2}$", "$Q=\\frac{1}{q}, P=-pq^{2}$", "$Q=\\frac{2}{q}, P=pq^{2}$", "$Q=-\\frac{1}{q}, P=-pq^{2}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    }
+];
+
+
+
+
+// LOGIC
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+    function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "Classical Mechanics - Test 2"; // Test ka naam
+            var currentDate = new Date().toLocaleString();
+            
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
+
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
+        }
+    } catch(e) {
+        console.log("Login check error: ", e);
+    }
+    // ==========================================================
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+// ==== DELETED HUA CODE WAPAS AAGAYA ====
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
