@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+// EXACT QUESTIONS COPIED FROM PDF
+// --- QUANTUM MECHANICS TEST 2 QUESTIONS ---
+var qs = [
+    // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
+    { 
+        q: "An electron beam in $|\\downarrow\\rangle$ spin state is sent through a Stern-Gerlach apparatus with magnetic field along the direction $\\theta = 60^{\\circ}, \\phi = 45^{\\circ}$ (Symbols have their usual meanings). The percentage of electrons with their spin parallel to the magnetic field in the Stern Gerlach apparatus, will be equal to", 
+        o: ["25 %", "33.3 %", "50 %", "66.67 %"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The dimensionality of the Hilbert space required to describe the net spin of a system containing a Gluon and an electron is", 
+        o: ["4", "6", "8", "10"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The wave function of a particle is given by $\\psi(\\vec{r}) = (x+iy)f(r)$. Which of the following is correct?", 
+        o: ["$\\psi$ is eigen function of $\\hat{L}_z$ with eigenvalue $+\\hbar$", "$\\psi$ is eigen function of $\\hat{L}_z$ with eigenvalue $-\\hbar$", "$\\psi$ is not an eigenfunction of $\\hat{L}_z$", "Exact form of $f(r)$ is required to decide whether $\\psi(\\vec{r})$ is an eigen function of $\\hat{L}_z$ or not"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle is in the ground state of a potential of the form<br><br>$V(\\vec{r}) = \\begin{cases} 0; & 0 \\le x,y,z \\le L \\\\ \\infty; & otherwise \\end{cases}$<br><br>If the potential suddenly changes to<br><br>$V'(\\vec{r}) = \\begin{cases} 0; & 0 \\le x,y,z \\le 2L \\\\ \\infty; & otherwise \\end{cases}$<br><br>then the probability of finding the particle in the ground state of the new potential is,", 
+        o: ["$2(\\frac{8}{3\\pi})^6$", "$8(\\frac{8}{3\\pi})^6$", "$8(\\frac{4}{3\\pi})^6$", "$2(\\frac{8}{\\pi})^5$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider the state<br><br>$\\Phi(\\vec{r}) = \\frac{2}{3}\\psi_{2,1,0} + \\frac{2}{3}\\psi_{3,1,0} + \\frac{1}{3}\\psi_{2,1,+1}$<br><br>where $\\psi_{n,l,m}$ are eigenstates of the Hydrogen atom. Which of the following operators have a definite value for the given state $\\Phi(\\vec{r})$?", 
+        o: ["Energy, $\\hat{L}^2$ and $\\hat{L}_z$", "Energy and $\\hat{L}^2$", "$\\hat{L}^2$ and $\\hat{L}_z$", "Only $\\hat{L}^2$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a 2-D box of side length \"a\". If 14 spin-1/2 particles of mass 'm' each are placed inside such a box, the ground state energy of the system will be", 
+        o: ["$\\frac{32\\pi^2\\hbar^2}{ma^2}$", "$\\frac{8\\pi^2\\hbar^2}{ma^2}$", "$\\frac{16\\pi^2\\hbar^2}{ma^2}$", "$\\frac{18\\pi^2\\hbar^2}{ma^2}$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a spin $s = \\frac{3}{2}$ particle whose Hamiltonian is given by,<br><br>$\\hat{H} = \\frac{\\alpha}{\\hbar^2}(\\hat{S}_x^2 + \\hat{S}_y^2 - 2\\hat{S}_z^2) - \\frac{\\beta}{\\hbar}\\hat{S}_z \\quad [\\alpha, \\beta > 0]$<br><br>The ground state energy of the system is", 
+        o: ["$-3(\\alpha + \\frac{\\beta}{2})$", "$-3(\\alpha - \\frac{\\beta}{2})$", "$3(\\alpha + \\frac{\\beta}{2})$", "$3(\\alpha - \\frac{\\beta}{2})$"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The state of an electron in a hydrogen atom is given by,<br><br>$\\psi_{210}(r,\\theta,\\phi) = \\frac{1}{4\\sqrt{2\\pi a^3}}\\frac{r}{a}e^{-r/2a}\\cos\\theta$<br><br>The ratio of $\\langle 1/r \\rangle$ to that of $1/\\langle r \\rangle$ for this state is equal to.", 
+        o: ["$4/5$", "$4/3$", "$5/4$", "1"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The radial wavefunction of a Hydrogen atom energy eigenfunction is non-zero at all finite points (apart from origin). If the value of $\\langle \\hat{L}^2 \\rangle$ for the state is equal to $12\\hbar^2$, then its energy is equal to,", 
+        o: ["-3.4 eV", "-1.51 eV", "-0.85 eV", "-0.54 eV"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a two-electron system in a one-dimensional infinite potential well of width \"L\". The total energy of the system is equal to $\\frac{13\\pi^2\\hbar^2}{2mL^2}$ and its total spin is equal to 1. If $\\phi_n(x)$ denotes the n-th eigenstate of the single particle system, then the spatial wavefunction of the composite system is", 
+        o: ["$\\frac{1}{\\sqrt{2}}(\\phi_2(x_1)\\phi_3(x_2) + \\phi_2(x_2)\\phi_3(x_1))$", "$\\frac{1}{\\sqrt{2}}(\\phi_2(x_1)\\phi_3(x_2) - \\phi_2(x_2)\\phi_3(x_1))$", "$\\frac{1}{\\sqrt{2}}(\\phi_1(x_1)\\phi_2(x_2) + \\phi_1(x_2)\\phi_2(x_1))$", "$\\frac{1}{\\sqrt{2}}(\\phi_1(x_1)\\phi_2(x_2) - \\phi_1(x_2)\\phi_2(x_1))$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+
+    // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
+    { 
+        q: "Consider a set of particles which interact by a pair potential $V(r) = Ar^{\\alpha}$ where r is the inter-particle separation and $\\alpha$ is a positive constant. If a system of such particles has reached virial equilibrium, the ratio of the potential energy to the total energy of the system is", 
+        o: ["$\\frac{2}{5}$", "$\\frac{2}{\\alpha+2}$", "$\\frac{\\alpha}{\\alpha+2}$", "$\\frac{3}{5}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A quantum particle of mass m moves in a 2-D anisotropic harmonic oscillator potential of the form $V(x,y) = \\frac{1}{2}m\\omega^2 x^2 + 8m\\omega^2 y^2$. The degeneracy of the tenth excited level is", 
+        o: ["1", "3", "4", "10"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A particle is in the state $Y_2^1$, where $\\{Y_l^m\\}$ are the spherical harmonics. The uncertainty in $\\hat{L}_x$ for the given state will be.", 
+        o: ["$\\frac{5}{2}\\hbar$", "$5\\hbar$", "$\\sqrt{\\frac{5}{2}}\\hbar$", "$\\sqrt{5}\\hbar$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "An electron is in the ground state of a Hydrogen atom. The probability of finding it within a radius $na$ ($a$ is Bohr radius, $n>0$) is equal to.", 
+        o: ["$[1 - (1 + 2n + 2n^2)e^{-2n}]$", "$[1 - (1 + 2n^2 + 2n^3)e^{-2n}]$", "$[1 - (1 + 2n + 2n^2)e^{-n}]$", "$[1 - (1 + 2n^2 + 2n^3)e^{-n}]$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The Hamiltonian of a spin 1/2 system is given by,<br><br>$\\hat{H} = \\mu\\vec{\\sigma}\\cdot\\vec{B}$ ($\\mu$ a positive constant, $\\vec{\\sigma}$ pauli matrices)<br><br>where, $\\vec{B} = B_0(\\frac{\\hat{i}+\\hat{j}}{\\sqrt{2}})$. If a particle starts out at t=0 in the spin-state, $|\\chi\\rangle = \\binom{1}{0}$, its state at time 't' will be given by (where $\\alpha = \\frac{\\mu B_0}{\\hbar}$)", 
+        o: ["$\\binom{\\cos\\alpha t}{\\frac{(1+i)}{\\sqrt{2}}\\sin\\alpha t}$", "$\\binom{\\cos\\alpha t}{i\\sin\\alpha t}$", "$\\binom{\\cos\\alpha t}{\\sin\\alpha t}$", "$\\binom{\\cos\\alpha t}{\\frac{(1-i)}{\\sqrt{2}}\\sin\\alpha t}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A particle of mass m moves in a two dimensional space (x, y) under the influence of a Hamiltonian:<br><br>$\\hat{H} = \\frac{p_x^2}{2m} + \\frac{p_y^2}{2m} + m\\omega^2(x^2 + y^2 - xy)$<br><br>The ground state energy of the particle is", 
+        o: ["$0.866 \\hbar\\omega$", "$1.366 \\hbar\\omega$", "$1.0 \\hbar\\omega$", "$0.5 \\hbar\\omega$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The operator $\\hat{S}_z$ as expressed in the eigenbasis of $\\hat{S}_y$ will be equal to", 
+        o: ["$\\frac{\\hbar}{2}\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$", "$\\frac{\\hbar}{2}\\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix}$", "$\\frac{\\hbar}{2}\\begin{pmatrix} 0 & 1 \\\\ -1 & 0 \\end{pmatrix}$", "$\\frac{\\hbar}{2}\\begin{pmatrix} 0 & i \\\\ -i & 0 \\end{pmatrix}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "An operator for a spin 1/2 particle is given by $\\hat{O} = B[\\frac{1}{2}\\hat{i} + \\frac{\\sqrt{3}}{2}\\hat{j}]\\cdot\\vec{\\sigma}$<br><br>and B is positive constant. The eigenvalues of $\\hat{O}$ are (where $\\vec{\\sigma}$ denotes Pauli Spin matrices)", 
+        o: ["$\\pm\\frac{B}{2}$", "$\\pm\\frac{B}{\\sqrt{2}}$", "$\\pm B$", "$B$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The ground state energy for a particle of mass 'm' sliding frictionlessly around a circular ring of circumference 'L' is", 
+        o: ["$\\frac{\\pi^2\\hbar^2}{2mL^2}$", "$\\frac{2\\pi^2\\hbar^2}{mL^2}$", "$\\frac{\\pi^2\\hbar^2}{mL^2}$", "0"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A system consists of two spin 1/2 particles designated by 1 and 2. The commutator $[S_x^{(1)}S_y^{(2)}, S_y^{(1)}S_y^{(2)}]$ represented in the standard basis for this system will be", 
+        o: ["$\\frac{i\\hbar^3}{4}\\begin{pmatrix} 1 & 0 & 0 & 0 \\\\ 0 & 1 & 0 & 0 \\\\ 0 & 0 & -1 & 0 \\\\ 0 & 0 & 0 & -1 \\end{pmatrix}$", "$\\frac{i\\hbar^3}{4}\\begin{pmatrix} 1 & 0 & 0 & 0 \\\\ 0 & 1 & 0 & 0 \\\\ 0 & 0 & -i & 0 \\\\ 0 & 0 & 0 & i \\end{pmatrix}$", "$-\\frac{i\\hbar^3}{4}\\begin{pmatrix} -1 & 0 & 0 & 0 \\\\ 0 & -1 & 0 & 0 \\\\ 0 & 0 & i & 0 \\\\ 0 & 0 & 0 & -i \\end{pmatrix}$", "None of these"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    }
+];
+
+
+// LOGIC
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
