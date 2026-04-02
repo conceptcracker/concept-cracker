@@ -62,7 +62,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
                 // Agar login nahi hai, toh bahar nikal do
-                alert("Test dene ke liye pehle Login karna zaroori hai!");
+                alert("please login to attempt test");
                 window.location.href = "index.html#login"; // (Agar index.html ek folder piche hai toh "../index.html#login" likhein)
             } else {
                 // Agar login hai, toh page dikha do
