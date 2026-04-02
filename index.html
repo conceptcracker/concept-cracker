@@ -4,88 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Concept Cracker | Yash Kumar Jangid</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
         body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
-        
-        /* Navbar */
         nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
         .logo { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
         .logo span { color: var(--accent); }
         .nav-links a { text-decoration: none; color: #444; font-weight: 500; margin-left: 30px; transition: 0.3s; }
         .nav-links a:hover { color: var(--accent); }
-
-        /* Hero Section */
-        .hero { background: linear-gradient(rgba(0,35,71,0.9), rgba(0,35,71,0.9)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80'); 
-                background-size: cover; background-position: center; color: white; padding: 100px 10%; text-align: center; }
+        
+        .hero { background: linear-gradient(rgba(0,35,71,0.9), rgba(0,35,71,0.9)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; color: white; padding: 100px 10%; text-align: center; }
         .hero h1 { font-size: 50px; margin-bottom: 20px; text-transform: uppercase; }
         .hero p { font-size: 20px; opacity: 0.8; max-width: 700px; margin: 0 auto 30px; }
-
-        /* Dashboard Cards */
         .section-title { text-align: center; margin: 50px 0 30px; font-size: 32px; color: var(--primary); }
         .container { padding: 0 10% 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: var(--white); padding: 40px 20px; border-radius: 20px; text-align: center; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; border-bottom: 5px solid transparent; }
+        
+        .card { background: var(--white); padding: 40px 20px; border-radius: 20px; text-align: center; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-bottom: 5px solid transparent; cursor: pointer; }
         .card:hover { transform: translateY(-10px); border-bottom: 5px solid var(--accent); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
         .card i { font-size: 45px; color: var(--secondary); margin-bottom: 20px; }
         .card h3 { font-size: 22px; margin-bottom: 15px; }
-
-        /* Mentor Section */
+        
         .mentor-sec { background: var(--white); padding: 80px 10%; display: flex; align-items: center; gap: 60px; flex-wrap: wrap; }
         .mentor-img-box { position: relative; }
         .mentor-img { width: 250px; height: 250px; border-radius: 30px; object-fit: cover; box-shadow: 20px 20px 0 var(--secondary); }
         .mentor-info { flex: 1; }
         .mentor-info h2 { font-size: 35px; color: var(--primary); margin-bottom: 10px; }
         .tagline { color: var(--accent); font-weight: bold; font-size: 18px; margin-bottom: 20px; display: block; }
+        
+        footer { background: var(--primary); color: white; padding: 50px 10%; text-align: center; }
+        .social-icons { margin-top: 25px; display: flex; justify-content: center; gap: 25px; }
+        .social-icons a { color: white; font-size: 28px; transition: 0.3s; }
+        .social-icons a:hover { color: var(--accent); transform: translateY(-5px); }
 
-        /* Login Modal */
+        /* AUTH MODAL & TABS CSS */
         #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .auth-box { background: var(--white); padding: 40px; border-radius: 25px; width: 380px; text-align: center; animation: fadeIn 0.3s ease; }
+        .auth-box { background: var(--white); padding: 35px; border-radius: 20px; width: 350px; text-align: center; position: relative; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .auth-box input { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
-        .btn-main { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        
+        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .auth-tab { flex: 1; padding: 12px; cursor: pointer; font-weight: bold; color: #777; transition: 0.3s; }
+        .auth-tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        
+        .auth-box input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-login { background: var(--primary); color: white; }
         .btn-login:hover { background: var(--secondary); }
-        .btn-login:disabled { background: #999; cursor: not-allowed; }
-        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; }
-
-        /* Social Icons - FIXED */
-        .social-icons { margin-top: 25px; display: flex; gap: 25px; }
-        .social-icons a { 
-            color: var(--secondary) !important; 
-            font-size: 32px; 
-            display: inline-block;
-            transition: 0.3s; 
-            text-decoration: none;
-        }
-        .social-icons a:hover { color: var(--accent) !important; transform: translateY(-5px); }
-        
-        /* Footer specific icons */
-        footer .social-icons { justify-content: center; }
-        footer .social-icons a { color: white !important; }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: #888; font-size: 28px; cursor: pointer; }
+        .close-btn:hover { color: #333; }
     </style>
 </head>
 <body>
 
 <div id="auth-modal">
-    <span class="close-btn" onclick="closeAuth()">&times;</span>
-    <div class="auth-box" id="login-container">
-        <h2 style="color:var(--primary)">Student Login</h2>
-        <p>Enter your credentials to access tests</p>
-        <input type="text" id="uid" placeholder="Registration ID (Ex: YASH101)">
-        <input type="password" id="pass" placeholder="Password">
-        <button class="btn-main btn-login" onclick="checkAccess()">Access Tests</button>
-        <p style="margin-top:20px; font-size:14px;">Don't have an ID? <a href="javascript:void(0)" onclick="showSignup()" style="color:var(--secondary); font-weight:bold;">Request Sign-up</a></p>
-    </div>
+    <div class="auth-box">
+        <span class="close-btn" onclick="closeAuth()">&times;</span>
+        <h2 style="color:var(--primary); margin-top:0;">Welcome Back</h2>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchTab('email-login')">Email</div>
+            <div class="auth-tab" onclick="switchTab('phone-login')">Mobile OTP</div>
+        </div>
 
-    <div class="auth-box" id="signup-container" style="display:none">
-        <h2 style="color:var(--accent)">Registration Request</h2>
-        <p>Fill details for account activation</p>
-        <input type="text" id="reg-name" placeholder="Full Name">
-        <input type="text" id="reg-mobile" placeholder="Mobile Number">
-        <input type="password" id="reg-pass" placeholder="Set Password">
-        <button class="btn-main btn-login" style="background:var(--accent)" onclick="submitSignup(this)">Submit Details</button>
-        <button class="btn-main" style="background:#eee; color:#333;" onclick="showLogin()">Back to Login</button>
+        <div id="email-login" class="auth-form active">
+            <input type="email" id="login-email" placeholder="Email Address">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn-main btn-login" onclick="loginEmail()">Login with Email</button>
+            <p style="margin-top:15px; font-size:13px;">Need an account? <a href="javascript:void(0)" onclick="switchTab('signup')" style="color:var(--secondary); font-weight:bold;">Sign Up Here</a></p>
+        </div>
+
+        <div id="phone-login" class="auth-form">
+            <p style="font-size:12px; color:#666; margin-bottom:10px;">Enter mobile number with country code</p>
+            <input type="tel" id="login-phone" placeholder="+91 9876543210" value="+91">
+            <div id="recaptcha-container" style="margin-top:10px;"></div>
+            <button class="btn-main btn-login" id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
+            
+            <div id="otp-section" style="display:none; margin-top:15px;">
+                <input type="text" id="otp-code" placeholder="Enter 6-digit OTP">
+                <button class="btn-main" style="background:var(--accent); color:white;" onclick="verifyOTP()">Verify & Login</button>
+            </div>
+        </div>
+
+        <div id="signup" class="auth-form">
+            <h3 style="color:var(--accent); margin:0 0 15px 0;">Create Account</h3>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="email" id="reg-email" placeholder="Email Address">
+            <input type="password" id="reg-pass" placeholder="Set Password (Min 6 chars)">
+            <button class="btn-main" style="background:var(--accent); color:white;" onclick="registerEmail()">Sign Up</button>
+            <p style="margin-top:15px; font-size:13px;"><a href="javascript:void(0)" onclick="switchTab('email-login')" style="color:#555;">Back to Login</a></p>
+        </div>
     </div>
 </div>
 
@@ -93,7 +107,7 @@
     <div class="logo">CONCEPT <span>CRACKER</span></div>
     <div class="nav-links">
         <a href="#">Home</a>
-        <a href="#dashboard">Tests</a>
+        <a href="subjects.html">Tests</a>
         <a href="#mentor">Mentor</a>
         <a href="#contact">Contact</a>
     </div>
@@ -102,23 +116,21 @@
 <section class="hero">
     <h1>Crack CSIR NET Physics</h1>
     <p>Expert mentorship and high-quality mock tests designed by our team to help you excel in competitive exams.</p>
-    <a href="#dashboard" style="background:var(--accent); color:white; padding:15px 40px; text-decoration:none; border-radius:50px; font-weight:bold;">EXPLORE NOW</a>
+    <a href="subjects.html" style="background:var(--accent); color:white; padding:15px 40px; text-decoration:none; border-radius:50px; font-weight:bold;">EXPLORE NOW</a>
 </section>
 
 <h2 class="section-title" id="dashboard">Learning Dashboard</h2>
 <div class="container">
-    <div class="card" onclick="openAuth()">
+    <div class="card" onclick="window.location.href='subjects.html'">
         <i class="fas fa-vial"></i>
         <h3>CSIR Mock Tests</h3>
         <p>Full length NTA style tests with detailed analysis and marking.</p>
     </div>
-    
     <div class="card" onclick="alert('Notes Section Coming Soon!')">
         <i class="fas fa-book-open"></i>
         <h3>Premium Notes</h3>
         <p>Handwritten and summarized notes for all Mathematical Physics units.</p>
     </div>
-
     <div class="card" onclick="alert('PYQ Database is under maintenance')">
         <i class="fas fa-graduation-cap"></i>
         <h3>Solved PYQs</h3>
@@ -134,11 +146,11 @@
         <span class="tagline">MEET YOUR MENTOR</span>
         <h2>Yash Kumar Jangid</h2>
         <p>Master's in Physics | CSIR NET Aspirant & Mentor</p>
-        <p>Founder of <b>Concept Cracker</b>, dedicated to simplifying complex physics concepts for students across Rajasthan and beyond. Our mission is to provide accessible, high-quality test series for physics.</p>
+        <p>Founder of <b>Concept Cracker</b>, dedicated to simplifying complex physics concepts for students across Rajasthan and beyond.</p>
         <div class="social-icons" style="justify-content: flex-start;">
-            <a href="https://wa.me/6376950332" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://t.me/Yash6376" target="_blank"><i class="fab fa-telegram"></i></a>
-            <a href="https://www.instagram.com/yashjangi.d?igsh=MTYzMHM0YWM3dXdhcg==" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/6376950332"><i class="fab fa-whatsapp"></i></a>
+            <a href="t.me/Yash6376"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.instagram.com/yashjangi.d?igsh=MTYzMHM0YWM3dXdhcg=="><i class="fab fa-instagram"></i></a>
         </div>
     </div>
 </section>
@@ -146,68 +158,103 @@
 <footer id="contact">
     <h3>Concept Cracker by Yash</h3>
     <p>Empowering Physics Aspirants since 2026</p>
-    <div class="social-icons">
-        <a href="https://youtube.com/@yashkumarjangid-x6y5s?si=05qoOhvhDq5UrtBF" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="mailto:support@conceptcracker.com"><i class="fas fa-envelope"></i></a>
-    </div>
     <p style="margin-top:30px; opacity:0.6; font-size:14px;">&copy; 2026 All Rights Reserved.</p>
 </footer>
 
 <script>
+    // --- FIREBASE CONFIGURATION ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      storageBucket: "concepts-creakres.firebasestorage.app",
+      messagingSenderId: "882506019552",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // --- UI MODAL LOGIC ---
     function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
     function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-    function showSignup() { document.getElementById('login-container').style.display = 'none'; document.getElementById('signup-container').style.display = 'block'; }
-    function showLogin() { document.getElementById('signup-container').style.display = 'none'; document.getElementById('login-container').style.display = 'block'; }
-
-    function checkAccess() {
-        const id = document.getElementById('uid').value;
-        const p = document.getElementById('pass').value;
-        if((id === "YASH101" && p === "physics") || (id === "9928051997" && p === "@Yash12345") || (id === "6376950332" && p === "123456")) {
-            window.location.href = "subjects.html";
-        } else {
-            alert("Oops! Invalid ID or your account is pending activation by Yash Sir.");
-        }
+    
+    function switchTab(tabId) {
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        if(event && event.target.classList.contains('auth-tab')) event.target.classList.add('active');
     }
 
-    function submitSignup(btn) {
-        const name = document.getElementById('reg-name').value;
-        const mobile = document.getElementById('reg-mobile').value;
-        const password = document.getElementById('reg-pass').value;
+    // Auto-open modal if hash exists
+    window.onload = function() {
+        if(window.location.hash === '#login') openAuth();
+    };
 
-        if(!name || !mobile || !password) {
-            alert("Bhai, saari details fill karna zaroori hai!");
-            return;
-        }
+    // --- EMAIL AUTHENTICATION ---
+    function loginEmail() {
+        const e = document.getElementById('login-email').value;
+        const p = document.getElementById('login-pass').value;
+        if(!e || !p) { alert("Enter email and password!"); return; }
+        
+        auth.signInWithEmailAndPassword(e, p).then((cred) => {
+            if(cred.user.emailVerified) { window.location.href="subjects.html"; }
+            else { alert("Please verify your email! Check your inbox."); auth.signOut(); }
+        }).catch(err => alert("Invalid Email or Password!"));
+    }
+    
+    function registerEmail() {
+        const n = document.getElementById('reg-name').value;
+        const e = document.getElementById('reg-email').value;
+        const p = document.getElementById('reg-pass').value;
+        if(!n || !e || !p) { alert("Please fill all fields"); return; }
+        
+        auth.createUserWithEmailAndPassword(e, p).then((cred) => {
+            db.collection('students').doc(cred.user.uid).set({ fullName: n, email: e });
+            cred.user.sendEmailVerification().then(() => {
+                alert("Account Created! A verification link has been sent to your email.");
+                auth.signOut();
+                switchTab('email-login');
+            });
+        }).catch(err => alert(err.message));
+    }
 
-        const originalText = btn.innerText;
-        btn.innerText = "Sending Request...";
-        btn.disabled = true;
+    // --- PHONE OTP AUTHENTICATION ---
+    let confirmationResult;
+    function sendOTP() {
+        const phone = document.getElementById('login-phone').value;
+        if(phone.length < 10) { alert("Enter valid phone number with +91"); return; }
+        
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'normal' });
+        
+        auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
+            .then((result) => {
+                confirmationResult = result;
+                document.getElementById('send-otp-btn').style.display = 'none';
+                document.getElementById('otp-section').style.display = 'block';
+                alert("OTP Sent Successfully!");
+            }).catch((err) => {
+                alert("Error: Ensure you are testing on a Live URL (GitHub Pages) and not local storage.");
+                console.error(err);
+            });
+    }
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
-
-        fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name, mobile: mobile, password: password })
-        })
-        .then(() => {
-            alert("Registration Successful! Your request has been received we will contact you soon .");
-            document.getElementById('reg-name').value = '';
-            document.getElementById('reg-mobile').value = '';
-            document.getElementById('reg-pass').value = '';
-            showLogin();
-        })
-        .catch(error => {
-            alert("Oops! Network error.");
-        })
-        .finally(() => {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        });
+    function verifyOTP() {
+        const code = document.getElementById('otp-code').value;
+        if(!code) { alert("Enter OTP!"); return; }
+        
+        confirmationResult.confirm(code).then((result) => {
+            // Check if user exists in database, if not add them
+            db.collection('students').doc(result.user.uid).get().then(doc => {
+                if(!doc.exists) {
+                    db.collection('students').doc(result.user.uid).set({ phone: result.user.phoneNumber, fullName: "New Student" });
+                }
+            });
+            window.location.href = "subjects.html";
+        }).catch((err) => { alert("Invalid OTP!"); });
     }
 </script>
 
 </body>
 </html>
-    
