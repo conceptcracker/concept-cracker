@@ -353,52 +353,6 @@ function sT(d){
     },1000);
 }
 
-
-            
-            // DHYAN DEIN: Test 2 mein isko "Quantum Mechanics - Test 2" kar dena
-            var testTitle = "Quantum Mechanics - Test 1"; 
-            var currentDate = new Date().toLocaleString();
-            var db = firebase.firestore();
-
-            // 1. Firebase (Student Profile) mein save karna
-            db.collection('students').doc(currentUser.uid).collection('marks').add({
-                testName: testTitle,
-                score: finalScore,
-                totalMarks: ms,
-                date: currentDate,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            // 2. Google Sheet par bhejna
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
-            
-            db.collection('students').doc(currentUser.uid).get().then(doc => {
-                var stuName = (doc.exists && doc.data().fullName) ? doc.data().fullName : (currentUser.email || currentUser.phoneNumber);
-                
-                // NAYA JUGAD: Test Name aur Score ek sath jodd diya
-                var resultData = testTitle + " | Score: " + finalScore + "/" + ms; 
-                
-                fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        name: stuName, 
-                        mobile: currentUser.email || currentUser.phoneNumber, 
-                        password: resultData // Ab Password wale column mein result aayega
-                    })
-                }).catch(err => console.log("Google Sheet Error: ", err));
-            });
-            
-    document.getElementById('f-sc').innerText=sc.toFixed(3);
-    document.getElementById('m-sc').innerText=ms;
-    document.getElementById('rc-c').innerText=c;
-    document.getElementById('rc-i').innerText=w;
-    document.getElementById('rc-u').innerText=u;
-    
-    var acc = 0;
-    if(c+w > 0) acc = (c/(c+w)*100);
-    document.getElementById('rc-a').innerText=acc.toFixed(2);
-
 function finalSubmit(force){
     if(!force && !confirm("Are you sure you want to submit the test?")) return;
     clearInterval(tInt);
