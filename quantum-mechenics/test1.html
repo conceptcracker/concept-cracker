@@ -398,27 +398,27 @@ function finalSubmit(force){
                 date: currentDate,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-
             // 2. Google Sheet par bhejna
             var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
             
             db.collection('students').doc(currentUser.uid).get().then(doc => {
                 var stuName = (doc.exists && doc.data().fullName) ? doc.data().fullName : (currentUser.email || currentUser.phoneNumber);
                 
-function finalSubmit(force){
-    if(!force && !confirm("Are you sure you want to submit the test?")) return;
-    clearInterval(tInt);
-    document.getElementById('test').style.display='none';
-    document.getElementById('res').style.display='block';
-    
-    var sc=0, c=0, w=0, u=0, ms=0;
-    for(var i=0; i<qs.length; i++){
-        ms+=qs[i].m;
-        if(uA[i]===null) u++;
-        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
-        else { sc-=qs[i].n; w++; }
-    }
-    
+                // NAYA JUGAD: Test Name aur Score ek sath jodd diya
+                var resultData = testTitle + " | Score: " + finalScore + "/" + ms; 
+                
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: stuName, 
+                        mobile: currentUser.email || currentUser.phoneNumber, 
+                        password: resultData // Ab Password wale column mein result aayega
+                    })
+                }).catch(err => console.log("Google Sheet Error: ", err));
+            });
+            
     document.getElementById('f-sc').innerText=sc.toFixed(3);
     document.getElementById('m-sc').innerText=ms;
     document.getElementById('rc-c').innerText=c;
