@@ -38,12 +38,12 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
-     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+     
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // 1. Aapka Firebase Connection
         const firebaseConfig = {
           apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
           authDomain: "concepts-creakres.firebaseapp.com",
@@ -52,25 +52,22 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         
-        // 2. SABSE PEHLE PAGE HIDE KARO (Taki bina login koi question na dekh sake)
+        // SABSE PEHLE PAGE HIDE KARO (Taki koi cheating na kar sake)
         document.write("<style>body { display: none; }</style>");
         
-        // 3. LOGIN CHECK
+        // TrebEdit/Mobile ke liye Error Fix
         const db = firebase.firestore();
         db.settings({ experimentalForceLongPolling: true });
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                // Agar login nahi hai, toh bahar nikal do
-                alert("please login to attempt test");
-                window.location.href = "index.html#login"; // (Agar index.html ek folder piche hai toh "../index.html#login" likhein)
+                alert("please login to attempt test!");
+                window.location.href = "../index.html#login";
             } else {
-                // Agar login hai, toh page dikha do
                 document.body.style.display = "flex"; 
             }
         });
-    </script>
-
+           </script>
     
     
 </head>
