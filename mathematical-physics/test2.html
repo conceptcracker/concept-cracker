@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Mathematical Physics - Test 2</title>
+<title>CSIR NET Test</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -60,18 +60,23 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
+                // 1. Agar login hi nahi hai
                 alert("Please login to attempt the test!");
                 window.location.href = "../index.html#login";
             } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
                 user.reload().then(() => {
                     if (user.emailVerified === false) {
-                        alert("email not verified.");
+                        alert("Email not verified. Please check your inbox.");
                         window.location.href = "../index.html";
                     } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
                         db.collection('students').doc(user.uid).get().then((doc) => {
                             if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
                                 document.body.style.display = "flex"; 
                             } else {
+                                // Agar Pending hai ya Approved nahi hai
                                 alert("🛑 Access denied, please contact support for assessment test.");
                                 window.location.href = "../index.html"; 
                             }
@@ -150,6 +155,38 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
     </div>
 </div>
 
+<div id="feedback-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:25px; border-radius:12px; width:90%; max-width:450px; text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+        <h2 style="color:#003366; margin-top:0;">Test Completed! 🎉</h2>
+        <p style="color:#555; margin-bottom:20px;">Please share your experience to help us improve.</p>
+        
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>1. Overall Test Experience:</b>
+            <div id="star-exp" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('exp', 1)">★</span><span onclick="setRating('exp', 2)">★</span><span onclick="setRating('exp', 3)">★</span><span onclick="setRating('exp', 4)">★</span><span onclick="setRating('exp', 5)">★</span>
+            </div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>2. Technical Smoothness (Glitches?):</b>
+            <div id="star-tech" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('tech', 1)">★</span><span onclick="setRating('tech', 2)">★</span><span onclick="setRating('tech', 3)">★</span><span onclick="setRating('tech', 4)">★</span><span onclick="setRating('tech', 5)">★</span>
+            </div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>3. Quality of Questions:</b>
+            <div id="star-qual" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('qual', 1)">★</span><span onclick="setRating('qual', 2)">★</span><span onclick="setRating('qual', 3)">★</span><span onclick="setRating('qual', 4)">★</span><span onclick="setRating('qual', 5)">★</span>
+            </div>
+        </div>
+        
+        <textarea id="feedback-comment" rows="3" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:10px; box-sizing:border-box;" placeholder="Any comments on technical issues or test level? (Optional)"></textarea>
+        
+        <button onclick="submitFeedbackAndShowResult()" style="background:#28a745; color:#fff; width:100%; padding:12px; border:none; border-radius:5px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:15px;">Submit & View Results</button>
+        <button onclick="calculateAndShowResults()" style="background:none; border:none; color:#007bff; text-decoration:underline; cursor:pointer; margin-top:10px; font-size:14px;">Skip & View Results</button>
+    </div>
+</div>
 <div id="res">
     <div class="r-box">
         <h2>Test Submitted Successfully!</h2>
@@ -167,8 +204,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 </div>
 
 <script>
-// YAHAN PAR APNE NAYE QUESTIONS DAALNA MAT BHOOLNA
-var qs=[
+  var qs=[
 // PART A - 3 Marks Each
 {
     q: "The value of the integral $\\int_{-\\infty}^{\\infty} \\sin^{2}x \\, \\delta[3(x-\\frac{\\pi}{4})] \\, dx$ is equal to:",
@@ -292,7 +328,7 @@ var qs=[
     o: ["Graph A", "Graph B", "Graph C", "Graph D"],
     a: 0, m: 5, n: 1.25
 }
-];
+]; 
 
 var cQ=0, uA=[], qS=[], tInt;
 for(var i=0;i<qs.length;i++){ uA.push(null); qS.push('n-vis'); }
@@ -355,13 +391,13 @@ function cI(v){cS+=v;document.getElementById('cd').value=cS;}
 function cC(){cS="";document.getElementById('cd').value="";}
 function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;}catch(e){document.getElementById('cd').value="Err";cS="";}}
 
-// YAHAN Galti thi jo maine theek kar di: "function" word missing tha
+// --- NAYA FEEDBACK & RESULT LOGIC ---
+var ratings = { exp: 0, tech: 0, qual: 0 };
+
 function finalSubmit(force){
     if(!force && !confirm("Are you sure you want to final submit the test?")) return;
     clearInterval(tInt);
     document.getElementById('test').style.display='none';
-    
-    // Result dikhane se pehle Feedback Modal dikhao
     document.getElementById('feedback-modal').style.display='flex';
 }
 
@@ -369,8 +405,8 @@ function setRating(category, stars) {
     ratings[category] = stars;
     let starElements = document.getElementById('star-' + category).getElementsByTagName('span');
     for(let i=0; i<5; i++) {
-        if(i < stars) starElements[i].style.color = "#ffc107"; // Gold
-        else starElements[i].style.color = "#ccc"; // Grey
+        if(i < stars) starElements[i].style.color = "#ffc107"; 
+        else starElements[i].style.color = "#ccc"; 
     }
 }
 
@@ -402,7 +438,6 @@ function submitFeedbackAndShowResult() {
         console.log("Firebase Auth error in local testing.");
     }
     
-    document.getElementById('feedback-modal').style.display='none';
     calculateAndShowResults();
 }
 
@@ -433,17 +468,16 @@ function calculateAndShowResults() {
     document.getElementById('rc-a').innerText=acc.toFixed(2);
 
     // ==========================================================
-    // SAFE SCORE SAVING (FIREBASE & GOOGLE SHEET)
+    // SCORE SAVING (FIREBASE & GOOGLE SHEET)
     // ==========================================================
     try {
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            var testTitle = document.title; // Page ka title khud utha lega
+            var testTitle = document.title; 
             var currentDate = new Date().toLocaleString();
             var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
 
-            // Google Sheet Update
             var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
             var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
 
@@ -458,7 +492,6 @@ function calculateAndShowResults() {
                 })
             }).catch(err => console.log("Google Sheet Error: ", err));
 
-            // Firebase Update
             var db = firebase.firestore();
             db.collection('students').doc(currentUser.uid).collection('marks').add({
                 testName: testTitle,
@@ -469,9 +502,8 @@ function calculateAndShowResults() {
             });
         }
     } catch(dbErr) {
-        console.log("Saving Error (TrebEdit me normal hai): ", dbErr);
+        console.log("Saving Error", dbErr);
     }
-    // ==========================================================
 
     // --- SMART PAPER (COLOR CODED) RESULT LOGIC ---
     var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Paper Analysis:</h3>";
