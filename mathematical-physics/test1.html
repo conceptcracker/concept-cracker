@@ -154,9 +154,8 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         </div>
         <h3 style="margin-top:0">Question Palette</h3>
         <div class="pal" id="pal"></div>
-        <button class="b-sub" onclick="subC()">Final Submit Test</button>
-    </div>
-</div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+
 
 <div id="res">
     <div class="r-box">
@@ -246,9 +245,13 @@ function sT(d){
         m=parseInt(t/60,10);s=parseInt(t%60,10);
         m=m<10?"0"+m:m;s=s<10?"0"+s:s;
         document.getElementById('time').innerText=m+":"+s;
-        if(--t<0){clearInterval(tInt);subC(true);}
+        if(--t<0){
+            clearInterval(tInt);
+            finalSubmit(true); // YAHAN CHANGE KIYA HAI
+        }
     },1000);
 }
+
 var cS="";
 function tCal(){var c=document.getElementById('calc');c.style.display=c.style.display==='block'?'none':'block';}
 function cI(v){cS+=v;document.getElementById('cd').value=cS;}
