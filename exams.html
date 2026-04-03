@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Exam - Concepts Creakers</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background: #f4f4f4; 
+            margin: 0; 
+            padding: 40px 20px; 
+            text-align: center; 
+        }
+        h1 { color: #003366; margin-bottom: 40px; font-size: 28px; }
+        
+        .grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 25px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        
+        .card { 
+            background: #fff; 
+            width: 260px; 
+            padding: 40px 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            position: relative; 
+            overflow: hidden; 
+            border: 2px solid transparent; 
+        }
+        
+        .card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15); 
+        }
+        
+        /* Active Card (CSIR NET) */
+        .card.active { border-color: #28a745; }
+        .card.active h2 { color: #28a745; }
+        
+        /* Disabled Cards */
+        .card.disabled { opacity: 0.8; background: #fafafa; }
+        .card.disabled h2 { color: #555; }
+        
+        .card h2 { margin: 0 0 10px 0; font-size: 24px; font-weight: bold; }
+        .card p { color: #666; font-size: 15px; margin: 0; }
+        
+        /* Ribbons / Badges */
+        .badge { 
+            position: absolute; 
+            top: 20px; 
+            right: -35px; 
+            background: #dc3545; 
+            color: white; 
+            padding: 5px 40px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            transform: rotate(45deg); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .badge.live { background: #28a745; }
+    </style>
+</head>
+<body>
+
+    <h1>Select Your Target Examination 🎯</h1>
+
+    <div class="grid">
+        <div class="card active" onclick="window.location.href='subjects.html'">
+            <div class="badge live">LIVE NOW</div>
+            <h2>CSIR NET</h2>
+            <p>Physical Sciences</p>
+        </div>
+
+        <div class="card disabled" onclick="alert('GATE Physics Test Series is launching soon! Stay tuned. 🚀')">
+            <div class="badge">SOON</div>
+            <h2>GATE</h2>
+            <p>Physics (PH)</p>
+        </div>
+
+        <div class="card disabled" onclick="alert('JEST Physics Test Series is launching soon! 🚀')">
+            <div class="badge">SOON</div>
+            <h2>JEST</h2>
+            <p>Physics</p>
+        </div>
+
+        <div class="card disabled" onclick="alert('BARC Scientific Officer Test Series is launching soon! 🚀')">
+            <div class="badge">SOON</div>
+            <h2>BARC</h2>
+            <p>Scientific Officer (Physics)</p>
+        </div>
+        
+        <div class="card disabled" onclick="alert('IIT JAM Physics Test Series is launching soon! 🚀')">
+            <div class="badge">SOON</div>
+            <h2>IIT JAM</h2>
+            <p>Physics</p>
+        </div>
+    </div>
+
+</body>
+</html>
+
