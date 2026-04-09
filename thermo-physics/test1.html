@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Test</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<style>
+/* --- MAIN TEST CSS --- */
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5; overflow-x:auto;}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px; flex-wrap:wrap;}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+
+/* --- 🔥 TCS iON CALCULATOR DRAGGABLE BOX CSS 🔥 --- */
+#tcs-calc-container { display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); z-index:9999; width:400px; background:#f4f4f4; border:2px solid #4b8df8; border-radius:6px; box-shadow:0 15px 40px rgba(0,0,0,0.5); }
+#tcs-drag-handle { background:#4b8df8; color:white; padding:10px; cursor:move; display:flex; justify-content:space-between; align-items:center; font-weight:bold; border-top-left-radius:4px; border-top-right-radius:4px; font-family:sans-serif;}
+.close-calc { cursor:pointer; font-size:18px; padding:0 5px; color:white; }
+</style>
+
+<script>
+    // --- FIREBASE SECURITY & SINGLE DEVICE LOGIN ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    
+    document.write("<style>body { display: none; }</style>");
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            alert("Please login to attempt the test!");
+            window.location.href = "../index.html#login";
+        } else {
+            user.reload().then(() => {
+                if (user.emailVerified === false) {
+                    alert("Email not verified. Please check your inbox.");
+                    window.location.href = "../index.html";
+                } else {
+                    db.collection('students').doc(user.uid).onSnapshot((doc) => {
+                        if (doc.exists) {
+                            let data = doc.data();
+                            let localToken = localStorage.getItem("sessionToken");
+
+                            if (data.sessionToken && data.sessionToken !== localToken) {
+                                firebase.auth().signOut().then(() => {
+                                    alert("🛑 MULTIPLE LOGIN DETECTED!\n\nAapka account kisi aur device par login hua hai.");
+                                    window.location.href = "../index.html#login";
+                                });
+                                return; 
+                            }
+                            if (data.status === "Approved") {
+                                document.body.style.display = "flex"; 
+                            } else {
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Mathematical Physics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li>Original TCS iON Scientific Calculator is available on the right panel.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks, -0.875 Negative.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks, -1.25 Negative.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px; padding: 15px; font-size:16px;" onclick="tcsToggle()">🖩 Scientific Calculator</button>
+        
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="tcs-calc-container">
+    <div id="tcs-drag-handle">
+        <span>Scientific Calculator</span>
+        <span class="close-calc" onclick="tcsToggle()">✖</span>
+    </div>
+    <iframe src="https://www.tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html" style="width:100%; height:330px; border:none; border-bottom-left-radius:4px; border-bottom-right-radius:4px; background:#fff;"></iframe>
+</div>
+
+<div id="feedback-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:25px; border-radius:12px; width:90%; max-width:450px; text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+        <h2 style="color:#003366; margin-top:0;">Test Completed! 🎉</h2>
+        <p style="color:#555; margin-bottom:20px;">Please share your experience to help us improve.</p>
+        
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>1. Overall Test Experience:</b>
+            <div id="star-exp" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('exp', 1)">★</span><span onclick="setRating('exp', 2)">★</span><span onclick="setRating('exp', 3)">★</span><span onclick="setRating('exp', 4)">★</span><span onclick="setRating('exp', 5)">★</span>
+            </div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>2. Technical Smoothness (Glitches?):</b>
+            <div id="star-tech" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('tech', 1)">★</span><span onclick="setRating('tech', 2)">★</span><span onclick="setRating('tech', 3)">★</span><span onclick="setRating('tech', 4)">★</span><span onclick="setRating('tech', 5)">★</span>
+            </div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>3. Quality of Questions:</b>
+            <div id="star-qual" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('qual', 1)">★</span><span onclick="setRating('qual', 2)">★</span><span onclick="setRating('qual', 3)">★</span><span onclick="setRating('qual', 4)">★</span><span onclick="setRating('qual', 5)">★</span>
+            </div>
+        </div>
+        
+        <textarea id="feedback-comment" rows="3" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:10px; box-sizing:border-box;" placeholder="Any comments? (Optional)"></textarea>
+        
+        <button onclick="submitFeedbackAndShowResult()" style="background:#28a745; color:#fff; width:100%; padding:12px; border:none; border-radius:5px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:15px;">Submit & View Results</button>
+        <button onclick="calculateAndShowResults()" style="background:none; border:none; color:#007bff; text-decoration:underline; cursor:pointer; margin-top:10px; font-size:14px;">Skip & View Results</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+// ==================================================
+// --- ALL 20 QUESTIONS (MATHEMATICAL PHYSICS) ---
+// ==================================================
+var qs = [
+    {
+        q: "From the definition $A=U-TS$, which Maxwell's relation is derived?",
+        img: "",
+        o: ["$(\\frac{\\partial T}{\\partial V})_{S}=-(\\frac{\\partial P}{\\partial S})_{V}$", "$(\\frac{\\partial S}{\\partial V})_{T}=(\\frac{\\partial P}{\\partial T})_{V}$", "$(\\frac{\\partial T}{\\partial P})_{T}=(\\frac{\\partial V}{\\partial S})_{P}$", "$(\\frac{\\partial S}{\\partial P})_{T}=-(\\frac{\\partial V}{\\partial T})_{P}$"],
+        a: 1, m: 3, n: 0.875
+    },
+    {
+        q: "A diatomic ideal gas is expanded adiabatically from an initial volume V and initial pressure P to a final volume 4V and a final presssure P/3. The work done by the gas is:",
+        img: "",
+        o: ["$\\frac{5}{7}PV$", "$\\frac{5}{6}PV$", "$\\frac{3}{4}PV$", "$\\frac{6}{5}PV$"],
+        a: 1, m: 3, n: 0.875
+    },
+    {
+        q: "Two identical bodies have internal energy $U=NCT$ with a constant C. The values of N and C are same for each body. The initial temperatures of the bodies are $T_{1}$ and $T_{2} (T_{1} > T_{2})$ and they are used as a source sink of work by connecting them to a Carnot heat engine and bringing them to a common final temperature $T_{f}$. The work delivered is",
+        img: "",
+        o: ["$W=NC(T_{1}+T_{2})^{2}$", "$W=NC(T_{1}-T_{2})^{2}$", "$W=NC(\\sqrt{T_{1}}-\\sqrt{T_{2}})^{2}$", "$0$"],
+        a: 2, m: 3, n: 0.875
+    },
+    {
+        q: "A 3D cavity of volume V filled with radiation is in thermal equilibrium at temperature T. If the number of photons inside the cavity is doubled without changing volume of cavity, then",
+        img: "",
+        o: ["Helmholtz free energy would be doubled", "Gibb's free energy would be doubled", "specific heat at constant volume becomes halved", "Helmholtz free energy remains unchanged"],
+        a: 0, m: 3, n: 0.875
+    },
+    {
+        q: "The vander Waals' equation for 1 mole of a gas is $(P+\\frac{a}{V^{2}})(V-b)=RT$, where a, b are constants. If U is the internal energy of n moles of this gas, then $(\\frac{\\partial U}{\\partial V})_{T}$ is",
+        img: "",
+        o: ["$0$", "$\\frac{a}{(\\frac{V}{n-b})^{2}}$", "$\\frac{a}{(nV)^{2}}$", "$\\frac{a}{(V/n)^{2}}$"],
+        a: 3, m: 3, n: 0.875
+    },
+    {
+        q: "What is the efficiency for a reversible engine operating around the indicated cycle, where T is temperature in K and S is the entropy in joules/K?",
+        img: "", // Add the T-S graph image link here
+        o: ["5 %", "70 %", "14.3 %", "24 %"],
+        a: 2, m: 3, n: 0.875
+    },
+    {
+        q: "A steam turbine is operated with an intake temperature of $400^{\\circ}C$ and an exhaust temperature of $150^{\\circ}C$. Which of the following value of work the turbine may perform for a given heat input Q?",
+        img: "",
+        o: ["0.80 Q", "0.60 Q", "0.40 Q", "0.20 Q"],
+        a: 3, m: 3, n: 0.875
+    },
+    {
+        q: "Ten gram of water at $30^{\\circ}C$ is poured gently into a lake at $40^{\\circ}C$. The change in entropy of the universe (in cal/K) is [Use $\\ln(313/303) = 0.0325$]",
+        img: "",
+        o: ["0.006", "0.032", "0.325", "0.319"],
+        a: 0, m: 3, n: 0.875
+    },
+    {
+        q: "The molar specific heat at constant volume of a gas of non-linear triatomic molecules at high temperatures such that all modes of motion are active is",
+        img: "",
+        o: ["$6 R$", "$\\frac{9}{2} R$", "$4 R$", "$\\frac{7}{2} R$"],
+        a: 0, m: 3, n: 0.875
+    },
+    {
+        q: "An ideal gas expands adiabatically and reversibly to twice its volume such that its pressure reduces to one-third of its initial value. The adiabatic index is (approximately) equals to",
+        img: "",
+        o: ["1.2", "1.6", "2.0", "1.0"],
+        a: 1, m: 3, n: 0.875
+    },
+    {
+        q: "One mole of a hypothetical gas follows the equation of state $P(V - b) = RT \\exp (-a/RTV)$ where both a and b are constants and other symbols have their standard meanings. The critical temperature of the gas is",
+        img: "",
+        o: ["$\\frac{a^{2}}{4Rb}$", "$\\frac{a}{4Rb}$", "$\\frac{a^{2}}{4Rb^{2}}$", "$\\frac{a}{4Rb^{2}}$"],
+        a: 1, m: 5, n: 1.25
+    },
+    {
+        q: "The temperature of a thermodynamical system with entropy is given by $S=b(N^{2}U^{2}V)^{1/3}$",
+        img: "",
+        o: ["$\\frac{3}{2b}(\\frac{U}{N^{2}V^{2}})^{1/3}$", "$\\frac{3}{2b}(\\frac{U}{N^{2}V^{2}})^{2/3}$", "$\\frac{3}{2}(\\frac{S^{2}}{b^{2}N^{2}V})^{1/3}$", "$\\frac{3}{2}(\\frac{S}{b^{3}N^{2}V})^{1/2}$"],
+        a: 3, m: 5, n: 1.25
+    },
+    {
+        q: "One mole of an ideal monatomic gas is taken round the cyclic process ABCA as shown in figure. The maximum temperature attained by the gas during the cycle is",
+        img: "", // Add P-V graph image link here
+        o: ["$\\frac{25P_{0}V_{0}}{8R}$", "$\\frac{P_{0}V_{0}}{2R}$", "$\\frac{17P_{0}V_{0}}{8R}$", "$\\frac{9P_{0}V_{0}}{2R}$"],
+        a: 0, m: 5, n: 1.25
+    },
+    {
+        q: "A mixture of two ideal gases X and Y has $n_{x}$ and $n_{y}$ in the ratio 3: 1, where n is the number of moles. The adiabatic constants of the gases are $\\frac{7}{5}$ and $\\frac{5}{3}$ respectively. The adiabatic constant of the mixture is",
+        img: "",
+        o: ["3", "$\\frac{5}{2}$", "$\\frac{13}{9}$", "$\\frac{7}{5}$"],
+        a: 2, m: 5, n: 1.25
+    },
+    {
+        q: "A classical monoatomic ideal gas is subjected to potential that corresponds to a force proportional to the fourth power of position (r). The specific heat per particle of the gas is",
+        img: "",
+        o: ["$0.6 k_{B}$", "$2.1 k_{B}$", "$1.5 k_{B}$", "$2 k_{B}$"],
+        a: 1, m: 5, n: 1.25
+    },
+    {
+        q: "The entropy of a mole of an ideal gas is given by $S=R[\\alpha+1.5 \\ln V+4.5 \\ln U]$. What is the amount of energy required to raise the temperature of gas from $20^{\\circ}C$ to $21^{\\circ}C$?",
+        img: "",
+        o: ["$12.47 \\, J \\, mol^{-1}$", "$20.24 \\, J \\, mol^{-1}$", "$37.41 \\, J \\, mol^{-1}$", "$52.32 \\, J \\, mol^{-1}$"],
+        a: 2, m: 5, n: 1.25
+    },
+    {
+        q: "A gas of molecules, each having mass m, is in thermal equilibrium at a temperature T. If $v_x, v_y$ and $v_z$ denote the Cartesian components of velocity of a molecule, the mean value of $v_x^2 v_y^2 v_z^2$ is proportional to",
+        img: "",
+        o: ["$T^{3}$", "$T^{4}$", "$T^{5}$", "$T^{6}$"],
+        a: 2, m: 5, n: 1.25
+    },
+    {
+        q: "One mole of helium and one mole of oxygen contained in two vessels of same volume have same entropy. If temperature of He is 300 K, what is the temperature of oxygen",
+        img: "",
+        o: ["300K", "100K", "37.5K", "75K"],
+        a: 2, m: 5, n: 1.25
+    },
+    {
+        q: "Which of the following thermodynamics relation is correct?",
+        img: "",
+        o: ["$\\mu=(\\frac{\\partial U}{\\partial S})_{V,N}$ and $\\mu=(\\frac{\\partial U}{\\partial N})_{V,S}$", "$\\mu=(\\frac{\\partial U}{\\partial V})_{S,V}$ and $P=-(\\frac{\\partial U}{\\partial V})_{S,N}$", "$P=-(\\frac{\\partial U}{\\partial V})_{S,N}$ and $T=-(\\frac{\\partial U}{\\partial S})_{V,N}$", "$T=-(\\frac{\\partial U}{\\partial V})_{S,N}$ and $P=(\\frac{\\partial V}{\\partial S})_{V,N}$"],
+        a: 1, m: 5, n: 1.25
+    },
+    {
+        q: "What will be the entropy S(V) of the system which has equation of state given by $V=(\\frac{aT}{P})^{2/3}$, where 'a' is some constant.",
+        img: "",
+        o: ["$2aV^{2}$", "$\\frac{1}{2}aV^{1/2}$", "$-\\frac{1}{2}aV^{2}$", "$-2aV^{-1/2}$"],
+        a: 3, m: 5, n: 1.25
+    },
+    
+        
+];
+
+var cQ=0, uA=[], qS=[], tInt;
+for(var i=0;i<qs.length;i++){ uA.push(null); qS.push('n-vis'); }
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0;i<qs.length;i++){
+        var b=document.createElement('div');
+        b.className='bub'; b.id='b-'+i; b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    if(qs.length > 0) lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600); // 60 mins
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    document.getElementById('qi').innerHTML=q.img?'<img src="'+q.img+'" class="q-img">':"";
+    var oH='';
+    for(var j=0;j<q.o.length;j++){
+        var ch=uA[cQ]===j?'checked':'';
+        oH+='<li><label><input type="radio" name="o" value="'+j+'" '+ch+'> '+q.o[j]+'</label></li>';
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    try {
+        if(window.MathJax && MathJax.typeset) { MathJax.typesetClear(); MathJax.typeset(); }
+    } catch(e) { console.log("MathJax error"); }
+}
+
+function gO(){var o=document.getElementsByName('o');for(var i=0;i<o.length;i++)if(o[i].checked)return parseInt(o[i].value);return null;}
+function uS(i,s){qS[i]=s;var b=document.getElementById('b-'+i);if(b)b.className='bub '+s;}
+function sav(){var s=gO();if(s!==null){uA[cQ]=s;uS(cQ,'ans');}else uS(cQ,'n-ans');if(cQ<qs.length-1)lQ(cQ+1);}
+function clr(){uA[cQ]=null;var o=document.getElementsByName('o');for(var i=0;i<o.length;i++)o[i].checked=false;uS(cQ,'n-ans');}
+function rev(){uA[cQ]=gO();uS(cQ,'rev');if(cQ<qs.length-1)lQ(cQ+1);}
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10);s=parseInt(t%60,10);
+        m=m<10?"0"+m:m;s=s<10?"0"+s:s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); finalSubmit(true); }
+    },1000);
+}
+
+// ==================================================
+// 🔥 ORIGINAL TCS iON CALCULATOR DRAG LOGIC 🔥
+// ==================================================
+var calcContainer = document.getElementById("tcs-calc-container");
+var dragHandle = document.getElementById("tcs-drag-handle");
+var isDragging = false, offsetX, offsetY;
+
+function tcsToggle() { 
+    if(calcContainer.style.display === 'block') { 
+        calcContainer.style.display = 'none'; 
+    } else { 
+        calcContainer.style.display = 'block'; 
+        calcContainer.style.top = '20%'; 
+        calcContainer.style.left = '50%';
+        calcContainer.style.transform = 'translateX(-50%)';
+    } 
+}
+
+// Mouse Events
+dragHandle.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    calcContainer.style.transform = 'none';
+    offsetX = e.clientX - calcContainer.getBoundingClientRect().left;
+    offsetY = e.clientY - calcContainer.getBoundingClientRect().top;
+});
+document.addEventListener('mousemove', function(e) {
+    if (isDragging) { 
+        calcContainer.style.left = (e.clientX - offsetX) + 'px'; 
+        calcContainer.style.top = (e.clientY - offsetY) + 'px'; 
+    }
+});
+document.addEventListener('mouseup', function() { isDragging = false; });
+
+// Touch Events
+dragHandle.addEventListener('touchstart', function(e) {
+    isDragging = true;
+    calcContainer.style.transform = 'none';
+    var touch = e.touches[0];
+    offsetX = touch.clientX - calcContainer.getBoundingClientRect().left;
+    offsetY = touch.clientY - calcContainer.getBoundingClientRect().top;
+});
+document.addEventListener('touchmove', function(e) {
+    if (isDragging) {
+        var touch = e.touches[0];
+        calcContainer.style.left = (touch.clientX - offsetX) + 'px';
+        calcContainer.style.top = (touch.clientY - offsetY) + 'px';
+    }
+});
+document.addEventListener('touchend', function() { isDragging = false; });
+
+// ==================================================
+// --- ADVANCED FEEDBACK & RESULT LOGIC ---
+// ==================================================
+var ratings = { exp: 0, tech: 0, qual: 0 };
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to final submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('tcs-calc-container').style.display='none'; // Calc band karo
+    document.getElementById('feedback-modal').style.display='flex';
+}
+function setRating(category, stars) {
+    ratings[category] = stars;
+    let starElements = document.getElementById('star-' + category).getElementsByTagName('span');
+    for(let i=0; i<5; i++) { if(i < stars) starElements[i].style.color = "#ffc107"; else starElements[i].style.color = "#ccc"; }
+}
+function submitFeedbackAndShowResult() {
+    if(ratings.exp === 0 || ratings.tech === 0 || ratings.qual === 0) { alert("Please provide star ratings!"); return; }
+    var comment = document.getElementById('feedback-comment').value;
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            db.collection('feedbacks').add({ 
+                email: currentUser.email || currentUser.phoneNumber || "Unknown", 
+                testName: document.title, experienceRating: ratings.exp, technicalRating: ratings.tech, 
+                qualityRating: ratings.qual, comment: comment, date: new Date().toLocaleString() 
+            });
+        }
+    } catch(e) {}
+    calculateAndShowResults();
+}
+
+function calculateAndShowResults() {
+    document.getElementById('feedback-modal').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms += qs[i].m;
+        if(uA[i] === null) { u++; } else if(uA[i] === qs[i].a) { sc += qs[i].m; c++; } else { sc -= qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = document.title; 
+            var currentDate = new Date().toLocaleString();
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+            fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData }) });
+            
+            db.collection('students').doc(currentUser.uid).collection('marks').add({ 
+                testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+        }
+    } catch(dbErr) {}
+
+    // SMART PAPER (COLOR CODED)
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Paper Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var qImgStr = (qs[j].img && qs[j].img !== "") ? "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>" : "";
+        var optionsHtml = "<ul style='list-style:none; padding:0;'>";
+        for(var k=0; k<qs[j].o.length; k++) {
+            var optBg = "#fff", optColor = "#333", optBorder = "1px solid #ccc", icon = "";
+            if (uA[j] === k) { 
+                if (uA[j] === qs[j].a) { optBg = "#28a745"; optColor = "#fff"; optBorder = "1px solid #28a745"; icon = " ✔️"; } 
+                else { optBg = "#dc3545"; optColor = "#fff"; optBorder = "1px solid #dc3545"; icon = " ❌"; }
+            } 
+            optionsHtml += "<li style='padding:12px; margin-bottom:10px; border-radius:6px; background:"+optBg+"; color:"+optColor+"; border:"+optBorder+"; font-size:16px; overflow-x:auto;'>" + qs[j].o[k] + icon + "</li>";
+        }
+        optionsHtml += "</ul>";
+        var cA = qs[j].o[qs[j].a];
+        var answerText = "<div style='margin-top:15px; padding:15px; background:#e8f4f8; border-left:4px solid #0056b3; border-radius:4px; overflow-x:auto;'><span style='color:#0056b3; font-size:16px;'><b>✅ Correct Answer:</b> " + cA + "</span></div>";
+        detHtml += "<div style='padding:25px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px; margin-bottom:25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);'><div style='font-size:18px; margin-bottom:20px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.6;'>"+qs[j].q+qImgStr+"</div></div>" + optionsHtml + answerText + "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML = detHtml;
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    if(window.Chart) { new Chart(document.getElementById('rc').getContext('2d'),{ type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]} }); }
+}
+
+window.onload = iT; 
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+
+</script>
+</body>
+</html>
