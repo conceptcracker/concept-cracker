@@ -1,0 +1,569 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+ 
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+    // ==================================================
+// 🔥 DEMON LEVEL QUANTUM MECHANICS TEST (TIFR / JEST / CSIR NET) 🔥
+// ==================================================
+
+var qs = [
+
+// --- PART B (10 NAT Questions | 3 Marks each | 0 Negative) ---
+{
+    type: 'nat',
+    q: "A particle is confined in a 3-Dimensional cubical box of side $L$. The energy of a particular state is measured to be $E = 14 \\frac{\\pi^2 \\hbar^2}{2mL^2}$. What is the exact degeneracy of this energy level?",
+    img: "",
+    a: 6, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "A quantum system with total angular momentum $j=2$ is prepared in the state $|j=2, m=1\\rangle$. If a measurement of $J_x^2$ is made, what is the expectation value $\\langle J_x^2 \\rangle$ in units of $\\hbar^2$?",
+    img: "",
+    a: 2.5, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "For low-energy s-wave scattering by a hard sphere of radius $R$, the phase shift is $\\delta_0 = -kR$. What is the ratio of the total quantum scattering cross-section $\\sigma$ to the classical geometrical cross-section ($\\pi R^2$)?",
+    img: "",
+    a: 4, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "Three identical, non-interacting spin-3/2 fermions are placed in a 1-Dimensional harmonic oscillator potential of frequency $\\omega$. What is the absolute ground state energy of this many-body system in units of $\\hbar\\omega$?",
+    img: "",
+    a: 1.5, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "For a 1-D harmonic oscillator in its ground state $|0\\rangle$, the expectation value $\\langle 0 | \\hat{x}^6 | 0 \\rangle$ evaluates to $c \\left(\\frac{\\hbar}{2m\\omega}\\right)^3$. Find the exact integer value of $c$.",
+    img: "",
+    a: 15, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "Evaluate the double commutator $[L_x, [L_x, L_y]]$ for orbital angular momentum. If the result is written as $c \\, \\hbar^2 L_y$, what is the value of the constant $c$?",
+    img: "",
+    a: 1, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "What is the expectation value of the square of the radial distance $\\langle r^2 \\rangle$ for an electron in the exact ground state ($n=1, l=0$) of a Hydrogen atom, expressed in units of $a_0^2$ (square of Bohr radius)?",
+    img: "",
+    a: 3, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "According to the WKB approximation, the total number of bound states $N(E)$ up to energy $E$ for a 1-D potential $V(x) = \\alpha |x|$ scales as $N(E) \\propto E^p$. Find the exact numerical value of $p$.",
+    img: "",
+    a: 1.5, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "According to the Virial Theorem, for a particle moving in a 1-D potential $V(x) = k x^6$, the ratio of the expectation value of kinetic energy to potential energy $\\langle T \\rangle / \\langle V \\rangle$ is equal to:",
+    img: "",
+    a: 3, m: 3, n: 0
+},
+{
+    type: 'nat',
+    q: "A particle is in the ground state of a 1-D infinite square well extending from $x=0$ to $x=L$. A constant weak perturbation $H' = V_0$ is applied ONLY in the right half of the well ($L/2 < x < L$). Find the first-order energy shift in units of $V_0$.",
+    img: "",
+    a: 0.5, m: 3, n: 0
+},
+
+// --- PART C (10 MCQ Questions | 5 Marks each | -1.5 Negative) ---
+{
+    type: 'mcq',
+    q: "In the relativistic Dirac equation formulation for an electron, the velocity operator $\\vec{v}$ is given by:",
+    img: "",
+    o: ["$\\frac{\\vec{p}}{m}$", "$c \\vec{\\alpha}$", "$c \\vec{\\gamma}$", "$\\frac{c^2 \\vec{p}}{E}$"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "A 1-D harmonic oscillator is initially in its ground state $|0\\rangle$. A time-dependent perturbation $V(x,t) = V_0 \\hat{x}^2 e^{-\\Gamma t} \\cos(\\omega t)$ is applied. According to first-order time-dependent perturbation theory, transitions are strictly allowed ONLY to the state:",
+    img: "",
+    o: ["$|1\\rangle$", "$|2\\rangle$", "All even $n$ states", "All odd $n$ states"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "Two identical spin-1/2 electrons interact via a spatial delta-function potential $V = V_0 \\delta(\\vec{r}_1 - \\vec{r}_2)$. Which composite spin state will experience a non-zero, non-vanishing interaction energy shift due to this perturbation?",
+    img: "",
+    o: ["The Triplet states only", "The Singlet state only", "Both Singlet and Triplet states", "Neither state (Shift is exactly zero)"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "A particle with intrinsic spin $S=1$ and orbital angular momentum $L=2$ is prepared. The total number of accessible basis states in the tensor product space, and the maximum possible value of the operator $\\hat{J}^2$ are respectively:",
+    img: "",
+    o: ["$15$ states, and $12\\hbar^2$", "$15$ states, and $3\\hbar^2$", "$9$ states, and $12\\hbar^2$", "$9$ states, and $6\\hbar^2$"],
+    a: 0, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "For a 'Squeezed Vacuum State' of a quantum electromagnetic field, the variances in the quadrature operators (analogous to position $\\Delta x^2$ and momentum $\\Delta p^2$) satisfy which of the following conditions?",
+    img: "",
+    o: ["Both are strictly smaller than the standard zero-point fluctuation ($\\hbar/2m\\omega$).", "Both are larger than the zero-point fluctuation.", "One is smaller and the other is larger than the zero-point fluctuation.", "Their product strictly violates the Heisenberg Uncertainty Principle."],
+    a: 2, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "In Feynman's Path Integral formulation of Quantum Mechanics, the free-particle propagator $K(x, t; x_0, 0)$ is mathematically proportional to:",
+    img: "",
+    o: ["$\\exp\\left(\\frac{i\\hbar(x-x_0)^2}{2mt}\\right)$", "$\\exp\\left(\\frac{im(x-x_0)^2}{2\\hbar t}\\right)$", "$\\exp\\left(-\\frac{m(x-x_0)^2}{2\\hbar t}\\right)$", "$\\exp\\left(\\frac{im x x_0}{\\hbar t}\\right)$"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "In a 3-D quantum scattering experiment, if the total scattering cross-section is measured to be exactly $\\sigma = \\frac{4\\pi}{k^2}$, what is the value of the phase shift $\\delta_0$ for the s-wave partial wave?",
+    img: "",
+    o: ["$\\pi/4$", "$\\pi/2$", "$\\pi$", "$2\\pi$"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "A spin-1/2 ensemble is initially in a completely unpolarized, maximally mixed state. It is then passed through an $S_z$ Stern-Gerlach apparatus, and only the upper beam ($S_z = +\\hbar/2$) is retained. The new density matrix $\\rho'$ of the filtered beam is:",
+    img: "",
+    o: ["$\\frac{1}{2} \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$", "$\\begin{pmatrix} 1/2 & 0 \\\\ 0 & 0 \\end{pmatrix}$", "$\\begin{pmatrix} 1 & 0 \\\\ 0 & 0 \\end{pmatrix}$", "$\\begin{pmatrix} 0 & 0 \\\\ 0 & 1 \\end{pmatrix}$"],
+    a: 2, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "When a single unstable particle of intrinsic spin $S=1$ decays exclusively into two identical spin-1/2 particles, the combined spin state of the two resulting particles must be:",
+    img: "",
+    o: ["An antisymmetric Singlet state", "A symmetric Triplet state", "A maximally entangled Bell state with $S_{total}=0$", "A completely antisymmetric spatial and spin state"],
+    a: 1, m: 5, n: 1.5
+},
+{
+    type: 'mcq',
+    q: "The ground state ($n=1$) of the Hydrogen atom is subjected to a uniform external static electric field $\\vec{E}$ (Stark Effect). The lowest non-vanishing, non-zero correction to its energy is of the order of:",
+    img: "",
+    o: ["$\\mathcal{O}(E)$ (Linear Stark Effect)", "$\\mathcal{O}(E^2)$ (Quadratic Stark Effect)", "$\\mathcal{O}(E^3)$", "Exact zero at all orders of perturbation"],
+    a: 1, m: 5, n: 1.5
+}
+];
+
+// ==================================================
+// 🔥 UPDATED LOGIC (WITH NAT + MCQ SUPPORT) 🔥
+// ==================================================
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600); // 60 minutes
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    // --- NAT vs MCQ RENDER LOGIC ---
+    if(q.type === 'nat') {
+        var prevAns = (uA[cQ] !== null) ? uA[cQ] : "";
+        document.getElementById('ol').innerHTML = '<div style="margin-top:20px; padding-left:10px;"><input type="number" step="any" id="nat-val" placeholder="Enter your numerical answer here..." value="'+prevAns+'" style="padding:12px; font-size:16px; width:100%; max-width:350px; border:2px solid #003366; border-radius:6px; outline:none; font-weight:bold;"></div>';
+    } else {
+        var oH='';
+        for(var j=0; j<q.o.length; j++){
+            var ch = (uA[cQ]===j) ? 'checked' : '';
+            oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+        }
+        document.getElementById('ol').innerHTML=oH;
+    }
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    if(qs[cQ].type === 'nat') {
+        var v = document.getElementById('nat-val').value;
+        return v === "" ? null : parseFloat(v);
+    } else {
+        var ops=document.getElementsByName('opt');
+        for(var i=0; i<ops.length; i++) {
+            if(ops[i].checked) return parseInt(ops[i].value);
+        }
+        return null;
+    }
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    if(qs[cQ].type === 'nat') {
+        document.getElementById('nat-val').value = "";
+    } else {
+        var ops=document.getElementsByName('opt');
+        for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    }
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) {
+            u++;
+        } else {
+            // NAT aur MCQ ki Checking
+            var isCorrect = false;
+            if(qs[i].type === 'nat') {
+                // Allows a slight decimal tolerance (0.05) for numerical answers
+                if(Math.abs(uA[i] - qs[i].a) <= 0.05) isCorrect = true;
+            } else {
+                if(uA[i] === qs[i].a) isCorrect = true;
+            }
+            
+            if(isCorrect) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // USER'S ORIGINAL CODE: SAVE SCORE TO GOOGLE SHEETS & FIREBASE
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "Quantum Mechanics - NAT Pattern Test"; 
+            var currentDate = new Date().toLocaleString();
+            
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
+
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
+        }
+    } catch(e) {
+        console.log("Login check error: ", e);
+    }
+    // ==========================================================
+
+    // DETAILED REPORT GENERATION
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var isNat = qs[j].type === 'nat';
+        var isCorrect = false;
+        if(uA[j] !== null) {
+            isCorrect = isNat ? (Math.abs(uA[j] - qs[j].a) <= 0.05) : (uA[j] === qs[j].a);
+        }
+        
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
+        var yA = (uA[j]===null) ? "None" : (isNat ? uA[j] : qs[j].o[uA[j]]);
+        var cA = isNat ? qs[j].a : qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+// ==== USER'S ORIGINAL BASIC CALCULATOR ====
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+
+</body>
+</html>
+
