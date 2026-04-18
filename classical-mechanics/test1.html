@@ -38,6 +38,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
+       <script src="../calculator.js"></script>
        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -132,18 +133,8 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         </div>
     </div>
     <div class="right">
-        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
-        <div id="calc">
-            <input type="text" id="cd" disabled>
-            <div class="c-grid">
-                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
-                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
-                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
-                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
-                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
-                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
-            </div>
-        </div>
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tcsToggle()">Scientific Calculator</button>
+        
         <h3 style="margin-top:0">Question Palette</h3>
         <div class="pal" id="pal"></div>
         <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
@@ -486,12 +477,6 @@ function sT(d){
     }
 }
 
-// ==== DELETED HUA CODE WAPAS AAGAYA ====
-var cExp="";
-function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
-function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
-function cC(){ cExp=""; document.getElementById('cd').value=""; }
-function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
 
 window.onload=iT;
 window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
