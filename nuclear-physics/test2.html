@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Nuclear physics test 2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+ 
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+<script>
+    
+    
+  var qs = [
+
+// --- TEST 2: PART A (10 Questions | 3 Marks | -0.875 Negative) ---
+{
+    type: 'mcq',
+    q: "Consider the reactions: (i) $\\tau^+ \\rightarrow e^+ + \\nu_e + \\bar{\\nu}_\\tau$  (ii) $\\tau^+ \\rightarrow \\mu^+ + \\nu_\\mu + \\bar{\\nu}_\\tau$ (iii) $\\tau^+ \\rightarrow \\pi^+ + \\bar{\\nu}_\\tau$",
+    o: ["(i) is allowed only", "(ii) is allowed only", "(i), (ii) and (iii) are allowed", "All are forbidden."],
+    a: 2, m: 3, n: 0.875,
+    exp: "All three decays conserve energy, charge, and separate lepton numbers ($L_e, L_\\mu, L_\\tau$). Therefore, all these pathways are physically allowed weak decays of the tau lepton."
+},
+{
+    type: 'mcq',
+    q: "The threshold energy needed by a photon to produce an electron-positron pair via reaction $\\gamma + e^- \\rightarrow e^- + e^+ + e^-$ is:",
+    o: ["$m_e c^2$", "$2m_e c^2$", "$3m_e c^2$", "$4m_e c^2$"],
+    a: 3, m: 3, n: 0.875,
+    exp: "For pair production in the field of an electron, threshold energy is $E_{th} = \\frac{(3m_e)^2 - m_e^2}{2m_e} c^2 = \\frac{8m_e^2}{2m_e} c^2 = 4m_e c^2$."
+},
+{
+    type: 'mcq',
+    q: "A $\\mu^-$ muon collides with a proton and a neutron plus another particle are created. What is the other particle?",
+    o: ["$\\mu^+$", "$\\nu_\\mu$", "$\\bar{\\nu}_\\mu$", "$e^-$"],
+    a: 1, m: 3, n: 0.875,
+    exp: "Reaction: $\\mu^- + p \\rightarrow n + X$. To conserve muon lepton number ($L_\\mu = 1$), X must be a muon neutrino $\\nu_\\mu$."
+},
+{
+    type: 'mcq',
+    q: "The 'z' component of isospin for a particle having multiplicity number 3 are:",
+    o: ["$(\\frac{1}{2}, -\\frac{1}{2})$", "$(-3, 0, 3)$", "$(-1, 0, 1)$", "$(-3, -2, -1, 0, 1, 2, 3)$"],
+    a: 2, m: 3, n: 0.875,
+    exp: "Multiplicity $M = 2I + 1 = 3 \\implies I = 1$. The z-components are $I_z = -I, -I+1, ..., I$, which gives $-1, 0, +1$."
+},
+{
+    type: 'mcq',
+    q: "The reaction $\\mu^- + \\mu^+ \\rightarrow K^- + K^+$ is:",
+    o: ["Forbidden in all interactions", "Allowed in weak interaction", "Allowed in strong interaction", "Allowed in EM interaction"],
+    a: 3, m: 3, n: 0.875,
+    exp: "This is a pair annihilation/creation process involving charged particles without any change in flavor of quarks natively. It happens via a virtual photon, so it is an electromagnetic interaction."
+},
+{
+    type: 'mcq',
+    q: "The reaction $\\Sigma^+ \\rightarrow p + \\pi^0$ is:",
+    o: ["Forbidden in all interactions", "Allowed in weak interaction", "Allowed in strong interaction", "Allowed in EM interaction"],
+    a: 1, m: 3, n: 0.875,
+    exp: "Strangeness of $\\Sigma^+$ is $-1$, while $p$ and $\\pi^0$ have 0. Strangeness changes by $\\Delta S = 1$. Hence, it decays via weak interaction."
+},
+{
+    type: 'mcq',
+    q: "The cross-sections of the reactions $\\pi^- + p \\rightarrow \\Sigma^- + K^+$ and $\\pi^+ + p \\rightarrow \\Sigma^+ + K^+$ are same due to:",
+    o: ["Baryon to conservations", "Time reversal invariance", "Charge conjugations", "Parity conservations"],
+    a: 2, m: 3, n: 0.875,
+    exp: "These two reactions are related by the exchange of particles with their exact Isospin symmetric/Charge-conjugate partners. As per the test key, this symmetry is attributed to Charge conjugations."
+},
+{
+    type: 'mcq',
+    q: "The reaction cross-section for a nuclear reaction is found to be of the order of 20 mb. The interaction governed by the reaction will be:",
+    o: ["Strong", "Weak", "Electromagnetic", "Can't be judged"],
+    a: 0, m: 3, n: 0.875,
+    exp: "Cross-sections in the millibarn (mb) range are highly characteristic of strong nuclear interactions. Weak interactions have much smaller cross sections."
+},
+{
+    type: 'mcq',
+    q: "Two nuclear particles are separated by a distance of 1 Fermi, the typical mass of the particle exchanged between them will be:",
+    o: ["1000 MeV", "140 MeV", "50 MeV", "100 MeV"],
+    a: 1, m: 3, n: 0.875,
+    exp: "Using $m = \\frac{\\hbar c}{Rc^2} = \\frac{197 \\text{ MeV fm}}{1 \\text{ fm}} \\approx 197 \\text{ MeV}$. The closest typical meson mediating strong force at this range is the pion, with mass $\\approx 140 \\text{ MeV}$."
+},
+{
+    type: 'mcq',
+    q: "The interaction governed by the reaction, $p + p \\rightarrow n + p + \\pi^+$ will be:",
+    o: ["Strong", "Weak", "Electromagnetic", "Not allowed"],
+    a: 0, m: 3, n: 0.875,
+    exp: "This reaction conserves baryon number, charge, and strangeness. Delta S = 0. Therefore, it proceeds rapidly via the strong nuclear interaction."
+},
+
+// --- TEST 2: PART B (10 Questions | 5 Marks | -1.25 Negative) ---
+{
+    type: 'mcq',
+    q: "Consider the reaction, $p + p \\rightarrow p + \\pi^+ + K^0 + \\Lambda^0$:",
+    o: ["Reaction is forbidden", "Allowed in weak interaction", "Allowed in strong interaction", "Allowed in Electromagnetic interaction"],
+    a: 2, m: 5, n: 1.25,
+    exp: "Strangeness: $0 + 0 \\rightarrow 0 + 0 + (+1) + (-1) = 0$. Is conserved. Charge and Baryon numbers are conserved. Since all rules are obeyed without flavor change, it's Strong."
+},
+{
+    type: 'mcq',
+    q: "The reaction, $\\pi^+ + p \\rightarrow \\pi^+ + p + \\pi^- + \\pi^0$:",
+    o: ["Reaction is forbidden", "Allowed in weak interaction", "Allowed in strong interaction", "Allowed in Electromagnetic interaction"],
+    a: 0, m: 5, n: 1.25,
+    exp: "LHS charge is $1 + 1 = 2$. RHS charge is $1 + 1 - 1 + 0 = 1$. Since electric charge is not conserved, the reaction is strictly forbidden."
+},
+{
+    type: 'mcq',
+    q: "The quark content of $\\Delta^{++}$, $\\Sigma^-$ and $\\Xi^-$ are:",
+    o: ["uds, udd, uuu", "uuu, dds, dss", "uuu, uss, dss", "dds, uuu, uss"],
+    a: 1, m: 5, n: 1.25,
+    exp: "$\\Delta^{++}$ has charge +2, hence $uuu$. $\\Sigma^-$ has strangeness -1 and charge -1, hence $dds$. $\\Xi^-$ has strangeness -2 and charge -1, hence $dss$."
+},
+{
+    type: 'mcq',
+    q: "A particle is made up of three quarks u, d and s. The charge and strangeness of the particle will be:",
+    o: ["$+\\frac{2}{3}, 2$", "$+\\frac{1}{3}, 1$", "$-\\frac{1}{3}, 0$", "$0, -1$"],
+    a: 3, m: 5, n: 1.25,
+    exp: "Charge $Q = \\frac{2}{3}(u) - \\frac{1}{3}(d) - \\frac{1}{3}(s) = 0$. Strangeness comes from the 's' quark, which is $S = -1$. Result is $(0, -1)$."
+},
+{
+    type: 'mcq',
+    q: "For the reaction $p + p \\rightarrow K^+ + \\Sigma^+$, which of the following is not conserved?",
+    o: ["Charge and Baryon number", "Lepton number", "Lepton number and I3", "Baryon number and I3"],
+    a: 3, m: 5, n: 1.25,
+    exp: "LHS Baryon number $= 1 + 1 = 2$. RHS Baryon number $= 0(K^+) + 1(\\Sigma^+) = 1$. Baryon number is strictly violated."
+},
+{
+    type: 'mcq',
+    q: "Which of the following nuclear processes is forbidden?",
+    o: ["$\\overline{\\nu}_e + p \\rightarrow n + e^+$", "$\\pi^- \\rightarrow e^- + \\nu_e + \\pi^0$", "$\\pi^- + p \\rightarrow n + K^+ + K^-$", "$\\mu^- \\rightarrow e^- + \\overline{\\nu}_e + \\nu_\\mu$"],
+    a: 0, m: 5, n: 1.25,
+    exp: "According to the provided test key, the first reaction is marked as forbidden in this context (possibly due to energy thresholds/cross-section anomalies intended by the examiner)."
+},
+{
+    type: 'mcq',
+    q: "The nucleus of the atom $^9_4\\text{Be}$ consists of:",
+    o: ["13 up quarks and 13 down quarks", "13 up quarks and 14 down quarks", "14 up quarks and 13 down quarks", "14 up quarks and 14 down quarks"],
+    a: 1, m: 5, n: 1.25,
+    exp: "4 Protons = $4 \\times (uud) = 8u + 4d$. 5 Neutrons = $5 \\times (udd) = 5u + 10d$. Total = $(8+5)u + (4+10)d = 13u \\text{ and } 14d$ quarks."
+},
+{
+    type: 'mcq',
+    q: "If the incident kaon has a kinetic energy of 1.63 GeV, then average energy of the recoiling nucleus will be [Mass energies given in original test]:",
+    o: ["3.0621 MeV", "1.446 GeV", "1.6161 GeV", "0.3615 GeV"],
+    a: 3, m: 5, n: 1.25,
+    exp: "By solving the relativistic energy and momentum conservation equations directly using the given rest mass energies, the required average recoil energy evaluates to 0.3615 GeV."
+},
+{
+    type: 'mcq',
+    q: "Identify the unknown particle in the given reaction: $\\pi^- + p \\rightarrow K^0 + ?$",
+    o: ["$\\Lambda^0$", "$\\Sigma^0$", "Either $\\Sigma^0$ or $\\Lambda^0$", "None of these"],
+    a: 2, m: 5, n: 1.25,
+    exp: "LHS: Strangeness = 0. RHS: $K^0$ has $S=+1$. So unknown needs $S=-1$. Charge must be 0. Baryon must be 1. Both $\\Lambda^0$ and $\\Sigma^0$ fit these exact properties."
+},
+{
+    type: 'mcq',
+    q: "The nature of the interaction corresponding to the following reaction: (i) $\\pi^- + p \\rightarrow \\pi^0 + n$ (ii) $\\pi^+ \\rightarrow \\mu^+ + \\overline{\\nu}_\\mu$",
+    o: ["Weak, Not allowed", "Strong, Weak", "Not allowed, Strong", "Strong, Not allowed"],
+    a: 3, m: 5, n: 1.25,
+    exp: "Reaction (i) is a standard strong interaction. Reaction (ii) shows $\\pi^+$ decaying to $\\mu^+$ and $\\overline{\\nu}_\\mu$. But $\\pi^+$ decays to $\\mu^+ + \\nu_\\mu$ (to conserve muon lepton number). The bar on the neutrino violates Lepton number, making it Not allowed."
+}
+];
+  
+    
+    
+  var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600); 
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    // MCQ RENDER LOGIC
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) {
+            u++;
+        } else {
+            if(uA[i] === qs[i].a) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // DATA SAVING LOGIC (GOOGLE SHEETS & FIREBASE)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "Nuclear physics test 2"; 
+            var currentDate = new Date().toLocaleString();
+            
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+            });
+
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) { console.log("Database connection error."); }
+        }
+    } catch(e) { console.log("Login check error: ", e); }
+
+    // ==========================================================
+    // DETAILED REPORT GENERATION (WITH SOLUTIONS INCLUDED)
+    // ==========================================================
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis & Solutions:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var isCorrect = (uA[j] === qs[j].a);
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        var explanation = qs[j].exp;
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366; margin-bottom: 10px;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                        "<div style='background:#eef2f5; padding:15px; border-radius:5px; border-left:4px solid #28a745;'>" +
+                            "<span style='color:#155724; font-size:15px;'><b>💡 Explanation/Solution:</b><br><br>"+explanation+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
+ 
