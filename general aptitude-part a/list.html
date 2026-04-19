@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Aptitude| Concept Cracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        header { background: var(--primary); color: white; padding: 20px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; }
+        .logo span { color: var(--accent); }
+        .back-btn { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .page-title { text-align: center; margin: 40px 0 10px; font-size: 28px; color: var(--primary); }
+        .subtitle { text-align: center; margin-bottom: 30px; color: #666; }
+        
+        .container { padding: 0 5% 50px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        .test-card { 
+            background: var(--white); padding: 25px 30px; border-radius: 12px; display: flex; 
+            justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border-left: 6px solid var(--secondary); transition: 0.3s; width: 100%; box-sizing: border-box;
+        }
+
+        .start-btn { background: var(--accent); color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; white-space: nowrap; cursor: pointer; }
+        .start-btn:hover { background: #e68a00; transform: translateY(-2px); }
+
+        /* LOCKED BUTTON: No glow, No tap */
+        .btn-locked {
+            background: #bdc3c7 !important; 
+            color: #7f8c8d !important;
+            cursor: default !important;
+            pointer-events: none; 
+            box-shadow: none !important; 
+            transform: none !important; 
+        }
+
+        @media (max-width: 600px) {
+            .test-card { flex-direction: column; text-align: center; gap: 15px; }
+            .start-btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CONCEPT <span>CRACKER</span></div>
+        <a href="../subjects.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Subjects</a>
+    </header>
+
+    <h2 class="page-title">General Aptitude</h2>
+    <p class="subtitle">Select a mock test to begin your practice</p>
+
+    <div class="container">
+        <div class="test-card">
+            <div class="test-info">
+                <h3>Mock Test 1: General Aptitude</h3>
+                <p>20 Questions | 60 Minutes | CSIR NET Pattern</p>
+            </div>
+            <a href="test1.html" class="start-btn">Start Test <i class="fas fa-play"></i></a>
+        </div>
+
+         <div class="test-card">
+            <div class="test-info">
+                <h3>Mock Test 2: General Aptitude</h3>
+                <p>20 Questions | 60 Minutes | CSIR NET Pattern</p>
+            </div>
+            <a href="test2.html" class="start-btn">Start Test <i class="fas fa-play"></i></a>
+          </div>
+        
+
+        
+         <div class="test-card">
+            <div class="test-info">
+                <h3>Mock Test 3: General Aptitude</h3>
+                <p>20 Questions | 60 Minutes | CSIR NET Pattern</p>
+            </div>
+            <a href="test3.html" class="start-btn">Start Test <i class="fas fa-play"></i></a>
+         </div>
+            <div class="test-card">
+            <div class="test-info">
+                <h3>Mock Test 4: General Aptitude</h3>
+                <p>20 Questions | 60 Minutes | CSIR NET Pattern</p>
+            </div>
+            <a href="test4.html" class="start-btn">Start Test <i class="fas fa-play"></i></a>
+         </div>
+
+    
+   
+        </div>
+    </div>
+</body>
+</html>
