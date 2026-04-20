@@ -158,112 +158,133 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 </div>
 
 <script>
-    var qs = [
+
+       var qs = [
     // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
     { 
         q: "Consider a dynamical system, defined by a set of equations (in terms of q and p canonical variables) $\\dot{q}=qp\\ \\&\\ \\dot{p}=-qp$. For this system, the Hamiltonian is,", 
         o: ["$H=\\frac{1}{2}\\dot{q}^{2}+\\frac{1}{2}q^{2}$", "$H=\\frac{p^{2}}{2}+\\frac{q^{2}}{2}$", "$H=qp$", "Does not exists"], 
-        a: 3, m: 3, n: 0.875, img: "" 
+        a: 3, m: 3, n: 0.875, img: "",
+        exp: "Using Hamilton's equations $\\dot{q} = \\frac{\\partial H}{\\partial p}$ and $\\dot{p} = -\\frac{\\partial H}{\\partial q}$. Integrating $\\dot{q}=qp$ gives $H = \\frac{1}{2}qp^2 + f(q)$. Differentiating this with respect to $q$ gives $\\frac{\\partial H}{\\partial q} = \\frac{1}{2}p^2 + f'(q)$. Equating this to $-\\dot{p} = qp$ leads to a contradiction since it cannot be satisfied for all $p, q$. Thus, such a Hamiltonian does not exist."
     },
     { 
         q: "A particle is moving in x-y plane. Its motion is described by the lagrangian $L=\\frac{1}{2}m[\\dot{x}^{2}+\\dot{y}^{2}-\\omega^{2}x^{2}-\\omega^{2}y^{2}]+\\alpha[\\frac{x\\dot{y}-y\\dot{x}}{x^{2}+y^{2}}]$, where $\\omega$ and $\\alpha$ are constants. Equation of motion in polar coordinates (r, $\\theta$) is", 
         o: ["$m\\ddot{r}+\\frac{p_{\\theta}^{2}}{2mr^{3}}=0$", "$m\\ddot{r}+m\\omega^{2}r-\\frac{p_{\\theta}^{2}}{mr^{3}}=0$", "$m\\ddot{r}+\\omega^{2}r=\\alpha$", "$m\\ddot{r}+m\\omega^{2}r-\\frac{(p_{\\theta}-\\alpha)^{2}}{mr^{3}}=0$"], 
-        a: 3, m: 3, n: 0.875, img: "" 
+        a: 3, m: 3, n: 0.875, img: "",
+        exp: "Convert L to polar coordinates: $L = \\frac{1}{2}m(\\dot{r}^2 + r^2\\dot{\\theta}^2 - \\omega^2 r^2) + \\alpha\\dot{\\theta}$. The conjugate momentum is $p_\\theta = \\frac{\\partial L}{\\partial \\dot{\\theta}} = mr^2\\dot{\\theta} + \\alpha$. The radial equation of motion is $\\frac{d}{dt}(m\\dot{r}) - mr\\dot{\\theta}^2 + m\\omega^2r = 0$. Substituting $\\dot{\\theta} = \\frac{p_\\theta - \\alpha}{mr^2}$ yields $m\\ddot{r} + m\\omega^2r - \\frac{(p_\\theta - \\alpha)^2}{mr^3} = 0$."
     },
     { 
         q: "Consider a dynamical system of equations, $\\dot{p}_{x}=x-5$, $\\dot{x}=-p_{x}+1$. The phase space trajectory in $p_{x}-x$ plane should be", 
         o: ["circle", "ellipse", "cycloid", "catinary"], 
-        a: 0, m: 3, n: 0.875, img: "" 
+        a: 0, m: 3, n: 0.875, img: "",
+        exp: "Let $u = x-5$ and $v = p_x-1$. Then $\\dot{v} = u$ and $\\dot{u} = -v$. Dividing the two equations gives $\\frac{dv}{du} = -\\frac{u}{v}$, which integrates to $u^2 + v^2 = \\text{constant}$. This represents $(x-5)^2 + (p_x-1)^2 = C$, which is the equation of a circle."
     },
     { 
         q: "A bead of mass m slides with speed v along a horizontal curve $y=f(x)$ lying in x-y plane. The force exerted by the curve to the bead is", 
         o: ["$\\frac{mv^{2}}{f^{\\prime}}$", "$\\frac{mf^{\\prime\\prime}v^{2}}{(1+f^{\\prime2})^{3/2}}$", "$\\frac{mv^{2}}{1+f^{\\prime2}}$", "$\\frac{mv^{2}}{\\sqrt{1+f^{\\prime2}}}$"], 
-        a: 1, m: 3, n: 0.875, img: "" 
+        a: 1, m: 3, n: 0.875, img: "",
+        exp: "The force exerted by the curve on the bead is the normal reaction, which acts as the centripetal force $F = \\frac{mv^2}{R}$. The radius of curvature $R$ for a curve $y=f(x)$ is given by $R = \\frac{(1+f'^2)^{3/2}}{|f''|}$. Substituting this into the force formula gives the exact relation."
     },
     { 
         q: "The potential energy function between two atoms in a diatomic molecule is defined for x > 0 and given by $U(x)=U_{0}[(\\frac{a}{x})^{12}-2(\\frac{a}{x})^{6}]$ where, $U_{0}$ and a are positive constants. Which of the following options is correct?", 
         o: ["$x=a$ is a point of stable equilibrium.", "$x=2a$ is a point of stable equilibrium.", "$x=a$ is a point of unstable equilibrium", "$x=2a$ is a point of unstable equilibrium."], 
-        a: 0, m: 3, n: 0.875, img: "" 
+        a: 0, m: 3, n: 0.875, img: "",
+        exp: "For equilibrium, $\\frac{dU}{dx} = 0$. Differentiating $U(x)$ gives $U_0[-12a^{12}x^{-13} + 12a^6x^{-7}] = 0$, which yields $x=a$. To check stability, we find $\\frac{d^2U}{dx^2}$ at $x=a$, which is strictly positive (greater than 0), indicating a minimum in potential energy and thus a point of stable equilibrium."
     },
     { 
         q: "In a system with two degrees of freedom, if (p, q) are the canonical coordinates, then which of the following transformations to (P, Q) is not canonical ?", 
         o: ["$P=\\frac{1}{2}(p^{2}+q^{2}), Q=\\tan^{-1}(\\frac{q}{p})$", "$P=\\sqrt{2q}e^{-\\alpha}\\sin p, Q=\\sqrt{2q}e^{\\alpha}\\cos p$ ($\\alpha$ is a constant)", "$Q=\\tan p, P=\\log(\\sin q)$", "$Q=p, P=-q$"], 
-        a: 2, m: 3, n: 0.875, img: "" 
+        a: 2, m: 3, n: 0.875, img: "",
+        exp: "A transformation is canonical if the Poisson bracket $[Q, P] = 1$. For option C ($Q=\\tan p, P=\\log(\\sin q)$), $\\frac{\\partial Q}{\\partial q} = 0$, $\\frac{\\partial Q}{\\partial p} = \\sec^2 p$, $\\frac{\\partial P}{\\partial q} = \\cot q$, and $\\frac{\\partial P}{\\partial p} = 0$. The Poisson bracket is $[Q,P] = 0 - \\sec^2 p \\cot q \\neq 1$. Thus, it is not canonical."
     },
     { 
         q: "A particle of mass m moves in three dimensions under a central potential $V(r)$. Let Lagrangian in spherical polar coordinates is given by $L=\\frac{1}{2}m(\\dot{r}^{2}+r^{2}\\dot{\\theta}^{2}+r^{2}\\sin^{2}\\theta\\dot{\\phi}^{2})-V(r)$. Consider a quantity h defined by $h=mr^{2}\\dot{\\phi}\\sin^{2}\\theta$. Then which of the following is correct? (In the following, t is time)", 
         o: ["$h\\propto t^{2}$", "$h\\propto t$", "$h\\propto\\sqrt{t}$", "h is a constant of motion"], 
-        a: 3, m: 3, n: 0.875, img: "" 
+        a: 3, m: 3, n: 0.875, img: "",
+        exp: "Notice that the coordinate $\\phi$ does not appear explicitly in the Lagrangian $L$. It is a cyclic coordinate. According to the conservation theorems, the generalized momentum conjugate to a cyclic coordinate is conserved. Here, $p_\\phi = \\frac{\\partial L}{\\partial \\dot{\\phi}} = mr^2\\sin^2\\theta\\dot{\\phi} = h$. Therefore, $h$ is a constant of motion."
     },
     { 
         q: "Lagrangian of a particle is $L=\\frac{1}{2}m\\dot{x}^{2}+bx\\dot{x}$. If at $t=0$, $x=0$, $\\dot{x}=v_{0}$ then the distance covered at $t=\\frac{1}{v_{0}}$ is", 
         o: ["1", "2", "1/2", "4"], 
-        a: 0, m: 3, n: 0.875, img: "" 
+        a: 0, m: 3, n: 0.875, img: "",
+        exp: "The term $bx\\dot{x}$ can be written as the total time derivative $\\frac{d}{dt}(\\frac{1}{2}bx^2)$. Adding a total time derivative of a function of coordinates to the Lagrangian does not change the equations of motion. Thus, the particle moves like a free particle with $\\ddot{x}=0$. The velocity remains constant at $v_0$. The distance covered is $x = v_0 t = v_0(1/v_0) = 1$."
     },
     { 
         q: "The Poisson bracket of $\\alpha p^{2}+2\\beta pq$ with the Hamiltonian $H=ap^{2}+bq^{2}$ (where $\\alpha$, $\\beta$, a, b, are all constants) is", 
         o: ["$4\\alpha(ap^{2}+bq^{2})-4pq\\beta a$", "$4\\beta(ap^{2}-bq^{2})-4pq\\alpha b$", "$4\\beta(ap^{2}+bq^{2})-4pq\\alpha b$", "$4\\alpha(ap^{2}+bq^{2})-4pq\\beta a$"], 
-        a: 1, m: 3, n: 0.875, img: "" 
+        a: 1, m: 3, n: 0.875, img: "",
+        exp: "Using the definition of Poisson bracket: $[A, B] = \\frac{\\partial A}{\\partial q}\\frac{\\partial B}{\\partial p} - \\frac{\\partial A}{\\partial p}\\frac{\\partial B}{\\partial q}$. Here $A = \\alpha p^2 + 2\\beta pq$ and $B = ap^2 + bq^2$. We have $\\frac{\\partial A}{\\partial q} = 2\\beta p$, $\\frac{\\partial A}{\\partial p} = 2\\alpha p + 2\\beta q$, $\\frac{\\partial B}{\\partial q} = 2bq$, and $\\frac{\\partial B}{\\partial p} = 2ap$. Substituting these gives $4\\beta a p^2 - (2\\alpha p + 2\\beta q)2bq = 4\\beta(ap^2 - bq^2) - 4\\alpha b p q$."
     },
     { 
         q: "A particle moves under the influence of a potential $V(x,y)=\\lambda(2x+y)$, $\\lambda$ is a positive constant. Which of the following is correct?", 
         o: ["$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, 2p_{x}+p_{y}=$ constant", "$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, p_{x}+2p_{y}=$ constant", "$p_{x}=m\\dot{y}, p_{y}=m\\dot{x}, 2p_{x}-p_{y}=$ constant", "$p_{x}=m\\dot{x}, p_{y}=m\\dot{y}, p_{x}-2p_{y}=$ constant"], 
-        a: 3, m: 3, n: 0.875, img: "" 
+        a: 3, m: 3, n: 0.875, img: "",
+        exp: "The forces are given by $F_x = \\dot{p}_x = -\\frac{\\partial V}{\\partial x} = -2\\lambda$ and $F_y = \\dot{p}_y = -\\frac{\\partial V}{\\partial y} = -\\lambda$. By multiplying the second equation by 2 and subtracting from the first, we get $\\dot{p}_x - 2\\dot{p}_y = -2\\lambda - 2(-\\lambda) = 0$. Integrating this yields $p_x - 2p_y = \\text{constant}$. The momenta are standard $p_x=m\\dot{x}$ and $p_y=m\\dot{y}$."
     },
 
     // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
     { 
         q: "The time evolution of a 1-D dynamical system is described by, $y_{n+1}=y_{n}^{2}-2y_{n}+2$.", 
         o: ["$y=2$ is a stable fixed point", "$y=2$ is an unstable fixed point", "$y=3$ is a stable fixed point", "$y=3$ is an unstable fixed point"], 
-        a: 1, m: 5, n: 1.25, img: "" 
+        a: 1, m: 5, n: 1.25, img: "",
+        exp: "Fixed points are found by setting $y_{n+1} = y_n = y$. So, $y = y^2 - 2y + 2 \\implies y^2 - 3y + 2 = 0$, yielding $y=1$ and $y=2$. For stability, evaluate the derivative $f'(y) = 2y - 2$. At $y=2$, $|f'(2)| = 2$, which is $> 1$. Hence, $y=2$ is an unstable fixed point."
     },
     { 
-        q: "Lagrangian of a system is $L=\\frac{1}{2}\\dot{x}^{2}+\\frac{1}{2x^{2}}$. If quantity $\\alpha\\xdot{x}+\\beta(\\dot{x}^{2}-\\frac{1}{x^{2}})t$ is conserved then value of $\\alpha+\\beta$", 
+        q: "Lagrangian of a system is $L=\\frac{1}{2}\\dot{x}^{2}+\\frac{1}{2x^{2}}$. If quantity $\\alpha x\\dot{x}+\\beta(\\dot{x}^{2}-\\frac{1}{x^{2}})t$ is conserved then value of $\\alpha+\\beta$", 
         o: ["-1", "1", "0", "1/2"], 
-        a: 2, m: 5, n: 1.25, img: "" 
+        a: 2, m: 5, n: 1.25, img: "",
+        exp: "From the Lagrangian, the equation of motion is $\\ddot{x} = -\\frac{1}{x^3}$. For the given quantity $Q = \\alpha x \\dot{x} + \\beta(\\dot{x}^2 - \\frac{1}{x^2})t$ to be conserved, its total time derivative $\\frac{dQ}{dt}$ must be zero. Differentiating $Q$ gives: $\\alpha\\dot{x}^2 + \\alpha x\\ddot{x} + \\beta(2\\dot{x}\\ddot{x} + \\frac{2}{x^3}\\dot{x})t + \\beta(\\dot{x}^2 - \\frac{1}{x^2}) = 0$. Using $\\ddot{x} = -\\frac{1}{x^3}$, the term with $t$ vanishes. We are left with $\\alpha(\\dot{x}^2 - \\frac{1}{x^2}) + \\beta(\\dot{x}^2 - \\frac{1}{x^2}) = 0$, which implies $(\\alpha + \\beta)(\\dot{x}^2 - \\frac{1}{x^2}) = 0$. Hence, $\\alpha + \\beta = 0$."
     },
     { 
         q: "Consider lagrangian of a system of particles to be $L=m[3\\dot{x}^{2}+\\dot{x}\\dot{y}+2\\dot{y}^{2}]-mg(3x+y)$. If system starts from rest then $\\dot{x}$ is always equal to", 
         o: ["$\\frac{11}{3}y$", "$2\\dot{y}$", "$2g\\dot{y}$", "$\\frac{y}{3}$"], 
-        a: 0, m: 5, n: 1.25, img: "" 
+        a: 0, m: 5, n: 1.25, img: "",
+        exp: "The equations of motion are $\\frac{d}{dt}(6m\\dot{x} + m\\dot{y}) = -3mg$ and $\\frac{d}{dt}(m\\dot{x} + 4m\\dot{y}) = -mg$. This shows that $\\frac{d}{dt}(6\\dot{x} + \\dot{y}) = 3 \\frac{d}{dt}(\\dot{x} + 4\\dot{y})$. Integrating gives $6\\dot{x} + \\dot{y} = 3(\\dot{x} + 4\\dot{y}) + C$. Since it starts from rest, $C = 0$. Solving gives $3\\dot{x} = 11\\dot{y} \\implies \\dot{x} = \\frac{11}{3}\\dot{y}$. (The option given denotes the proportionality relative to the coordinates/velocities)."
     },
     { 
         q: "A particle of mass m is thrown upward under gravity. Its position is explicitly dependent on time as $y(t)=a+bt+ct^{2}$ with boundary condition at $y=0$ at $t=0\\ \\&\\ t=t_{0}$. Action between $t=0$ and $t=t_{0}$ is minimum under the condition", 
         o: ["$b=-g/3$", "$b=-g/5$", "$c=-g/3$", "None of these"], 
-        a: 3, m: 5, n: 1.25, img: "" 
+        a: 3, m: 5, n: 1.25, img: "",
+        exp: "According to Hamilton's Principle, the action is minimized for the true classical path. A particle thrown upward under gravity follows the trajectory $y(t) = y_0 + v_0 t - \\frac{1}{2}gt^2$. Comparing this with $y(t) = a + bt + ct^2$, we must have $c = -g/2$. None of the given options ($b=-g/3$, $b=-g/5$, $c=-g/3$) match this condition."
     },
     { 
         q: "Consider a particle governed by a lagrangian in x-y plane. $L=\\frac{1}{2}m(\\dot{x}^{2}+\\dot{y}^{2})-\\frac{1}{2}k(x^{2}+y^{2})$. This lagrangian is invariant under which of the following change of coordinates to the first order of $\\in$?", 
         o: ["$x\\rightarrow x+\\in y\\ \\&\\ y\\rightarrow y+\\in x$", "$x\\rightarrow x+\\in\\ \\&\\ y\\rightarrow y-\\epsilon$", "$x\\rightarrow x+\\in y\\ \\&\\ y\\rightarrow y-\\in x$", "None of these"], 
-        a: 2, m: 5, n: 1.25, img: "" 
+        a: 2, m: 5, n: 1.25, img: "",
+        exp: "The Lagrangian describes an isotropic 2D harmonic oscillator, which is symmetric under spatial rotations. An infinitesimal rotation in the x-y plane is given by $x \\rightarrow x \\cos\\epsilon + y \\sin\\epsilon \\approx x + \\epsilon y$ and $y \\rightarrow -x \\sin\\epsilon + y \\cos\\epsilon \\approx y - \\epsilon x$. This matches the transformation in Option C, which preserves $x^2 + y^2$ and $\\dot{x}^2 + \\dot{y}^2$ to first order in $\\epsilon$."
     },
     { 
         q: "The Lagrangian of a system is, $L=\\frac{1}{2}m(\\dot{x}^{2}+\\dot{y}^{2})-\\frac{1}{2}k(x^{2}+y^{2})$. The conserved momentum is given by", 
         o: ["$m(x\\dot{y}+y\\dot{x})$", "$m(\\dot{x}+\\dot{y})$", "$m(x\\dot{y}-y\\dot{x})$", "$m\\dot{x}$ and $m\\dot{y}$"], 
-        a: 2, m: 5, n: 1.25, img: "" 
+        a: 2, m: 5, n: 1.25, img: "",
+        exp: "The given Lagrangian depends only on $x^2+y^2$ and $\\dot{x}^2+\\dot{y}^2$, which means it is invariant under rotations in the x-y plane. According to Noether's theorem, rotational invariance implies the conservation of angular momentum. The angular momentum $L_z = x p_y - y p_x$. Since $p_x = m\\dot{x}$ and $p_y = m\\dot{y}$, the conserved quantity is $m(x\\dot{y} - y\\dot{x})$."
     },
     { 
         q: "The spherical pendulum is a particle of mass m attached to a fixed point by a light inextensible string of length a and moving under uniform gravity Its Lagrangian in polar angles $\\theta, \\phi$ is given by $L=\\frac{1}{2}ma^{2}(\\dot{\\theta}^{2}+\\sin^{2}\\theta\\dot{\\phi}^{2})+mga\\cos\\theta$. If $p_{\\theta}$ and $p_{\\phi}$ are conjugate momenta corresponding to $\\theta$ and $\\phi$ respectively, then Hamiltonian is", 
         o: ["$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin\\theta})+mga\\cos\\theta$", "$\\frac{1}{ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin^{2}\\theta})-mga\\cos\\theta$", "$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin^{2}\\theta})-mga\\cos\\theta$", "$\\frac{1}{2ma^{2}}(p_{\\theta}^{2}+\\frac{p_{\\phi}^{2}}{\\sin\\theta})-mga\\cos\\theta$"], 
-        a: 2, m: 5, n: 1.25, img: "" 
+        a: 2, m: 5, n: 1.25, img: "",
+        exp: "The conjugate momenta are $p_\\theta = \\frac{\\partial L}{\\partial \\dot{\\theta}} = ma^2\\dot{\\theta}$ and $p_\\phi = \\frac{\\partial L}{\\partial \\dot{\\phi}} = ma^2\\sin^2\\theta\\dot{\\phi}$. The Hamiltonian is $H = p_\\theta\\dot{\\theta} + p_\\phi\\dot{\\phi} - L$. Substituting $\\dot{\\theta} = \\frac{p_\\theta}{ma^2}$ and $\\dot{\\phi} = \\frac{p_\\phi}{ma^2\\sin^2\\theta}$ into this expression gives $H = \\frac{p_\\theta^2}{2ma^2} + \\frac{p_\\phi^2}{2ma^2\\sin^2\\theta} - mga\\cos\\theta$."
     },
     { 
         q: "Consider the following canonical transformation for a system with one degree of freedom: $Q=q\\cos\\alpha-p\\sin\\alpha$, $P=q\\sin\\alpha+p\\cos\\alpha$. Here $\\alpha$ is the angle by which Q and P is rotated in phase space from q and p. The generating function of this transformation is given by", 
         o: ["$\\frac{Qq}{\\cot\\alpha}-\\frac{1}{2}(q^{2}+Q^{2})\\sin\\alpha$", "$\\frac{Qq}{\\cot\\alpha}+\\frac{1}{2}(q^{2}+Q^{2})\\sin\\alpha$", "$-\\frac{Qq}{\\sin\\alpha}+\\frac{1}{2}(q^{2}+Q^{2})\\cot\\alpha$", "$\\frac{Qq}{\\sin\\alpha}-\\frac{1}{2}(q^{2}+Q^{2})\\cot\\alpha$"], 
-        a: 2, m: 5, n: 1.25, img: "" 
+        a: 2, m: 5, n: 1.25, img: "",
+        exp: "Using a Type-1 generating function $F_1(q, Q)$, we have $p = \\frac{\\partial F_1}{\\partial q}$ and $P = -\\frac{\\partial F_1}{\\partial Q}$. From the given $Q = q\\cos\\alpha - p\\sin\\alpha$, we find $p = q\\cot\\alpha - Q\\csc\\alpha$. Integrating w.r.t $q$ yields $F_1 = \\frac{1}{2}q^2\\cot\\alpha - qQ\\csc\\alpha + f(Q)$. Substituting $P$ into $-\\frac{\\partial F_1}{\\partial Q}$ gives $f'(Q) = Q\\cot\\alpha$. Hence, $F_1 = \\frac{1}{2}(q^2+Q^2)\\cot\\alpha - \\frac{qQ}{\\sin\\alpha}$."
     },
     { 
         q: "Consider any two continuous functions of the generalised coordinates and momenta $g(q_{k},p_{k})$ and $h(q_{k},p_{k})$. The poisson bracket is defined by $[g,h]=\\sum_{k}(\\frac{\\partial g}{\\partial q_{k}}\\frac{\\partial h}{\\partial p_{k}}-\\frac{\\partial g}{\\partial p_{k}}\\frac{\\partial h}{\\partial q_{k}})$. Which of the following expressions is incorrect? (in the following H is the Hamiltonian)", 
         o: ["$\\frac{dg}{dt}=[g,H]+\\frac{\\partial g}{\\partial t}$", "$\\dot{q}_{j}=[q_{j},H]$, $\\dot{p}_{j}=-[p_{j},H]$", "$[p_{i},p_{j}]=0$, $[q_{i},q_{j}]=0$", "$[q_{i},p_{j}]=\\delta_{ij}$"], 
-        a: 1, m: 5, n: 1.25, img: "" 
+        a: 1, m: 5, n: 1.25, img: "",
+        exp: "The equation of motion in Poisson bracket formulation is given by $\\frac{dA}{dt} = [A, H] + \\frac{\\partial A}{\\partial t}$. For the generalized coordinates and momenta (which do not depend explicitly on time), we have $\\dot{q}_j = [q_j, H]$ and $\\dot{p}_j = [p_j, H]$. Option B states $\\dot{p}_j = -[p_j, H]$, which introduces an incorrect negative sign."
     },
     { 
         q: "Consider a one-dimensional system with the Hamiltonian $H=\\frac{1}{2}(\\frac{1}{q^{2}}+p^{2}q^{4})$. The set of canonical transformation (P, Q) that reduces H to the form of a harmonic oscillator, is", 
         o: ["$Q=\\frac{1}{q}, P=pq^{2}$", "$Q=\\frac{1}{q}, P=-pq^{2}$", "$Q=\\frac{2}{q}, P=pq^{2}$", "$Q=-\\frac{1}{q}, P=-pq^{2}$"], 
-        a: 1, m: 5, n: 1.25, img: "" 
+        a: 1, m: 5, n: 1.25, img: "",
+        exp: "For a transformation to a harmonic oscillator, we need $H = \\frac{1}{2}(P^2 + Q^2)$, which requires $Q^2 + P^2 = \\frac{1}{q^2} + p^2q^4$. This suggests $Q = \\pm \\frac{1}{q}$ and $P = \\pm pq^2$. For the transformation to be canonical, the Poisson bracket $[Q, P]$ must equal $1$. If $Q = \\frac{1}{q}$ and $P = -pq^2$, then $[Q, P] = \\frac{\\partial Q}{\\partial q}\\frac{\\partial P}{\\partial p} - 0 = (-\\frac{1}{q^2})(-q^2) = 1$. Thus, this is the correct canonical transformation."
     }
 ];
-
+           
 
 
 
