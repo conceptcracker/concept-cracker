@@ -312,7 +312,7 @@ function iT(){
 function startTest() {
     document.getElementById('inst').style.display='none';
     document.getElementById('test').style.display='flex';
-    sT(3600);
+    sT(3600); 
 }
 
 function lQ(i){
@@ -325,11 +325,12 @@ function lQ(i){
     document.getElementById('qt').innerHTML=q.q;
     
     var imgHtml = "";
-    if(q.img !== "") {
+    if(q.img && q.img !== "") {
         imgHtml = "<img src='" + q.img + "' class='q-img'>";
     }
     document.getElementById('qi').innerHTML = imgHtml;
     
+    // MCQ RENDER LOGIC
     var oH='';
     for(var j=0; j<q.o.length; j++){
         var ch = (uA[cQ]===j) ? 'checked' : '';
@@ -390,7 +391,8 @@ function sT(d){
         if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
     },1000);
 }
-    function finalSubmit(force){
+
+function finalSubmit(force){
     if(!force && !confirm("Are you sure you want to submit the test?")) return;
     clearInterval(tInt);
     document.getElementById('test').style.display='none';
@@ -399,9 +401,12 @@ function sT(d){
     var sc=0, c=0, w=0, u=0, ms=0;
     for(var i=0; i<qs.length; i++){
         ms+=qs[i].m;
-        if(uA[i]===null) u++;
-        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
-        else { sc-=qs[i].n; w++; }
+        if(uA[i]===null) {
+            u++;
+        } else {
+            if(uA[i] === qs[i].a) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
     }
     
     document.getElementById('f-sc').innerText=sc.toFixed(3);
@@ -415,79 +420,56 @@ function sT(d){
     document.getElementById('rc-a').innerText=acc.toFixed(2);
 
     // ==========================================================
-    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
+    // DATA SAVING LOGIC (GOOGLE SHEETS & FIREBASE)
     // ==========================================================
     try {
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            var testTitle = "Classical Mechanics - Test 2"; // Test ka naam
+            var testTitle = "Classical mechanics test 1"; 
             var currentDate = new Date().toLocaleString();
             
-            // User ki pehchaan nikalna
-            var userIdentifier = "Student";
-            if(currentUser.email) {
-                userIdentifier = currentUser.email;
-            } else if (currentUser.phoneNumber) {
-                userIdentifier = currentUser.phoneNumber;
-            }
-
-            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
             var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
             var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
 
             fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: userIdentifier, 
-                    mobile: "Attempted at: " + currentDate, 
-                    password: combinedScoreData 
-                })
-            }).then(() => {
-                console.log("✅ Google Sheet mein score chala gaya!");
-            }).catch(err => console.log("Google Sheet Error: ", err));
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+            });
 
-            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
             try {
                 var db = firebase.firestore();
                 db.collection('students').doc(currentUser.uid).collection('marks').add({
-                    testName: testTitle,
-                    score: finalScore,
-                    totalMarks: ms,
-                    date: currentDate,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            } catch(dbErr) {
-                console.log("Database connection error.");
-            }
+            } catch(dbErr) { console.log("Database connection error."); }
         }
-    } catch(e) {
-        console.log("Login check error: ", e);
-    }
-    // ==========================================================
+    } catch(e) { console.log("Login check error: ", e); }
 
-    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    // ==========================================================
+    // DETAILED REPORT GENERATION (WITH SOLUTIONS INCLUDED)
+    // ==========================================================
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis & Solutions:</h3>";
     for(var j=0; j<qs.length; j++){
-        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var isCorrect = (uA[j] === qs[j].a);
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
         var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
         var cA = qs[j].o[qs[j].a];
-        
-        var qImgStr = "";
-        if(qs[j].img && qs[j].img !== "") {
-            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
-        }
+        var explanation = qs[j].exp;
         
         detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
-                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
-                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366; margin-bottom: 10px;'>" +
                             "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
                             "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
                         "</div>" +
+                        "<div style='background:#eef2f5; padding:15px; border-radius:5px; border-left:4px solid #28a745;'>" +
+                            "<span style='color:#155724; font-size:15px;'><b>💡 Explanation/Solution:</b><br><br>"+explanation+"</span>" +
+                        "</div>" +
                     "</div>";
-    }
-    document.getElementById('detailed-res').innerHTML=detHtml;
+    }document.getElementById('detailed-res').innerHTML=detHtml;
     
     if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
     
@@ -498,9 +480,9 @@ function sT(d){
     }
 }
 
-
 window.onload=iT;
 window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
 </script>
 </body>
 </html>
+
