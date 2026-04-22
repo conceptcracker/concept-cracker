@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results | BARC Test Series</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <style>
+        :root { --primary: #003366; --acc: #ff9800; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #333; }
+        
+        nav { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-decoration: none; }
+        .logo span { color: var(--acc); }
+        
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        
+        /* Direct Login Box */
+        #login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 350px; margin: 50px auto; text-align: center; }
+        #login-box h2 { color: var(--primary); margin-top: 0; }
+        #login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        
+        /* Dashboard & History */
+        #dashboard { display: none; }
+        .welcome-card { background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;}
+        
+        .history-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid var(--acc); display: flex; justify-content: space-between; align-items: center; }
+        .history-info h3 { margin: 0 0 5px; color: #333; }
+        .btn-report { background: #eef2f5; color: var(--primary); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; }
+        .btn-report:hover { background: var(--primary); color: white; }
+
+        /* Report Modal (Pie Chart UI) */
+        #report-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .report-box { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; text-align: center; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 25px; cursor: pointer; color: #777; }
+        .chart-container { width: 250px; height: 250px; margin: 20px auto; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px;}
+        .stat-item { font-size: 14px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="barc-subjects.html" class="logo"><i class="fas fa-arrow-left" style="font-size:18px; margin-right:10px; color:#555;"></i> CONCEPT <span>CRACKER</span></a>
+    </nav>
+
+    <div class="container">
+        
+        <div id="login-box">
+            <h2>View Results</h2>
+            <p style="font-size:13px; color:#666;">Enter your Access ID and Password to view your test reports.</p>
+            <input type="text" id="r-id" placeholder="Access ID">
+            <input type="password" id="r-pass" placeholder="Password">
+            <button class="btn-main" onclick="loginToResults()">View My Report</button>
+        </div>
+
+        <div id="dashboard">
+            <div class="welcome-card">
+                <div>
+                    <h2 style="margin:0; color:var(--primary);">Welcome, <span id="student-name">Student</span></h2>
+                    <p style="margin:5px 0 0; color:#666;">Access ID: <span id="student-display-id">---</span></p>
+                </div>
+                <button onclick="logoutResults()" style="background:none; border:1px solid #dc3545; color:#dc3545; padding:8px 15px; border-radius:5px; cursor:pointer;">Logout</button>
+            </div>
+
+            <h3 style="color:var(--primary); border-bottom:2px solid #ddd; padding-bottom:10px;"><i class="fas fa-history"></i> My Attempt History</h3>
+            <div id="results-list">
+                <p style="text-align:center; padding:20px; color:#777;">Loading your reports...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="report-modal">
+        <div class="report-box">
+            <span class="close-btn" onclick="document.getElementById('report-modal').style.display='none'">&times;</span>
+            <h2 id="modal-title" style="color:var(--primary); margin-top:0;">Test Analysis</h2>
+            <div class="chart-container"><canvas id="analyticsChart"></canvas></div>
+            <div class="stats-grid">
+                <div class="stat-item" style="color:var(--primary);">🎯 Score: <span id="m-score">0</span></div>
+                <div class="stat-item" style="color:#007bff;">⚡ Accuracy: <span id="m-acc">0</span>%</div>
+                <div class="stat-item" style="color:#28a745;">✅ Correct: <span id="m-corr">0</span></div>
+                <div class="stat-item" style="color:#dc3545;">❌ Incorrect: <span id="m-inc">0</span></div>
+                <div class="stat-item" style="color:#6c757d;">⚪ Unattempted: <span id="m-unatt">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AAPKA ASLI FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+            authDomain: "concepts-creakres.firebaseapp.com",
+            projectId: "concepts-creakres",
+            storageBucket: "concepts-creakres.firebasestorage.app",
+            messagingSenderId: "882506019552",
+            appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        
+        const db = firebase.firestore();
+        let myChart = null;
+
+        // Page load par check karo session hai ya nahi
+        window.onload = () => {
+            let sId = sessionStorage.getItem('barc_logged_in');
+            if(sId) {
+                showDashboard(sId, sessionStorage.getItem('barc_student_name'));
+            } else {
+                document.getElementById('login-box').style.display = 'block';
+            }
+        };
+
+        // Results dekhne ke liye login (Same 'barc_access' collection use hoga)
+        function loginToResults() {
+            let id = document.getElementById('r-id').value.trim();
+            let pass = document.getElementById('r-pass').value.trim();
+            if(!id || !pass) return alert("Enter ID and Password!");
+
+            db.collection('barc_access').doc(id).get().then((doc) => {
+                if (doc.exists && doc.data().password === pass) {
+                    sessionStorage.setItem('barc_logged_in', id);
+                    sessionStorage.setItem('barc_student_name', doc.data().name || id);
+                    showDashboard(id, doc.data().name || id);
+                } else {
+                    alert("Invalid ID or Password!");
+                }
+            }).catch(e => alert("Database Error"));
+        }
+
+        function logoutResults() {
+            sessionStorage.removeItem('barc_logged_in');
+            sessionStorage.removeItem('barc_student_name');
+            window.location.reload();
+        }
+
+        // Dashboard load karna aur saare tests fetch karna
+        function showDashboard(studentId, studentName) {
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            document.getElementById('student-name').innerText = studentName;
+            document.getElementById('student-display-id').innerText = studentId;
+
+            db.collection('barc_results').where('studentID', '==', studentId).get().then((snapshot) => {
+                let list = document.getElementById('results-list');
+                if (snapshot.empty) {
+                    list.innerHTML = "<p style='text-align:center; padding:20px; color:#777; background:white; border-radius:8px;'>You haven't attempted any tests yet.</p>";
+                    return;
+                }
+                
+                // JavaScript mein Sorting (Taaki Firebase index ka error na aaye)
+                let resultsData = [];
+                snapshot.forEach(doc => resultsData.push(doc.data()));
+                resultsData.sort((a, b) => b.timestamp - a.timestamp);
+
+                let html = "";
+                resultsData.forEach(data => {
+                    let passData = JSON.stringify(data).replace(/'/g, "\\'"); 
+                    html += `
+                    <div class="history-card">
+                        <div class="history-info">
+                            <h3>${data.testName}</h3>
+                            <p><i class="far fa-calendar-alt"></i> ${data.date}</p>
+                            <p style="color:var(--primary); font-weight:bold; margin-top:5px;">Score: ${data.score} / ${data.totalMarks}</p>
+                        </div>
+                        <button class="btn-report" onclick='openReportModal(${passData})'>
+                            <i class="fas fa-chart-pie"></i> View Report
+                        </button>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            });
+        }
+
+        // Modal mein Pie Chart aur Details dikhana
+        function openReportModal(data) {
+            document.getElementById('report-modal').style.display = 'flex';
+            
+            document.getElementById('modal-title').innerText = data.testName;
+            document.getElementById('m-score').innerText = `${data.score} / ${data.totalMarks}`;
+            
+            let c = data.correct || 0, w = data.incorrect || 0, u = data.unattempted || 0, acc = data.accuracy || 0;
+
+            document.getElementById('m-corr').innerText = c;
+            document.getElementById('m-inc').innerText = w;
+            document.getElementById('m-unatt').innerText = u;
+            document.getElementById('m-acc').innerText = acc;
+
+            if (myChart) { myChart.destroy(); }
+            
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct', 'Incorrect', 'Unattempted'],
+                    datasets: [{ data: [c, w, u], backgroundColor: ['#28a745', '#dc3545', '#6c757d'], borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    </script>
+</body>
+</html>

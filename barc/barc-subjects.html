@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARC Test Series | Concept Cracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <style>
+        :root { --primary: #003366; --acc: #ff9800; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #333; }
+        
+        nav { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-decoration: none; }
+        .logo span { color: var(--acc); }
+        
+        .header { text-align: center; padding: 40px 20px; background: var(--primary); color: white; }
+        .header h1 { margin: 0 0 10px; font-size: 28px; }
+        
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .test-card { background: #fff; padding: 20px 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .test-info h2 { margin: 0 0 8px; font-size: 20px; color: var(--primary); }
+        .test-info p { margin: 0; color: #666; font-size: 14px; }
+        .tags span { background: #eef2f5; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 10px; color: #555; }
+        .btn-attempt { background: var(--acc); color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        
+        /* Direct Login Popup UI */
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 300px; text-align: center; position: relative; }
+        .login-box h3 { color: var(--primary); margin-top: 0; }
+        .login-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-start { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
+    </style>
+</head>
+<body>
+    
+    <nav>
+        <a href="../index.html" class="logo">CONCEPT <span>CRACKER</span></a>
+        <div class="nav-right" style="display: flex; gap: 20px; align-items: center;">
+            <a href="barc-results.html" style="color:var(--primary); font-weight:bold; text-decoration:none; background:#eef2f5; padding:8px 15px; border-radius:5px;"><i class="fas fa-chart-pie"></i> My Results</a>
+            <a href="../index.html" style="color:#555; font-weight:bold; text-decoration:none;">Back to Home</a>
+        </div>
+    </nav>
+    
+
+    <div class="header">
+        <h1>BARC OCES/DGFS Test Series</h1>
+        <p>Attempt premium full-length mock tests using your Access ID.</p>
+    </div>
+
+    <div class="container">
+        <div class="test-card">
+            <div class="test-info">
+                <h2>BARC Full Length Mock Test 1</h2>
+                <div class="tags"><span>100 Qs</span><span>120 Mins</span><span>300 Marks</span></div>
+            </div>
+            <button class="btn-attempt" onclick="openLogin('barc-test1.html')">Attempt Test</button>
+        </div>
+        
+          <div class="test-card">
+            <div class="test-info">
+                <h2>BARC Full Length Mock Test 2</h2>
+                <div class="tags"><span>100 Qs</span><span>120 Mins</span><span>300 Marks</span></div>
+            </div>
+            <button class="btn-attempt" onclick="openLogin('barc-test1.html')">Attempt Test</button>
+        </div>
+        
+          <div class="test-card">
+            <div class="test-info">
+                <h2>BARC Full Length Mock Test 3</h2>
+                <div class="tags"><span>100 Qs</span><span>120 Mins</span><span>300 Marks</span></div>
+            </div>
+            <button class="btn-attempt" onclick="openLogin('barc-test1.html')">Attempt Test</button>
+        </div>
+        
+          <div class="test-card">
+            <div class="test-info">
+                <h2>BARC Full Length Mock Test 4</h2>
+                <div class="tags"><span>100 Qs</span><span>120 Mins</span><span>300 Marks</span></div>
+                
+            </div>
+            <button class="btn-attempt" onclick="openLogin('barc-test1.html')">Attempt Test</button>
+        </div>  <div class="test-card">
+            <div class="test-info">
+                <h2>BARC Full Length Mock Test 5</h2>
+                <div class="tags"><span>100 Qs</span><span>120 Mins</span><span>300 Marks</span></div>
+            </div>
+            <button class="btn-attempt" onclick="openLogin('barc-test1.html')">Attempt Test</button>
+        </div>
+    </div>
+
+    <div id="login-modal">
+        <div class="login-box">
+            <span class="close-btn" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+            <h3>Enter Test Credentials</h3>
+            <p style="font-size:12px; color:#666;">Contact Yash Sir for Access ID and Password.</p>
+            <input type="text" id="studentId" placeholder="Access ID (e.g., student01)">
+            <input type="password" id="studentPass" placeholder="Password">
+            <button class="btn-start" onclick="verifyAndStart()">Start Exam</button>
+        </div>
+    </div>
+
+    <script>
+        // AAPKA ASLI FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+            authDomain: "concepts-creakres.firebaseapp.com",
+            projectId: "concepts-creakres",
+            storageBucket: "concepts-creakres.firebasestorage.app",
+            messagingSenderId: "882506019552",
+            appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        let targetTestUrl = "";
+
+        // Popup open karega
+        function openLogin(url) {
+            targetTestUrl = url;
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        // Database se ID Password Check Karega
+        function verifyAndStart() {
+            let id = document.getElementById('studentId').value.trim();
+            let pass = document.getElementById('studentPass').value.trim();
+
+            if(!id || !pass) {
+                alert("Please enter both Access ID and Password!");
+                return;
+            }
+
+            // Humne naya collection banaya hai 'barc_access' jisme aap ID Pass rakhoge
+            db.collection('barc_access').doc(id).get().then((doc) => {
+                if (doc.exists && doc.data().password === pass) {
+                    // Password Sahi Hai! Session mein save kar lo taaki test file isko read kar sake
+                    sessionStorage.setItem('barc_logged_in', id);
+                    sessionStorage.setItem('barc_student_name', doc.data().name || id);
+                    
+                    alert("Verification Successful! Starting Test...");
+                    window.location.href = targetTestUrl;
+                } else {
+                    alert("Invalid Access ID or Password! Please try again.");
+                }
+            }).catch(err => {
+                alert("Database Error: Check connection.");
+            });
+        }
+    </script>
+</body>
+</html>

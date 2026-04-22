@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARC Mock Test 1</title>
+    
+    <link rel="stylesheet" href="test-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+            authDomain: "concepts-creakres.firebaseapp.com",
+            projectId: "concepts-creakres",
+            storageBucket: "concepts-creakres.firebasestorage.app",
+            messagingSenderId: "882506019552",
+            appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    </script>
+    
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, startup: { typeset: false } };</script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script> window.IS_TEST_PAGE = true; </script>
+    <script src="calculator.js"></script>
+</head>
+
+<body>
+
+    <div id="inst" style="display:flex; flex-direction:column; align-items:center; padding:40px 20px; background:#eef2f5; min-height:100vh;">
+        <div style="background:#fff; padding:30px 40px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.1); max-width:850px; width:100%;">
+            <h2 style="text-align:center; color:#003366; margin-top:0; border-bottom:2px solid #003366; padding-bottom:10px;">BARC MOCK TEST 1</h2>
+            
+            <h3 style="color:#333;">Exam Details:</h3>
+            <ul style="line-height:1.8; font-size:15px; color:#444;">
+                <li><b>Total Duration:</b> 120 Minutes</li>
+                <li><b>Total Questions:</b> 10 (Classical Mechanics)</li>
+                <li><b>Tools:</b> Scientific Calculator is available on the top right.</li>
+                <li><b>Security:</b> Do not switch tabs. Test will auto-submit after 3 warnings.</li>
+            </ul>
+
+            <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:30px; border:1px solid #f5c6cb;">
+                <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px; align-items:center;">
+                    <input type="checkbox" style="transform:scale(1.5);" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                    I have read and understood the instructions. I am ready to begin the exam.
+                </label>
+            </div>
+            
+            <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5; padding:12px; margin-top:20px;" onclick="document.getElementById('inst').style.display='none'; document.getElementById('test-header').style.display='flex'; document.getElementById('test').style.display='flex'; sT(7200);" disabled>Start Test</button>
+        </div>
+    </div>
+
+    <header id="test-header" style="display:none;">
+        <h2>BARC/NPCIL scientific officer Test</h2>
+        <div>Time Left: <span id="time">120:00</span></div>
+    </header>
+    
+    <div class="main" id="test" style="display:none;">
+        <div class="left">
+            <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+            <div id="qt" class="q-txt">Loading...</div>
+            <div id="qi"></div>
+            <ul class="opts" id="ol"></ul>
+            
+            <div class="btn-grp">
+                <button class="b-sav" onclick="sav()">Save & Next</button>
+                <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+                <button class="b-clr" onclick="clr()">Clear Response</button>
+            </div>
+        </div>
+        <div class="right">
+          <button class="b-calc" onclick="tcsToggle()">Scientific Calculator</button>
+
+            <h3 style="margin-top:0;">Question Palette</h3>
+            <div class="pal" id="pal"></div>
+            <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+        </div>
+    </div>
+
+    <div id="res" style="display:none; padding:40px; text-align:center;">
+        <div class="r-box" style="background:white; padding:30px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); max-width:800px; margin:auto;">
+            <h2 style="color:#003366;">Test Submitted Successfully!</h2>
+            <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+            <div class="chart" style="width:300px; height:300px; margin:20px auto;"><canvas id="rc"></canvas></div>
+            <div class="stats" style="display:flex; justify-content:space-around; margin-top:20px; font-weight:bold; font-size:18px;">
+                <div style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+                <div style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+                <div style="color:#6c757d">Unattempted: <span id="rc-u">0</span></div>
+                <div style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+            </div>
+            <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px;"></div>
+        </div>
+    </div>
+
+    <script>
+                window.TEST_NAME = "BARC Mock Test 1";
+        var qs = [
+            // 1. Quantum Mechanics
+            { 
+                q: "A particle of mass $m$ is in a 1-D box of length $L$ (from $x=0$ to $x=L$). A small perturbation $H'=\\lambda\\delta(x-L/2)$ is applied at the center of the box. What is the first-order energy correction to the first excited state?", 
+                o: ["$0$", "$\\lambda/L$", "$2\\lambda/L$", "$-\\lambda/L$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "The wavefunction for the first excited state ($n=2$) is $\\psi_2(x) = \\sqrt{2/L}\\sin(2\\pi x/L)$. The first-order energy correction is $E_2^{(1)} = \\int_0^L |\\psi_2(x)|^2 H' dx = \\lambda |\\psi_2(L/2)|^2$. Since $\\sin(2\\pi(L/2)/L) = \\sin(\\pi) = 0$, the correction is exactly $0$."
+            },
+            // 2. Nuclear Physics
+            { 
+                q: "According to the semi-empirical mass formula (Liquid Drop Model), the surface energy term of a nucleus depends on its mass number $A$ as:", 
+                o: ["$A^{2/3}$", "$A^{1/3}$", "$A$", "$A^{-1/3}$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "The surface area of a nucleus is proportional to $R^2$. Since the nuclear radius $R \\propto A^{1/3}$, the surface area and hence the surface energy term is proportional to $(A^{1/3})^2 = A^{2/3}$."
+            },
+            // 3. Electromagnetic Theory
+            { 
+                q: "The skin depth $\\delta$ of an electromagnetic wave of frequency $\\omega$ penetrating into a good conductor of conductivity $\\sigma$ is proportional to:", 
+                o: ["$\\omega^{-1/2}$", "$\\omega^{1/2}$", "$\\omega^{-1}$", "$\\omega$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "For a good conductor, the skin depth is given by $\\delta = \\sqrt{\\frac{2}{\\mu\\sigma\\omega}}$. Therefore, $\\delta \\propto \\omega^{-1/2}$."
+            },
+            // 4. Solid State Physics
+            { 
+                q: "What is the volume of the primitive cell of the reciprocal lattice for an FCC lattice with conventional lattice parameter $a$?", 
+                o: ["$32\\pi^3/a^3$", "$16\\pi^3/a^3$", "$8\\pi^3/a^3$", "$4\\pi^3/a^3$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "The primitive cell volume of an FCC lattice in real space is $V = a^3/4$. The volume of the reciprocal lattice primitive cell is $V^* = \\frac{(2\\pi)^3}{V} = \\frac{8\\pi^3}{a^3/4} = \\frac{32\\pi^3}{a^3}$."
+            },
+            // 5. Electronics
+            { 
+                q: "An ideal operational amplifier (Op-Amp) is used to build an inverting amplifier with a feedback resistor $R_f = 100\\text{ k}\\Omega$ and an input resistor $R_i = 10\\text{ k}\\Omega$. If a DC input voltage of $2\\text{ V}$ is applied, what will be the output voltage?", 
+                o: ["$-20\\text{ V}$", "$20\\text{ V}$", "$-10\\text{ V}$", "$10\\text{ V}$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "For an inverting amplifier, the voltage gain is $A = -R_f/R_i$. Here, $A = -100\\text{ k}\\Omega / 10\\text{ k}\\Omega = -10$. Thus, $V_{out} = A \\times V_{in} = -10 \\times 2\\text{ V} = -20\\text{ V}$."
+            },
+            // 6. Thermodynamics & Statistical Physics
+            { 
+                q: "Which of the following represents a correct Maxwell's thermodynamic relation?", 
+                o: ["$(\\frac{\\partial T}{\\partial V})_S = -(\\frac{\\partial P}{\\partial S})_V$", "$(\\frac{\\partial T}{\\partial P})_S = -(\\frac{\\partial V}{\\partial S})_P$", "$(\\frac{\\partial S}{\\partial V})_T = (\\frac{\\partial P}{\\partial T})_V$", "Both A and C"], 
+                a: 3, m: 3, n: 1, img: "",
+                exp: "From $dU = TdS - PdV$, we get $(\\frac{\\partial T}{\\partial V})_S = -(\\frac{\\partial P}{\\partial S})_V$ (Option A is true). From Helmholtz free energy $dA = -SdT - PdV$, we get $(\\frac{\\partial S}{\\partial V})_T = (\\frac{\\partial P}{\\partial T})_V$ (Option C is true). Hence, both A and C are correct."
+            },
+            // 7. Mathematical Physics
+            { 
+                q: "The value of the complex integral $\\oint \\frac{dz}{z^2 + 1}$ evaluated counter-clockwise over the circle $|z| = 2$ is:", 
+                o: ["$0$", "$2\\pi i$", "$\\pi i$", "$-\\pi i$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "The poles of the integrand are at $z = +i$ and $z = -i$. Both poles lie inside the circle $|z| = 2$. The residue at $z=i$ is $\\lim_{z\\to i} \\frac{z-i}{(z-i)(z+i)} = \\frac{1}{2i}$. The residue at $z=-i$ is $\\frac{1}{-2i}$. Sum of residues = $\\frac{1}{2i} - \\frac{1}{2i} = 0$. By Cauchy's Residue Theorem, the integral is $2\\pi i \\times 0 = 0$."
+            },
+            // 8. Atomic & Molecular Physics
+            { 
+                q: "In the anomalous Zeeman effect, the transition $^2P_{1/2} \\rightarrow \\ ^2S_{1/2}$ splits into how many distinct spectral lines?", 
+                o: ["2", "3", "4", "6"], 
+                a: 2, m: 3, n: 1, img: "",
+                exp: "The $^2S_{1/2}$ state has $m_j = \\pm 1/2$. The $^2P_{1/2}$ state also has $m_j = \\pm 1/2$. The selection rules are $\\Delta m_j = 0, \\pm 1$. All four transitions ($\\frac{1}{2} \\to \\frac{1}{2}$, $\\frac{1}{2} \\to -\\frac{1}{2}$, $-\\frac{1}{2} \\to \\frac{1}{2}$, and $-\\frac{1}{2} \\to -\\frac{1}{2}$) are allowed. Therefore, 4 lines are observed."
+            },
+            // 9. Quantum Mechanics
+            { 
+                q: "The value of the commutator $[x^2, p_x^2]$ is:", 
+                o: ["$2i\\hbar (x p_x + p_x x)$", "$i\\hbar (x p_x + p_x x)$", "$4i\\hbar x p_x$", "$0$"], 
+                a: 0, m: 3, n: 1, img: "",
+                exp: "Using the commutator identity $[AB, C] = A[B,C] + [A,C]B$, we expand $[x^2, p_x^2] = x[x, p_x^2] + [x, p_x^2]x$. Since $[x, p_x^2] = 2i\\hbar p_x$, this gives $x(2i\\hbar p_x) + (2i\\hbar p_x)x = 2i\\hbar (x p_x + p_x x)$."
+            },
+            // 10. Statistical Mechanics
+            { 
+                q: "The Fermi energy $E_F$ of a two-dimensional free electron gas depends on the areal electron density $n$ as:", 
+                o: ["$E_F \\propto n^{1/2}$", "$E_F \\propto n$", "$E_F \\propto n^{2/3}$", "$E_F \\propto n^2$"], 
+                a: 1, m: 3, n: 1, img: "",
+                exp: "In 2D, the density of states $g(E) = \\frac{m}{\\pi \\hbar^2}$ is a constant (independent of $E$). The total number of electrons $N = \\int_0^{E_F} g(E) dE = \\frac{m A}{\\pi \\hbar^2} E_F$. Therefore, areal density $n = N/A \\propto E_F$, which means $E_F \\propto n$."
+            }
+                    // PART C (Questions 11 to 40)
+        ,
+        {
+            q: "Which of the following is an eigenfunction of the momentum operator $\\hat{p}_x = -i\\hbar\\frac{\\partial}{\\partial x}$?",
+            o: ["$\\sin(kx)$", "$\\cos(kx)$", "$e^{ikx}$", "$e^{-kx^2}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The momentum operator is $\\hat{p}_x = -i\\hbar\\frac{\\partial}{\\partial x}$. Applying it to $e^{ikx}$ gives $-i\\hbar(ik)e^{ikx} = \\hbar k e^{ikx}$. Since the operator returns the original function multiplied by a constant ($\\hbar k$), it is an eigenfunction. Sine and cosine functions yield cosine and sine respectively, making them a superposition of momentum states, not pure eigenfunctions."
+        },
+        {
+            q: "If the Lagrangian of a system is $L = \\frac{1}{2}m\\dot{x}^2 - \\frac{1}{2}kx^2$, the Hamiltonian $H$ is given by:",
+            o: ["$\\frac{p^2}{2m} - \\frac{1}{2}kx^2$", "$\\frac{p^2}{2m} + \\frac{1}{2}kx^2$", "$\\frac{p^2}{m} + kx^2$", "$\\frac{p^2}{m} - kx^2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The conjugate momentum is $p = \\frac{\\partial L}{\\partial \\dot{x}} = m\\dot{x}$. The Hamiltonian is obtained via Legendre transformation: $H = p\\dot{x} - L = \\frac{p^2}{m} - (\\frac{p^2}{2m} - \\frac{1}{2}kx^2) = \\frac{p^2}{2m} + \\frac{1}{2}kx^2$."
+        },
+        {
+            q: "At absolute zero temperature ($T=0\\text{ K}$), the Fermi-Dirac distribution function $f(E)$ for an energy state strictly below the Fermi energy ($E < E_F$) is:",
+            o: ["$0$", "$0.5$", "$1$", "$\\infty$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The Fermi-Dirac distribution is $f(E) = \\frac{1}{e^{(E-E_F)/k_BT} + 1}$. At $T=0$, if $E < E_F$, the term $(E-E_F)$ is negative. The exponent goes to $-\\infty$, making $e^{-\\infty} = 0$. Thus $f(E) = 1/(0+1) = 1$. All states below the Fermi level are completely occupied."
+        },
+        {
+            q: "In electrodynamics, the retarded scalar potential $V(\\vec{r}, t)$ at a field point $\\vec{r}$ and time $t$ due to a charge distribution $\\rho(\\vec{r}', t')$ is evaluated at the retarded time $t_{ret}$ given by:",
+            o: ["$t_{ret} = t + \\frac{|\\vec{r} - \\vec{r}'|}{c}$", "$t_{ret} = t - \\frac{|\\vec{r} - \\vec{r}'|}{c}$", "$t_{ret} = t - \\frac{c}{|\\vec{r} - \\vec{r}'|}$", "$t_{ret} = t$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Electromagnetic information travels at the finite speed of light $c$. The potential at time $t$ and position $\\vec{r}$ depends on the state of the source at an earlier time $t_{ret} = t - \\frac{|\\vec{r} - \\vec{r}'|}{c}$, which perfectly accounts for the spatial propagation delay."
+        },
+        {
+            q: "Which of the following commutator identities is mathematically incorrect?",
+            o: ["$[A, B] = -[B, A]$", "$[A, BC] = [A, B]C + B[A, C]$", "$[AB, C] = A[B, C] + [A, C]B$", "$[A, B+C] = [A, B] - [A, C]$"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "Commutators follow linearity with respect to addition. Therefore, the correct expansion is $[A, B+C] = [A, B] + [A, C]$. Option D contains a negative sign, making it the incorrect identity."
+        },
+        {
+            q: "The volume term in the semi-empirical mass formula is strictly proportional to the mass number $A$. This is a direct physical consequence of:",
+            o: ["The Coulomb repulsion between protons", "The Pauli exclusion principle", "The saturation of nuclear forces", "The surface tension of the nucleus"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Nuclear strong forces are short-ranged and exhibit saturation, meaning each nucleon only interacts with its closest neighbors. Because of this, the binding energy per nucleon is roughly constant, leading to a total volume binding energy that scales linearly with $A$."
+        },
+        {
+            q: "The boolean expression $Y = A\\bar{B} + \\bar{A}B$ represents the output of which foundational logic gate?",
+            o: ["AND", "OR", "XOR", "NAND"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The expression $A\\bar{B} + \\bar{A}B$ evaluates to true (1) strictly when inputs $A$ and $B$ are in different states. This defines the Exclusive-OR (XOR) gate logic."
+        },
+        {
+            q: "A particle of mass $m$ moves in a central potential $V(r)$. If its angular momentum is $L$, the effective 1-D potential $V_{eff}(r)$ governing its radial motion is:",
+            o: ["$V(r) - \\frac{L^2}{2mr^2}$", "$V(r) + \\frac{L^2}{2mr^2}$", "$V(r) + \\frac{L^2}{mr^2}$", "$V(r)$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "In central force motion, the kinetic energy is split into radial and angular parts. The angular part $\\frac{L^2}{2mr^2}$ acts as a centrifugal barrier and is added to the real potential to form the effective potential $V_{eff}(r) = V(r) + \\frac{L^2}{2mr^2}$."
+        },
+        {
+            q: "What is the ground state energy of a 1-D quantum harmonic oscillator with mass $m$ and angular frequency $\\omega$?",
+            o: ["$0$", "$\\hbar\\omega$", "$\\frac{1}{2}\\hbar\\omega$", "$\\frac{3}{2}\\hbar\\omega$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The energy levels of a 1-D harmonic oscillator are given by $E_n = (n + 1/2)\\hbar\\omega$. For the ground state, $n=0$, giving the zero-point energy $E_0 = \\frac{1}{2}\\hbar\\omega$, which is a direct consequence of the Heisenberg uncertainty principle."
+        },
+        {
+            q: "When an unpolarized light beam reflects off a dielectric surface at Brewster's angle $\\theta_B$, the reflected light is:",
+            o: ["Completely unpolarized", "Partially polarized", "Completely polarized parallel to the plane of incidence", "Completely polarized perpendicular to the plane of incidence"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "At Brewster's angle, the reflection coefficient for parallel-polarized light is precisely zero. Therefore, the reflected beam consists entirely of light polarized perpendicular to the plane of incidence (s-polarized)."
+        },
+        {
+            q: "For an ideal gas undergoing a reversible isothermal expansion from volume $V_1$ to $V_2$, the change in entropy $\\Delta S$ of the gas is:",
+            o: ["$nR\\ln(V_2/V_1)$", "$nR\\ln(V_1/V_2)$", "$nC_v\\ln(T_2/T_1)$", "$0$"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "From the first law $dQ = dU + dW$. For an isothermal process of an ideal gas, $dU = 0$. So, $dQ = dW = PdV = \\frac{nRT}{V}dV$. Entropy change $\\Delta S = \\int \\frac{dQ}{T} = \\int_{V_1}^{V_2} \\frac{nR}{V} dV = nR\\ln(V_2/V_1)$."
+        },
+        {
+            q: "For any continuously differentiable vector field $\\vec{A}$, the divergence of its curl is always:",
+            o: ["$\\vec{A}$", "$|\\vec{A}|^2$", "$0$", "$\\nabla^2\\vec{A}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "It is a fundamental vector calculus identity that $\\nabla \\cdot (\\nabla \\times \\vec{A}) = 0$. The curl of a vector field produces a field with no sources or sinks, thus its divergence is identically zero."
+        },
+        {
+            q: "In an X-ray diffraction experiment, the condition for constructive interference from crystal planes spaced by distance $d$ is given by Bragg's Law as:",
+            o: ["$d\\sin\\theta = n\\lambda$", "$2d\\sin\\theta = n\\lambda$", "$2d\\cos\\theta = n\\lambda$", "$d\\cos\\theta = n\\lambda$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The path difference between X-rays scattered from adjacent parallel crystal planes is $2d\\sin\\theta$. For constructive interference, this must equal an integer multiple of the wavelength, yielding $2d\\sin\\theta = n\\lambda$."
+        },
+        {
+            q: "In the beta decay process $n \\rightarrow p + e^- + \\bar{\\nu}_e$, the antineutrino is postulated primarily to conserve which physical quantity?",
+            o: ["Charge", "Baryon number", "Energy and angular momentum", "Isospin"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Before Pauli's neutrino hypothesis, beta decay appeared to violate the conservation of energy (continuous electron energy spectrum) and angular momentum (spin 1/2 turning into two spin 1/2 particles). The antineutrino accounts for the missing energy and restores spin conservation."
+        },
+        {
+            q: "According to Hund's rules, the ground state term symbol for a carbon atom ($1s^2 2s^2 2p^2$) is:",
+            o: ["$^1S_0$", "$^3P_0$", "$^3P_1$", "$^1D_2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "For a $p^2$ configuration, we maximize $S$ (spins parallel, $S=1$, multiplicity $2S+1=3$). Next, we maximize $L$ ($m_l = +1, 0$, so $L=1$, which is a P state). Since the shell is less than half full, we take the minimum $J = |L-S| = 0$. Thus, the ground state is $^3P_0$."
+        },
+        {
+            q: "Bose-Einstein Condensation (BEC) is a phase transition that uniquely occurs in momentum space. It applies strictly to particles with:",
+            o: ["Half-integer spin", "Zero rest mass", "Integer spin", "Negative charge"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "BEC occurs when a macroscopic number of identical particles occupy the lowest energy quantum state. The Pauli exclusion principle prevents fermions (half-integer spin) from doing this; hence, BEC only applies to bosons (integer spin)."
+        },
+        {
+            q: "In a rectangular waveguide of dimensions $a \\times b$ (where $a > b$), the dominant mode of propagation is:",
+            o: ["TE$_{11}$", "TM$_{11}$", "TE$_{10}$", "TM$_{01}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The cutoff frequency for a $TE_{mn}$ mode is $f_c = \\frac{c}{2}\\sqrt{(m/a)^2 + (n/b)^2}$. The lowest cutoff frequency (dominant mode) occurs when $m=1$ and $n=0$ (since $a > b$), making TE$_{10}$ the dominant mode."
+        },
+        {
+            q: "A Common-Emitter (CE) transistor amplifier inherently introduces a phase shift between the input and output voltage signals of exactly:",
+            o: ["$0^\\circ$", "$90^\\circ$", "$180^\\circ$", "$360^\\circ$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "In a CE amplifier, an increase in base voltage increases the collector current. This causes a larger voltage drop across the collector resistor, which lowers the output collector voltage. This inversion corresponds to a $180^\\circ$ phase shift."
+        },
+        {
+            q: "A particle of energy $E$ encounters a 1-D potential step of height $V_0$. If $E > V_0$, quantum mechanics predicts that the reflection coefficient $R$ is:",
+            o: ["Exactly $0$", "Exactly $1$", "Greater than $0$ but less than $1$", "Infinite"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Unlike classical mechanics (where the particle always passes if $E > V_0$), quantum mechanics treats the particle as a wave. The sudden change in potential changes the impedance of space, causing partial reflection: $R = \\left(\\frac{k_1 - k_2}{k_1 + k_2}\\right)^2 > 0$."
+        },
+        {
+            q: "A particle moving with velocity $\\vec{v}$ in a rotating frame of reference with angular velocity $\\vec{\\omega}$ experiences a Coriolis force given by:",
+            o: ["$-m\\vec{\\omega} \\times \\vec{v}$", "$-2m\\vec{\\omega} \\times \\vec{v}$", "$-m\\vec{\\omega} \\times (\\vec{\\omega} \\times \\vec{r})$", "$2m\\vec{v} \\times \\vec{\\omega}$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Coriolis force is a fictitious force that acts on objects moving within a rotating reference frame. It is mathematically defined as $\\vec{F}_{cor} = -2m(\\vec{\\omega} \\times \\vec{v}_{rot})$."
+        },
+        {
+            q: "The First Law of Thermodynamics, mathematically stated as $dU = dQ - dW$, is fundamentally a statement of the conservation of:",
+            o: ["Momentum", "Mass", "Energy", "Entropy"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The first law equates the change in internal energy of a system to the heat added minus the work done by the system. It strictly enforces the principle of conservation of energy."
+        },
+        {
+            q: "The singularity of the complex function $f(z) = \\frac{\\sin(z)}{z}$ at $z = 0$ is classified as a:",
+            o: ["Removable singularity", "Essential singularity", "Simple pole", "Branch point"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "Expanding $\\sin(z)$ into a Taylor series gives $\\frac{1}{z}(z - z^3/3! + \\dots) = 1 - z^2/3! + \\dots$. Since there are no negative powers of $z$ in the Laurent expansion, the singularity at $z=0$ can be removed by defining $f(0) = 1$."
+        },
+        {
+            q: "In superconductors, the expulsion of magnetic fields from the interior of the material as it transitions below the critical temperature $T_c$ is known as:",
+            o: ["The Hall Effect", "The Josephson Effect", "The Meissner Effect", "The Peltier Effect"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The Meissner effect is the defining phenomenon of perfect diamagnetism in superconductors, where surface currents perfectly cancel applied external magnetic fields, leading to strictly zero internal magnetic flux."
+        },
+        {
+            q: "The expectation value of the position $x$ for a particle in any stationary state of a symmetric potential box (from $-L/2$ to $L/2$) is:",
+            o: ["$L/2$", "$-L/2$", "$L$", "$0$"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "Because the potential is symmetric about the origin, the probability density $|\\psi(x)|^2$ is an even function. The position operator $x$ is an odd function. The integral of an odd function times an even function over a symmetric interval is exactly $0$."
+        },
+        {
+            q: "For a relativistic particle of rest mass $m_0$ and momentum $p$, its total energy $E$ is related by:",
+            o: ["$E^2 = p^2c^2 + m_0^2c^4$", "$E = p^2/2m_0 + m_0c^2$", "$E^2 = p^2c^2 - m_0^2c^4$", "$E = pc$"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "The relativistic energy-momentum relation is a fundamental consequence of special relativity, given by the invariant invariant equation $E^2 - (pc)^2 = (m_0c^2)^2$."
+        },
+        {
+            q: "Which of the following elements serves as the strongest donor impurity when doped into a Silicon (Si) semiconductor crystal?",
+            o: ["Boron (B)", "Aluminum (Al)", "Phosphorus (P)", "Gallium (Ga)"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Silicon has 4 valence electrons. To create an n-type semiconductor (donor), a pentavalent impurity (5 valence electrons) is required. Phosphorus is a Group V element, providing one extra free electron."
+        },
+        {
+            q: "The Pauli matrices $\\sigma_x, \\sigma_y, \\sigma_z$ satisfy the anti-commutation relation $\\{\\sigma_i, \\sigma_j\\}$ equal to:",
+            o: ["$2i\\epsilon_{ijk}\\sigma_k$", "$2\\delta_{ij}I$", "$0$", "$\\delta_{ij}\\sigma_k$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Pauli matrices anti-commute with each other (e.g., $\\sigma_x\\sigma_y = -\\sigma_y\\sigma_x$) and their squares are the identity matrix $I$. This is compactly written as the anti-commutator $\\{\\sigma_i, \\sigma_j\\} = 2\\delta_{ij}I$."
+        },
+        {
+            q: "In statistical mechanics, the partition function $Z$ of a classical ideal gas of $N$ identical, indistinguishable non-interacting particles is related to the single-particle partition function $Z_1$ by:",
+            o: ["$Z = (Z_1)^N$", "$Z = N Z_1$", "$Z = \\frac{(Z_1)^N}{N!}$", "$Z = \\ln(Z_1)$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Because the particles are indistinguishable, counting all $(Z_1)^N$ states overcounts permutations of the particles. Gibbs resolved this paradox by dividing by $N!$, giving $Z = \\frac{(Z_1)^N}{N!}$."
+        },
+        {
+            q: "For an electromagnetic wave propagating in a vacuum, the ratio of the magnitude of the electric field $E$ to the magnetic field $B$ is:",
+            o: ["$\\mu_0\\epsilon_0$", "$1/c$", "$c^2$", "$c$"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "From Maxwell's equations (specifically Faraday's law $\\nabla \\times \\vec{E} = -\\partial \\vec{B}/\\partial t$), for a plane wave $\\vec{k} \\times \\vec{E} = \\omega \\vec{B}$. The magnitudes relate as $kE = \\omega B$, which simplifies to $E/B = \\omega/k = c$."
+        },
+        {
+            q: "In nuclear physics, the process of internal conversion involves the emission of:",
+            o: ["An alpha particle", "A gamma-ray photon", "An orbital electron", "A positron"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Internal conversion is a radioactive decay process wherein an excited nucleus interacts directly with one of its inner atomic orbital electrons, ejecting the electron from the atom completely, rather than emitting a gamma-ray photon."
+        }
+                // PART D (Questions 31 to 60) - Mixed Subjects
+        ,
+        {
+            q: "In classical mechanics, the Poisson bracket of the components of angular momentum $\\{L_x, L_y\\}$ evaluates to:",
+            o: ["$0$", "$L_z$", "$-L_z$", "$1$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Poisson brackets for the components of orbital angular momentum follow the cyclic permutation relation $\\{L_x, L_y\\} = L_z$, which is the classical analogue of the quantum mechanical commutator $[L_x, L_y] = i\\hbar L_z$."
+        },
+        {
+            q: "According to the Debye model of specific heat for solids, at very low temperatures ($T \\ll \\Theta_D$), the lattice heat capacity $C_v$ is proportional to:",
+            o: ["$T$", "$T^2$", "$T^3$", "Independent of $T$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "At low temperatures, only low-frequency acoustic phonon modes are excited. The density of states for these 3D phonons scales as $\\omega^2$, leading to the total internal energy scaling as $T^4$, and hence the heat capacity $C_v = \\partial U / \\partial T \\propto T^3$."
+        },
+        {
+            q: "The experimentally observed small, non-zero electric quadrupole moment of the Deuteron nucleus indicates that:",
+            o: ["The nuclear force is purely central", "The nuclear force has a non-central (tensor) component", "The neutron has a net positive charge", "The strong force violates parity conservation"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "If the nuclear force were strictly central, the deuteron ground state would be purely an S-state ($L=0$), which is spherically symmetric and has zero quadrupole moment. The non-zero quadrupole moment implies a mixing of the D-state ($L=2$), which is caused by the tensor component of the nuclear force."
+        },
+        {
+            q: "Including electron spin, what is the total degeneracy of the $n$-th principal energy level in a hydrogen-like atom?",
+            o: ["$n$", "$n^2$", "$2n^2$", "$2n+1$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "For a given principal quantum number $n$, the orbital quantum number $l$ ranges from $0$ to $n-1$. Each $l$ state has $2l+1$ magnetic sub-states. Summing these gives $n^2$ orbital states. Since an electron has two spin states ($m_s = \\pm 1/2$), the total degeneracy is $2n^2$."
+        },
+        {
+            q: "Which of the following boundary conditions is strictly valid for the electric field $\\vec{E}$ and electric displacement $\\vec{D}$ across the interface of two different dielectric media with no free surface charge?",
+            o: ["Normal component of $\\vec{E}$ is continuous", "Tangential component of $\\vec{D}$ is continuous", "Tangential component of $\\vec{E}$ is continuous", "Both tangential $\\vec{E}$ and normal $\\vec{E}$ are continuous"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "From Faraday's law $\\oint \\vec{E} \\cdot d\\vec{l} = 0$ (static case), the tangential component of the electric field is continuous across a boundary ($E_{1t} = E_{2t}$). The normal component of $\\vec{D}$ is continuous only if there is no free surface charge."
+        },
+        {
+            q: "A Zener diode is primarily used in electronic circuits as a:",
+            o: ["Half-wave rectifier", "Voltage regulator", "High-frequency oscillator", "Current amplifier"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "A Zener diode is heavily doped and operates in the reverse breakdown region. Once the reverse voltage exceeds the Zener breakdown voltage, the voltage across the diode remains almost perfectly constant regardless of current variations, making it an excellent voltage regulator."
+        },
+        {
+            q: "If a square matrix $A$ is Hermitian, then all its eigenvalues must be:",
+            o: ["Zero", "Purely imaginary", "Strictly positive", "Real"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "A Hermitian matrix is defined by $A = A^\\dagger$. If $Ax = \\lambda x$, multiplying by $x^\\dagger$ gives $x^\\dagger Ax = \\lambda x^\\dagger x$. Taking the conjugate transpose gives $x^\\dagger A^\\dagger x = \\lambda^* x^\\dagger x$. Since $A = A^\\dagger$, $\\lambda = \\lambda^*$, meaning the eigenvalues are always real."
+        },
+        {
+            q: "In the fine structure of hydrogen, the splitting of the $2p$ energy level into $^2P_{1/2}$ and $^2P_{3/2}$ states is primarily caused by:",
+            o: ["Relativistic mass variation", "Spin-orbit coupling", "The external Earth's magnetic field", "Finite size of the nucleus"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Fine structure arises from two main effects: relativistic momentum correction and spin-orbit coupling. The actual splitting of states with the same $l$ but different $j$ (like $^2P_{1/2}$ and $^2P_{3/2}$) is exclusively due to the spin-orbit interaction (coupling of electron's spin magnetic moment with the magnetic field generated by its orbital motion)."
+        },
+        {
+            q: "According to the Clausius-Clapeyron equation, the variation of boiling point of a liquid with pressure is given by $dP/dT = L / (T \\Delta V)$. If pressure increases, the boiling point of water:",
+            o: ["Decreases", "Increases", "Remains unchanged", "Fluctuates"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "For water boiling into steam, the volume of steam is much larger than the volume of liquid water, so $\\Delta V = V_{steam} - V_{water} > 0$. Since latent heat $L > 0$ and $T > 0$, $dP/dT$ is positive. Therefore, an increase in pressure leads to an increase in the boiling point."
+        },
+        {
+            q: "In the context of the Hall effect in semiconductors, if the Hall coefficient $R_H$ is found to be strictly positive, the dominant charge carriers are:",
+            o: ["Electrons", "Holes", "Neutrons", "Phonons"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Hall coefficient is given by $R_H = \\frac{1}{nq}$ where $q$ is the charge of the carrier. For electrons, $q = -e$, making $R_H$ negative. For holes, $q = +e$, making $R_H$ positive. Thus, a positive $R_H$ indicates p-type conduction."
+        },
+        {
+            q: "Which of the following represents the correct sequence of the first three nuclear 'Magic Numbers' based on the nuclear shell model?",
+            o: ["2, 8, 20", "2, 10, 18", "2, 8, 18", "2, 6, 14"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "The nuclear shell model, incorporating strong spin-orbit coupling, predicts unusually stable nuclei when proton or neutron numbers correspond to closed shells. The sequence of these magic numbers is 2, 8, 20, 28, 50, 82, 126."
+        },
+        {
+            q: "By applying De Morgan's theorems, the Boolean expression $\\overline{A \\cdot B}$ is equivalent to:",
+            o: ["$\\bar{A} \\cdot \\bar{B}$", "$\\bar{A} + \\bar{B}$", "$A + B$", "$A \\cdot B$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "De Morgan's first theorem states that the complement of a product of variables is equal to the sum of the complements of the variables. Therefore, $\\overline{A \\cdot B} = \\bar{A} + \\bar{B}$ (A NAND gate is equivalent to a bubbled OR gate)."
+        },
+        {
+            q: "The Fourier transform of a normalized Gaussian function $f(x) = e^{-ax^2}$ (where $a>0$) in the $k$-domain is:",
+            o: ["A sinusoidal function", "A delta function", "A Lorentzian function", "Another Gaussian function"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "A fundamental property of Fourier transforms is that the transform of a Gaussian function is always another Gaussian function. Specifically, it transforms from $e^{-ax^2}$ to proportional to $e^{-k^2/4a}$. This is directly related to the minimum uncertainty principle wavepackets."
+        },
+        {
+            q: "In the selection rules for electric dipole transitions in atoms, the change in the orbital angular momentum quantum number $\\Delta l$ must be:",
+            o: ["$\\Delta l = 0$ only", "$\\Delta l = \\pm 1$", "$\\Delta l = 0, \\pm 1$", "$\\Delta l = \\pm 2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The electric dipole transition involves the emission or absorption of a single photon, which carries an intrinsic spin (angular momentum) of 1. To conserve total angular momentum, the orbital angular momentum of the atom must change by exactly one unit, hence $\\Delta l = \\pm 1$."
+        },
+        {
+            q: "The chemical potential $\\mu$ of a photon gas in thermal equilibrium inside a cavity is:",
+            o: ["$0$", "$k_B T$", "$\\frac{3}{2} k_B T$", "Infinite"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "Photons are bosons whose number is not conserved (they can be freely created or absorbed by the walls of the cavity to maintain thermal equilibrium). Since the free energy is minimized with respect to photon number, $\\frac{\\partial F}{\\partial N} = \\mu = 0$."
+        },
+        {
+            q: "A Carnot engine operates between a hot reservoir at $600\\text{ K}$ and a cold sink at $300\\text{ K}$. What is its maximum theoretical efficiency?",
+            o: ["$25\\%$", "$50\\%$", "$75\\%$", "$100\\%$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The efficiency of a Carnot engine is given by $\\eta = 1 - \\frac{T_c}{T_h}$. Plugging in the values, $\\eta = 1 - \\frac{300}{600} = 1 - 0.5 = 0.5$, which is exactly $50\\%$."
+        },
+        {
+            q: "In the context of superconductivity, the isotope effect describes the experimental observation that the critical temperature $T_c$ varies with the isotopic mass $M$ as:",
+            o: ["$T_c \\propto M$", "$T_c \\propto M^2$", "$T_c \\propto M^{-1/2}$", "$T_c \\propto M^{-1}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The isotope effect, $T_c \\sqrt{M} = \\text{constant}$ (or $T_c \\propto M^{-1/2}$), was a crucial clue that lattice vibrations (phonons) play a fundamental role in the formation of Cooper pairs, leading directly to the BCS theory of superconductivity."
+        },
+        {
+            q: "For a system of identical fermions, the total quantum mechanical wavefunction of the system upon the exchange of any two particles must be:",
+            o: ["Symmetric", "Antisymmetric", "Zero", "Complex conjugated"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Pauli Exclusion Principle is a manifestation of a deeper quantum rule: the total wavefunction of a system of identical fermions (half-integer spin) must be completely antisymmetric under the exchange of any pair of particles."
+        },
+        {
+            q: "In Larmor's formula, the total power $P$ radiated by a non-relativistic point charge $q$ is proportional to:",
+            o: ["Its velocity", "Its velocity squared", "Its acceleration", "Its acceleration squared"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "Larmor's formula is $P = \\frac{\\mu_0 q^2 a^2}{6\\pi c}$. Thus, the radiated power depends on the square of the acceleration ($a^2$). A charge moving with constant velocity ($a=0$) does not radiate."
+        },
+        {
+            q: "In Raman spectroscopy, the scattered spectral lines that appear at lower frequencies (longer wavelengths) than the incident monochromatic light are called:",
+            o: ["Rayleigh lines", "Stokes lines", "Anti-Stokes lines", "Balmer lines"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "When the incident photon loses energy to the molecule (exciting it to a higher vibrational/rotational state), the scattered photon has lower energy and lower frequency. These are termed Stokes lines. If it gains energy, they are Anti-Stokes lines."
+        },
+        {
+            q: "If $u(x,y)$ and $v(x,y)$ are the real and imaginary parts of an analytic complex function $f(z) = u + iv$, they must satisfy the Cauchy-Riemann equations:",
+            o: ["$u_x = v_y$ and $u_y = v_x$", "$u_x = v_y$ and $u_y = -v_x$", "$u_x = -v_y$ and $u_y = v_x$", "$u_x = -v_y$ and $u_y = -v_x$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "For a complex function to be analytic (differentiable), it must satisfy the Cauchy-Riemann equations: $\\frac{\\partial u}{\\partial x} = \\frac{\\partial v}{\\partial y}$ and $\\frac{\\partial u}{\\partial y} = -\\frac{\\partial v}{\\partial x}$."
+        },
+        {
+            q: "Gibbs free energy $G$ is defined in thermodynamics as:",
+            o: ["$G = U - TS$", "$G = H - TS$", "$G = U + PV$", "$G = H + TS$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Gibbs free energy is defined as $G = H - TS$, where $H$ is enthalpy ($H = U + PV$), $T$ is temperature, and $S$ is entropy. It is the thermodynamic potential minimized when a system reaches equilibrium at constant pressure and temperature."
+        },
+        {
+            q: "Which of the following logic gates is considered a 'Universal Gate' because any other logic circuit can be built using only this gate?",
+            o: ["AND", "OR", "NOR", "XOR"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "NAND and NOR gates are universal gates. By combining multiple NOR gates (or NAND gates), one can construct the logical equivalents of NOT, AND, and OR gates, making it possible to build any digital circuit."
+        },
+        {
+            q: "In the quantum mechanical WKB approximation, the transmission probability $T$ through a broad and high potential barrier $V(x)$ is roughly proportional to $e^{-2\\gamma}$. The factor $\\gamma$ contains an integral of:",
+            o: ["$\\sqrt{2m(E-V(x))}/\\hbar$", "$\\sqrt{2m(V(x)-E)}/\\hbar$", "$(V(x)-E)^2$", "$(E-V(x))^2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "In the classically forbidden region ($V(x) > E$), the momentum becomes imaginary. The attenuation factor $\\gamma$ is the integral of the local imaginary momentum: $\\gamma = \\int \\frac{\\sqrt{2m(V(x)-E)}}{\\hbar} dx$."
+        },
+        {
+            q: "The Q-value of a nuclear reaction $A + B \\rightarrow C + D$ is defined as:",
+            o: ["$(m_C + m_D - m_A - m_B)c^2$", "$(m_A + m_B - m_C - m_D)c^2$", "The kinetic energy of the incident particle", "The binding energy of the heaviest nucleus"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Q-value is the energy released in the reaction, calculated by the mass defect: $Q = \\text{Initial Mass Energy} - \\text{Final Mass Energy} = (m_A + m_B - m_C - m_D)c^2$. A positive $Q$ indicates an exothermic reaction."
+        },
+        {
+            q: "For a linear, isotropic, and homogenous dielectric medium, the electric polarization $\\vec{P}$ is directly related to the electric field $\\vec{E}$ by the electric susceptibility $\\chi_e$ as:",
+            o: ["$\\vec{P} = \\epsilon_0 \\chi_e \\vec{E}$", "$\\vec{P} = \\chi_e \\vec{E}$", "$\\vec{P} = \\frac{\\chi_e}{\\epsilon_0} \\vec{E}$", "$\\vec{P} = \\epsilon_0 (1 + \\chi_e) \\vec{E}$"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "Electric polarization is the dipole moment per unit volume. In a linear medium, it is proportional to the applied macroscopic electric field, defined as $\\vec{P} = \\epsilon_0 \\chi_e \\vec{E}$, where $\\chi_e$ is the dimensionless susceptibility."
+        },
+        {
+            q: "The total number of microstates $\\Omega$ available to an isolated system in the microcanonical ensemble directly determines the system's:",
+            o: ["Temperature", "Entropy", "Enthalpy", "Free Energy"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "According to Boltzmann's fundamental entropy formula, $S = k_B \\ln \\Omega$. Thus, the number of accessible microstates strictly determines the entropy of the system."
+        },
+        {
+            q: "In an N-channel JFET, the gate-to-source voltage ($V_{GS}$) required to completely deplete the channel and drop the drain current to zero is called the:",
+            o: ["Threshold voltage", "Breakdown voltage", "Pinch-off voltage", "Saturation voltage"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The pinch-off voltage ($V_p$) in a JFET is the reverse-bias voltage applied to the gate ($V_{GS}$) that causes the depletion regions to physically touch, cutting off the conducting channel entirely."
+        },
+        {
+            q: "A rigid diatomic molecule has how many classical degrees of freedom at room temperature?",
+            o: ["3", "5", "6", "7"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "A rigid diatomic molecule has 3 translational degrees of freedom (x, y, z) and 2 rotational degrees of freedom (rotation about the two axes perpendicular to the bond axis). At room temperature, vibrational modes are generally frozen out, totaling $3 + 2 = 5$ degrees of freedom."
+        },
+        {
+            q: "Which element's spectrum gave the first definitive experimental proof of the existence of electron spin?",
+            o: ["Hydrogen (Balmer Series)", "Helium (Singlet and Triplet states)", "Sodium (D-line doublet)", "Neon (Zeeman effect)"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The sodium D-lines appear as a closely spaced doublet (589.0 nm and 589.6 nm). This fine structure splitting of the $3p$ state into $^2P_{1/2}$ and $^2P_{3/2}$ could only be explained by introducing the concept of electron spin and spin-orbit coupling."
+        }
+                // PART E (Questions 61 to 100) - Final Complete Batch
+        ,
+        {
+            q: "The eigenvalues of an antisymmetric (skew-symmetric) real matrix are always:",
+            o: ["Real and positive", "Zero or purely imaginary", "Real and negative", "Complex with non-zero real parts"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "For a real skew-symmetric matrix $A^T = -A$. If $Ax = \\lambda x$, taking the conjugate transpose leads to $\\lambda^* = -\\lambda$. Thus, the eigenvalues must be either zero or purely imaginary ($a \\pm ib$, where $a=0$)."
+        },
+        {
+            q: "If $\\hat{S}_x$ is the $x$-component of the spin operator for a spin-1/2 particle, the expectation value $\\langle S_x^2 \\rangle$ in any state is:",
+            o: ["$\\hbar^2 / 4$", "$\\hbar^2 / 2$", "$\\hbar^2$", "$0$"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "For a spin-1/2 system, the spin operators are $\\hat{S}_i = \\frac{\\hbar}{2}\\sigma_i$. Since the Pauli matrices square to the identity matrix ($\\sigma_x^2 = I$), $\\hat{S}_x^2 = \\frac{\\hbar^2}{4} I$. Thus, its expectation value is always $\\hbar^2 / 4$."
+        },
+        {
+            q: "According to Wien's displacement law, the wavelength $\\lambda_{max}$ corresponding to the maximum spectral emissive power of a black body at temperature $T$ is proportional to:",
+            o: ["$T$", "$T^2$", "$T^{-1}$", "$T^{-4}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Wien's displacement law states that $\\lambda_{max} T = b$ (where $b$ is Wien's constant). Therefore, $\\lambda_{max}$ is inversely proportional to the absolute temperature $T$."
+        },
+        {
+            q: "Which of the following fundamental conservation laws is strictly violated in Weak nuclear interactions but conserved in Strong and Electromagnetic interactions?",
+            o: ["Baryon number", "Lepton number", "Parity", "Energy"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The famous Wu experiment demonstrated that weak interactions (such as beta decay) do not conserve parity (spatial inversion symmetry), unlike strong and electromagnetic forces."
+        },
+        {
+            q: "In a 1D monatomic Bravais lattice of lattice constant $a$, the phonon group velocity $v_g$ exactly at the Brillouin zone boundary ($k = \\pm \\pi/a$) is:",
+            o: ["The speed of sound", "Infinity", "Zero", "Maximum"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The dispersion relation is $\\omega = \\omega_{max}|\\sin(ka/2)|$. The group velocity is $v_g = d\\omega/dk$. At $k = \\pi/a$, the derivative of sine involves a cosine term which becomes zero, indicating standing waves with zero group velocity."
+        },
+        {
+            q: "A logic circuit outputs a HIGH (1) state ONLY if an odd number of its inputs are HIGH. This circuit mathematically functions as a:",
+            o: ["NAND gate", "NOR gate", "XOR gate", "XNOR gate"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "An Exclusive-OR (XOR) gate acts as a parity generator/checker. It evaluates to true strictly when the number of true (1) inputs is odd."
+        },
+        {
+            q: "Moseley's law relates the frequency $\\nu$ of the characteristic X-ray lines (e.g., $K_\\alpha$) to the atomic number $Z$ of the target element as:",
+            o: ["$\\nu \\propto Z$", "$\\nu \\propto Z^2$", "$\\sqrt{\\nu} \\propto (Z - b)$", "$\\nu \\propto (Z - b)^{-1}$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Moseley found empirically that the square root of the frequency of X-ray lines scales linearly with the effective atomic number, $\\sqrt{\\nu} = a(Z - b)$, which provided the first experimental proof of the atomic number concept."
+        },
+        {
+            q: "The radial probability density $P(r)$ for the ground state ($1s$ state) of a hydrogen atom reaches its maximum value exactly at:",
+            o: ["$r = 0$", "$r = a_0$ (Bohr radius)", "$r = 2a_0$", "$r = a_0/2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The radial probability density is $P(r) = r^2 |R_{10}(r)|^2 \propto r^2 e^{-2r/a_0}$. Maximizing this by setting its derivative to zero yields $r = a_0$."
+        },
+        {
+            q: "A highly relativistic particle moves at a speed of $v = 0.8c$. Its kinetic energy is approximately what fraction of its rest mass energy $m_0 c^2$?",
+            o: ["$0.25$", "$0.67$", "$0.80$", "$1.67$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Lorentz factor is $\\gamma = 1/\\sqrt{1 - 0.8^2} = 1/0.6 = 5/3 \\approx 1.667$. Kinetic energy is $K = (\\gamma - 1)m_0c^2 = (1.667 - 1)m_0c^2 = 0.667 m_0c^2$."
+        },
+        {
+            q: "Evaluate the residue of the complex function $f(z) = \\frac{e^z}{z^3}$ at its pole $z = 0$.",
+            o: ["$1$", "$1/2$", "$1/6$", "$0$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Expanding $e^z$ gives $f(z) = \\frac{1}{z^3} (1 + z + z^2/2! + z^3/3! + \\dots)$. The residue is the coefficient of the $1/z$ term, which is $1/2! = 1/2$."
+        },
+        {
+            q: "When an electromagnetic wave traveling in a vacuum strikes a perfectly conducting boundary at normal incidence, the reflected electric field is:",
+            o: ["In phase with the incident wave", "Out of phase by $\\pi$ (180 degrees)", "Out of phase by $\\pi/2$", "Zero (absorbed)"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "At the surface of a perfect conductor, the tangential electric field must be zero. Therefore, the reflected electric field vector must be equal in magnitude but perfectly opposite in phase ($\\pi$ phase shift) to the incident wave."
+        },
+        {
+            q: "The chemical potential $\\mu$ of an ideal Bose gas exactly at the Bose-Einstein condensation critical temperature $T_c$ is:",
+            o: ["Strictly positive", "Zero", "Negative", "Infinite"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "For bosons, the chemical potential must be less than or equal to the lowest energy state (usually taken as $E=0$). As the gas cools down to $T_c$, $\\mu$ rises and hits exactly zero, initiating macroscopic occupation of the ground state (BEC)."
+        },
+        {
+            q: "Which of the following nuclei is known to have the highest binding energy per nucleon, making it the most thermodynamically stable nucleus?",
+            o: ["$^4$He", "$^{12}$C", "$^{56}$Fe (or $^{62}$Ni)", "$^{235}$U"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The binding energy curve peaks around mass numbers 56-62. Iron-56 and Nickel-62 are recognized as having the highest binding energy per nucleon, representing the ultimate endpoints of stellar nucleosynthesis."
+        },
+        {
+            q: "In the Kronig-Penney model of solid-state physics, the introduction of a periodic potential strictly leads to:",
+            o: ["A continuous un-interrupted energy spectrum", "Energy bands separated by forbidden gaps", "Highly localized, discrete atomic levels", "The destruction of lattice phonons"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The Kronig-Penney model rigorously proves that solving the Schrödinger equation for electrons in a periodic array of potential wells naturally results in allowed energy bands separated by forbidden band gaps."
+        },
+        {
+            q: "An ideal operational amplifier is configured with a capacitor $C$ in the feedback path and a resistor $R$ connected to the inverting input. This specific circuit functions as:",
+            o: ["An active high-pass filter", "A differentiator", "An integrator", "A non-inverting buffer"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "In this configuration, the input current $V_{in}/R$ must flow through the feedback capacitor. Since $I_c = C(dV_{out}/dt)$, integrating this gives $V_{out} = -\\frac{1}{RC}\\int V_{in} dt$, which is the equation of an integrator."
+        },
+        {
+            q: "If the parity operator $\\hat{\\Pi}$ acts on the $n$-th excited state $\\psi_n(x)$ of a 1D quantum harmonic oscillator, the resulting eigenvalue is:",
+            o: ["$1$", "$-1$", "$(-1)^n$", "Zero"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The wavefunctions of the harmonic oscillator contain Hermite polynomials $H_n(x)$. Since $H_n(-x) = (-1)^n H_n(x)$, the parity of the state strictly alternates with $n$, giving the eigenvalue $(-1)^n$."
+        },
+        {
+            q: "A mechanical system with $N$ degrees of freedom undergoes small oscillations around a stable equilibrium point. How many distinct normal modes of vibration will the system possess?",
+            o: ["$N-1$", "$N$", "$2N$", "$N^2$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "A fundamental theorem of small oscillations guarantees that a system with $N$ independent degrees of freedom will have exactly $N$ independent normal modes (eigenfrequencies)."
+        },
+        {
+            q: "The Kronecker delta $\\delta_{ij}$ (defined as 1 if $i=j$ and 0 otherwise) is mathematically classified as a tensor of rank:",
+            o: ["0 (Scalar)", "1 (Vector)", "2", "3"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The Kronecker delta connects two indices (two dimensions) and transforms as a mixed second-rank tensor under coordinate transformations. It acts as the identity matrix in tensor algebra."
+        },
+        {
+            q: "In a hollow metallic rectangular waveguide, TEM (Transverse Electro-Magnetic) waves cannot propagate because:",
+            o: ["They require a central inner conductor to satisfy boundary conditions", "The walls absorb them entirely", "Their cutoff frequency is mathematically infinity", "They violate the principle of energy conservation"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "For a TEM wave, both $E_z$ and $H_z$ are zero. By Faraday's Law, the transverse fields can be derived from a scalar potential. In a hollow waveguide with a single equipotential boundary, this potential must be constant everywhere inside, meaning no fields can exist. A two-conductor system (like coax) is required."
+        },
+        {
+            q: "For a classical 1D harmonic oscillator of total energy $E$, the trajectory in phase space $(x, p_x)$ is an ellipse. The total enclosed area of this ellipse is equal to:",
+            o: ["$E/\\nu$", "$E/\\omega$", "$2\\pi E / \\omega$", "$\\hbar\\omega$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The semi-major axes are $x_0 = \\sqrt{2E/k}$ and $p_0 = \\sqrt{2mE}$. The area of the ellipse is $\\pi x_0 p_0 = \pi \\sqrt{4mE^2/k} = 2\\pi E \\sqrt{m/k}$. Since $\\omega = \\sqrt{k/m}$, the area is exactly $2\\pi E/\\omega$."
+        },
+        {
+            q: "In a Kurie plot used for analyzing allowed beta decay transitions, the graph of $\\sqrt{N(p_e)/[p_e^2 F(Z, p_e)]}$ plotted against the electron's kinetic energy $K_e$ ideally yields:",
+            o: ["A parabolic curve", "A straight linear line", "An exponential decay curve", "A hyperbola"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Fermi's theory of beta decay predicts that this specific normalized quantity is directly proportional to $(K_{max} - K_e)$. Thus, plotting it against $K_e$ yields a straight line whose x-intercept gives the maximum endpoint energy $K_{max}$."
+        },
+        {
+            q: "Type-I superconductors exhibit perfectly diamagnetic behavior up to a critical magnetic field $H_c$, above which they:",
+            o: ["Become Type-II superconductors", "Transition directly into the normal resistive state", "Become perfectly ferromagnetic", "Form a vortex state (mixed state)"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "Unlike Type-II materials which have a mixed vortex state between $H_{c1}$ and $H_{c2}$, Type-I superconductors undergo an abrupt, first-order phase transition directly to the normal state when the applied field exceeds $H_c$."
+        },
+        {
+            q: "The Barkhausen criterion for sustained oscillations in a feedback electronic circuit with loop gain $A\\beta$ strictly requires:",
+            o: ["$|A\\beta| = 1$ and a phase shift of $0^\\circ$ or $360^\\circ$", "$|A\\beta| < 1$ and a phase shift of $180^\\circ$", "$|A\\beta| > 1$ and a phase shift of $90^\\circ$", "$|A\\beta| = 0$"],
+            a: 0, m: 3, n: 1, img: "",
+            exp: "For a circuit to sustain steady oscillations without an external input, the feedback signal must exactly replace the original signal in both magnitude ($|A\\beta|=1$) and phase (shift of $2n\\pi$), creating perfect positive feedback."
+        },
+        {
+            q: "For a quantum particle in an orbital angular momentum state characterized by quantum numbers $|l, m_l\\rangle$, the maximum possible value of the $z$-component of angular momentum is:",
+            o: ["$l(l+1)\\hbar$", "$l\\hbar$", "$\\hbar/2$", "$m_l\\hbar$"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "The operator $L_z$ has eigenvalues $m_l\\hbar$. Since the magnetic quantum number $m_l$ ranges from $-l$ to $+l$, the maximum possible value for the $z$-component is $l\\hbar$."
+        },
+        {
+            q: "The mathematical generating function $g(x,t) = (1 - 2xt + t^2)^{-1/2}$ generates which set of special orthogonal polynomials?",
+            o: ["Hermite polynomials", "Legendre polynomials", "Laguerre polynomials", "Chebyshev polynomials"],
+            a: 1, m: 3, n: 1, img: "",
+            exp: "This is the standard definition of the generating function for Legendre polynomials $P_n(x)$. Expanding $(1 - 2xt + t^2)^{-1/2}$ in a Taylor series in $t$ yields coefficients that are exactly $P_n(x)$."
+        },
+        {
+            q: "According to Poisson's Theorem in classical mechanics, if dynamical variables $F$ and $G$ are both constants of motion, their Poisson bracket $\\{F, G\\}$ must be:",
+            o: ["Always identically zero", "A non-trivial function of time", "Also a constant of motion", "Equal to the Hamiltonian of the system"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Poisson's theorem states that if $dF/dt = 0$ and $dG/dt = 0$, then the total time derivative of their Poisson bracket $d\\{F,G\\}/dt = 0$. Hence, the bracket itself constitutes another (though not always independent) constant of motion."
+        },
+        {
+            q: "In the operational mechanism of a Helium-Neon (He-Ne) gas laser, what is the primary role of the Helium atoms?",
+            o: ["They emit the red laser light photons", "They absorb extra photons to prevent premature stimulated emission", "They efficiently transfer excitation energy to Neon atoms via collisions", "They act as a cooling buffer gas for the laser tube"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "Helium atoms are easily excited by electrical discharge. Their excited states ($2^1S$ and $2^3S$) are highly metastable and resonant with the upper states of Neon. Through inelastic collisions, they transfer this energy to Neon, achieving the required population inversion."
+        },
+        {
+            q: "The force-mediating particles (gauge bosons) responsible for transmitting the strong nuclear force between quarks are called:",
+            o: ["Photons", "W and Z bosons", "Gravitons", "Gluons"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "In Quantum Chromodynamics (QCD), the strong force is mediated by 8 massless gauge bosons called gluons, which couple to the 'color' charge of the quarks."
+        },
+        {
+            q: "According to Larmor's classical radiation formula, an oscillating electric dipole radiates electromagnetic power proportional to its angular frequency $\\omega$ raised to the power:",
+            o: ["$2$", "$3$", "$4$", "$6$"],
+            a: 2, m: 3, n: 1, img: "",
+            exp: "The power radiated by a dipole is proportional to the square of its acceleration. For harmonic oscillation, $a = -\\omega^2 x$. Therefore, $a^2 \\propto \\omega^4$, making the radiated power strictly proportional to $\\omega^4$."
+        },
+        {
+            q: "At the absolute zero of temperature ($T \\rightarrow 0$ K), the entropy of any perfectly crystalline solid approaches exactly zero. This physical principle is known as:",
+            o: ["The Zeroth law of thermodynamics", "The First law of thermodynamics", "The Second law of thermodynamics", "The Third law of thermodynamics"],
+            a: 3, m: 3, n: 1, img: "",
+            exp: "This statement is the Nernst-Simon theorem, universally recognized as the Third Law of Thermodynamics. At absolute zero, a perfect crystal assumes its unique ground state, leaving only 1 available microstate ($\\Omega=1$), so $S = k_B \\ln(1) = 0$."
+        }
+        
+        ];
+
+    </script>
+    
+    <script src="test-engine.js"></script>
+
+</body>
+</html>
