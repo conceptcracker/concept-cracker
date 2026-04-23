@@ -186,6 +186,17 @@ function finalSubmit(force) {
         });
     }
 }
+// --- ACCIDENTAL RELOAD BLOCKER ---
+window.addEventListener('beforeunload', function (e) {
+    // Ye check karega ki kya test actual mein start ho chuka hai (Screen par dikh raha hai)
+    var testScreen = document.getElementById('test');
+    if (testScreen && testScreen.style.display === 'flex') {
+        // Agar test chal raha hai, toh browser ko refresh karne se pehle warning dene ko bolega
+        e.preventDefault();
+        e.returnValue = ''; 
+    }
+});
+
 
 
 window.onload = iT;
