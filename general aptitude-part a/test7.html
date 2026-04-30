@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET PART A  </title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+
+<script src="../calculator.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+ 
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>30 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Questions (Q.1 to Q.20) yo can attempt only 15 question:</b> +2 Marks for correct, -0.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+            <li>You can toggle between English and Hindi using the button in the header.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header>
+    <h2>Physics Mock Test</h2>
+    <div style="display:flex; align-items:center;">
+        <button id="lang-btn" onclick="toggleLang()" style="background:#ff9800; color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; margin-right:15px; font-weight:bold;">A/अ Hindi</button>
+        <div>Time Left: <span id="time">30:00</span></div>
+    </div>
+</header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tcsToggle()">🖩 Scientific Calculator</button>
+        
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+<script>
+           // --- CSIR-NET DECEMBER 2023: PART A (Q1 to Q20) ---
+        var qs = [
+            // Q1
+            {
+                type: 'mcq',
+                q_en: "All the four entries in column A must be matched with all those in column B. Each correctly matched option gets one mark and no mark is awarded otherwise. Which of the following mark(s) CANNOT be scored?",
+                q_hi: "कॉलम A की सभी चार प्रविष्टियों (entries) का कॉलम B की प्रविष्टियों के साथ मिलान किया जाना है। प्रत्येक सही मिलान किए गए विकल्प पर एक अंक मिलता है और अन्यथा कोई अंक नहीं दिया जाता है। निम्नलिखित में से कौन सा अंक प्राप्त नहीं किया जा सकता है?",
+                img: '',
+                o_en: ["3", "1", "2", "4"],
+                o_hi: ["3", "1", "2", "4"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "If you correctly match exactly 3 entries, the 4th entry automatically gets matched to its correct remaining counterpart. Therefore, it's impossible to score exactly 3 marks; you will score 4. You can score 0, 1, 2, or 4 marks.",
+                exp_hi: "यदि आप ठीक 3 प्रविष्टियों का सही मिलान करते हैं, तो चौथी प्रविष्टि स्वचालित रूप से अपने सही विकल्प से मिलान हो जाएगी। इसलिए, ठीक 3 अंक प्राप्त करना असंभव है; आपको सीधे 4 अंक मिलेंगे। आप 0, 1, 2 या 4 अंक प्राप्त कर सकते हैं।"
+            },
+            // Q2
+            {
+                type: 'mcq',
+                q_en: "Four children had 27 apples among them. No child had less than 5 apples. If no two children had the same number of apples, then which of the following could NOT be the number of apples a child had?",
+                q_hi: "चार बच्चों के पास कुल 27 सेब थे। किसी भी बच्चे के पास 5 से कम सेब नहीं थे। यदि किन्हीं भी दो बच्चों के पास समान संख्या में सेब नहीं थे, तो निम्नलिखित में से कौन सी संख्या किसी बच्चे के पास सेबों की संख्या नहीं हो सकती?",
+                img: '',
+                o_en: ["5", "6", "8", "9"],
+                o_hi: ["5", "6", "8", "9"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Let the apples be a < b < c < d. Minimum possible apples = 5, 6, 7, 8, which sum to 26. Since total is 27, we add 1 to the highest to keep them distinct: 5, 6, 7, 9. If a child had 8 apples, combinations like 5, 6, 8, x would mean x=8 (not distinct) or 5, 7, 8, x would mean x=7 (not distinct). Hence, 8 is impossible.",
+                exp_hi: "माना सेब a < b < c < d हैं। न्यूनतम संभव सेब = 5, 6, 7, 8, जिनका योग 26 है। चूंकि कुल 27 हैं, हम सबसे बड़े में 1 जोड़ते हैं ताकि वे अलग-अलग रहें: 5, 6, 7, 9. यदि किसी बच्चे के पास 8 सेब होते, तो 5, 6, 8, x (x=8, जो समान हो जाएगा) या 5, 7, 8, x (x=7, जो समान हो जाएगा)। अतः 8 असंभव है।"
+            },
+            // Q3
+            {
+                type: 'mcq',
+                q_en: "In 1979, Ramesh's age was the sum of the digits of his year of birth. In 2017, on his birthday, what was his age?",
+                q_hi: "1979 में, रमेश की आयु उसके जन्म के वर्ष के अंकों के योग के बराबर थी। 2017 में, उसके जन्मदिन पर, उसकी आयु क्या थी?",
+                img: '',
+                o_en: ["49", "57", "60", "64"],
+                o_hi: ["49", "57", "60", "64"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Let birth year be 19xy. Age in 1979 = 1979 - (1900 + 10x + y) = 79 - 10x - y. Sum of digits = 1 + 9 + x + y = 10 + x + y. Equating both: 79 - 10x - y = 10 + x + y => 11x + 2y = 69. If x=5, 55 + 2y = 69 => 2y = 14 => y=7. Birth year = 1957. Age in 2017 = 2017 - 1957 = 60 years.",
+                exp_hi: "माना जन्म का वर्ष 19xy है। 1979 में आयु = 79 - 10x - y. अंकों का योग = 10 + x + y. दोनों को बराबर करने पर: 79 - 10x - y = 10 + x + y => 11x + 2y = 69. यदि x=5 रखें, तो 2y=14 => y=7. जन्म का वर्ष = 1957. 2017 में आयु = 2017 - 1957 = 60 वर्ष।"
+            },
+            // Q4
+            {
+                type: 'mcq',
+                q_en: "If $a<x<b$, then for which of the following relations does $0<y<1$ always hold?",
+                q_hi: "यदि $a<x<b$, तो निम्नलिखित में से किस संबंध के लिए $0<y<1$ हमेशा सत्य होता है?",
+                img: '',
+                o_en: ["$y=\\frac{a-x}{b+a}$", "$y=\\frac{x-a}{b-a}$", "$y=\\frac{x-b}{b-a}$", "$y=\\frac{b-x}{a+b}$"],
+                o_hi: ["$y=\\frac{a-x}{b+a}$", "$y=\\frac{x-a}{b-a}$", "$y=\\frac{x-b}{b-a}$", "$y=\\frac{b-x}{a+b}$"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Since $a < x < b$, we know $x - a > 0$ and $b - x > 0$. Also, $b - a > 0$. In option 2, $y = (x-a)/(b-a)$. Since $x$ is strictly between $a$ and $b$, the distance $(x-a)$ is strictly less than the total distance $(b-a)$. Thus, $0 < (x-a)/(b-a) < 1$.",
+                exp_hi: "चूंकि $a < x < b$, हम जानते हैं कि $x - a > 0$ और $b - a > 0$। विकल्प 2 में, $y = (x-a)/(b-a)$। चूंकि $x$, $a$ और $b$ के बीच है, दूरी $(x-a)$ कुल दूरी $(b-a)$ से कम होगी। इस प्रकार, $0 < (x-a)/(b-a) < 1$ हमेशा सत्य होगा।"
+            },
+            // Q5
+            {
+                type: 'mcq',
+                q_en: "A person's viral load measured in some unit was 15, 25, 50, 200, 300, 150 and 30 on days 1 to 7, respectively. The maximum relative change took place between",
+                q_hi: "किसी व्यक्ति का वायरल लोड (कुछ इकाई में मापा गया) दिन 1 से 7 तक क्रमशः 15, 25, 50, 200, 300, 150 और 30 था। अधिकतम सापेक्ष परिवर्तन (maximum relative change) किसके बीच हुआ?",
+                img: '',
+                o_en: ["day 3 to day 4", "day 4 to day 5", "day 5 to day 6", "day 6 to day 7"],
+                o_hi: ["दिन 3 से दिन 4", "दिन 4 से दिन 5", "दिन 5 से दिन 6", "दिन 6 से दिन 7"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "Relative change = |Final - Initial| / Initial. Day 3 to 4: |200-50|/50 = 3.0 (300%). Day 4 to 5: |300-200|/200 = 0.5 (50%). Day 5 to 6: |150-300|/300 = 0.5 (50%). Day 6 to 7: |30-150|/150 = 0.8 (80%). The maximum relative change is 300% between day 3 to 4.",
+                exp_hi: "सापेक्ष परिवर्तन = |अंतिम - प्रारंभिक| / प्रारंभिक। दिन 3 से 4: |200-50|/50 = 3.0 (300%)। दिन 4 से 5: |300-200|/200 = 0.5 (50%)। दिन 5 से 6: |150-300|/300 = 0.5 (50%)। दिन 6 से 7: |30-150|/150 = 0.8 (80%)। अधिकतम सापेक्ष परिवर्तन दिन 3 से 4 के बीच (300%) है।"
+            },
+            // Q6
+            {
+                type: 'mcq',
+                q_en: "What is the value of x in the given magic square, (i.e, a square grid in which the sum of the numbers in rows, columns and diagonals is the same)? Row 1: X, x-5, 8. Row 2: x+1, y, y-2. Row 3: 2, 9, 4.",
+                q_hi: "दिए गए जादुई वर्ग (magic square) में x का मान क्या है, (अर्थात, एक वर्गाकार ग्रिड जिसमें पंक्तियों, स्तंभों और विकर्णों में संख्याओं का योग समान है)? पंक्ति 1: X, x-5, 8. पंक्ति 2: x+1, y, y-2. पंक्ति 3: 2, 9, 4.",
+                img: '',
+                o_en: ["6", "4", "3", "1"],
+                o_hi: ["6", "4", "3", "1"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "The sum of the last row is 2 + 9 + 4 = 15. Since it's a magic square, every row/column sum is 15. The first column sum: X + (x+1) + 2 = 15 => 2x + 3 = 15 => 2x = 12 => x = 6.",
+                exp_hi: "अंतिम पंक्ति का योग 2 + 9 + 4 = 15 है। चूंकि यह एक जादुई वर्ग है, प्रत्येक पंक्ति/स्तंभ का योग 15 होगा। पहले स्तंभ का योग: X + (x+1) + 2 = 15 => 2x + 3 = 15 => 2x = 12 => x = 6."
+            },
+            // Q7 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "In the figure $log_{10}y$ is plotted against $log_{10}x$. When y is plotted against x, then the plot in the provided range is",
+                q_hi: "चित्र में $log_{10}y$ को $log_{10}x$ के विरुद्ध प्लॉट किया गया है। जब y को x के विरुद्ध प्लॉट किया जाता है, तो दी गई सीमा (range) में प्लॉट क्या होगा?",
+                img: 'https://iili.io/BsuW1FR.png',
+                o_en: ["Graph A", "Graph B", "Graph C", "Graph D"],
+                o_hi: ["ग्राफ A", "ग्राफ B", "ग्राफ C", "ग्राफ D"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "The straight line passes through (2,0) and (0,-1). Its slope is (0 - (-1)) / (2 - 0) = 1/2. Equation: $\\log y = 0.5 \\log x - 1 \\implies y = 10^{-1} x^{1/2} = 0.1\\sqrt{x}$. A plot of $y \\propto \\sqrt{x}$ on a log-log scale matches Graph A in the official paper.",
+                exp_hi: "सीधी रेखा (2,0) और (0,-1) से होकर गुजरती है। इसका ढलान (slope) = 1/2 है। समीकरण: $\\log y = 0.5 \\log x - 1 \\implies y = 10^{-1} x^{1/2} = 0.1\\sqrt{x}$। लॉग-लॉग स्केल पर $y \\propto \\sqrt{x}$ का ग्राफ पेपर के 'ग्राफ A' से मेल खाता है।"
+            },
+            // Q8
+            {
+                type: 'mcq',
+                q_en: "Radius of sphere is measured with 5% uncertainty. What is the uncertainty in the volume, determined from this radius?",
+                q_hi: "गोले की त्रिज्या (radius) 5% अनिश्चितता के साथ मापी जाती है। इस त्रिज्या से निर्धारित आयतन (volume) में कितनी अनिश्चितता होगी?",
+                img: '',
+                o_en: ["5%", "6.6%", "125%", "15%"],
+                o_hi: ["5%", "6.6%", "125%", "15%"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Volume of a sphere $V = \\frac{4}{3}\\pi r^3$. The percentage uncertainty in volume is 3 times the percentage uncertainty in radius. $\\Delta V/V = 3 \\times (\\Delta r/r) = 3 \\times 5\\% = 15\\%$.",
+                exp_hi: "गोले का आयतन $V = \\frac{4}{3}\\pi r^3$ होता है। आयतन में प्रतिशत अनिश्चितता त्रिज्या में प्रतिशत अनिश्चितता का 3 गुना होती है। $\\Delta V/V = 3 \\times (\\Delta r/r) = 3 \\times 5\\% = 15\\%$।"
+            },
+            // Q9
+            {
+                type: 'mcq',
+                q_en: "In a market, you can buy a mango for Rs. 10, a lemon for Re. 1 and 8 chillies for Re.1. How many of these items do you need to buy to get a mix of 100 items for exactly Rs. 100?",
+                q_hi: "एक बाजार में, आप 10 रुपये में एक आम, 1 रुपये में एक नींबू और 1 रुपये में 8 मिर्च खरीद सकते हैं। 100 रुपये में ठीक 100 वस्तुओं का मिश्रण प्राप्त करने के लिए आपको इनमें से कितनी वस्तुएँ खरीदनी होंगी?",
+                img: '',
+                o_en: ["6 mangoes, 22 lemons, 72 chillis", "7 mangoes, 21 lemons, 72 chillis", "1 mango, 9 lemons, 80 chillis", "8 mangoes, 12 lemons, 80 chillis"],
+                o_hi: ["6 आम, 22 नींबू, 72 मिर्च", "7 आम, 21 नींबू, 72 मिर्च", "1 आम, 9 नींबू, 80 मिर्च", "8 आम, 12 नींबू, 80 मिर्च"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Let Mangoes=M, Lemons=L, Chillies=C. Equations: M+L+C = 100 and 10M + L + C/8 = 100. Subtracting first from second: 9M - 7C/8 = 0 => 72M = 7C. Since M and C are integers, let M=7, then C=72. Thus, L = 100 - (7+72) = 21. Checking price: 10(7) + 21 + 72/8 = 70 + 21 + 9 = 100.",
+                exp_hi: "समीकरण: M+L+C = 100 और 10M + L + C/8 = 100. पहले को दूसरे से घटाने पर: 9M - 7C/8 = 0 => 72M = 7C. चूँकि M और C पूर्णांक हैं, यदि M=7 रखें, तो C=72 होगा। इस प्रकार L = 100 - (7+72) = 21. कीमत की जाँच: 10(7) + 21 + 72/8 = 70 + 21 + 9 = 100."
+            },
+            // Q10
+            {
+                type: 'mcq',
+                q_en: "A letter is drawn at random from the following string of letters: RAMUKYAJNAS. What is the probability that it is NOT a vowel?",
+                q_hi: "निम्नलिखित अक्षरों की श्रृंखला में से एक अक्षर यादृच्छिक रूप से (randomly) निकाला जाता है: RAMUKYAJNAS. इसकी क्या प्रायिकता है कि यह स्वर (vowel) नहीं है?",
+                img: '',
+                o_en: ["1/2", "6/11", "7/11", "8/11"],
+                o_hi: ["1/2", "6/11", "7/11", "8/11"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Total letters in RAMUKYAJNAS = 11. Vowels (A, U, A, A) = 4. Letters that are NOT vowels (consonants) = 11 - 4 = 7. Probability = 7/11.",
+                exp_hi: "RAMUKYAJNAS में कुल अक्षर = 11. स्वर (A, U, A, A) = 4. वे अक्षर जो स्वर नहीं हैं (व्यंजन) = 11 - 4 = 7. प्रायिकता = 7/11."
+            },
+            // Q11 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The figure shows age-wise bar graph of male and female population of two countries. Which one of the following is likely to be true?",
+                q_hi: "चित्र दो देशों की पुरुष और महिला जनसंख्या का आयु-वार बार ग्राफ (bar graph) दर्शाता है। निम्नलिखित में से कौन सा सत्य होने की संभावना है?",
+                img: 'https://iili.io/BsuW4te.png',
+                o_en: ["Country Q has higher life expectancy", "Country P has higher per-capita income", "The population of country P is decreasing more rapidly than Q", "Country P has better health facilities"],
+                o_hi: ["देश Q की जीवन प्रत्याशा (life expectancy) अधिक है", "देश P की प्रति व्यक्ति आय अधिक है", "देश P की जनसंख्या Q की तुलना में अधिक तेजी से घट रही है", "देश P में बेहतर स्वास्थ्य सुविधाएं हैं"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "By observing the population pyramids, Country Q has a wider top compared to Country P, meaning a larger portion of Country Q's population survives into old age (70-91 years). This directly indicates a higher life expectancy in Country Q.",
+                exp_hi: "जनसंख्या पिरामिडों को देखने पर, देश Q का शीर्ष (top) देश P की तुलना में अधिक चौड़ा है, जिसका अर्थ है कि देश Q की जनसंख्या का एक बड़ा हिस्सा वृद्धावस्था (70-91 वर्ष) तक जीवित रहता है। यह सीधे तौर पर देश Q में उच्च जीवन प्रत्याशा (life expectancy) को दर्शाता है।"
+            },
+            // Q12
+            {
+                type: 'mcq',
+                q_en: "What is the minimum number of pourings needed to get 4 litre of milk from a fully filled 8 litre can, using ungraduated empty 5 and 3 litre cans? No milk should be wasted.",
+                q_hi: "बिना माप (ungraduated) वाले खाली 5 और 3 लीटर के डिब्बों का उपयोग करके पूरी तरह से भरे 8 लीटर के डिब्बे में से 4 लीटर दूध प्राप्त करने के लिए कम से कम कितनी बार दूध उड़ेलने (pourings) की आवश्यकता होगी? कोई भी दूध बर्बाद नहीं होना चाहिए।",
+                img: '',
+                o_en: ["4", "5", "6", "8"],
+                o_hi: ["4", "5", "6", "8"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Start: (8,0,0). 1. Pour 8L to 5L -> (3,5,0). 2. Pour 5L to 3L -> (3,2,3). 3. Pour 3L to 8L -> (6,2,0). 4. Pour 5L to 3L -> (6,0,2). 5. Pour 8L to 5L -> (1,5,2). 6. Pour 5L to 3L -> (1,4,3). Now the 5L can has exactly 4 Litres. Total 6 pourings.",
+                exp_hi: "शुरुआत: (8,0,0). 1. 8L से 5L में डालें -> (3,5,0). 2. 5L से 3L में डालें -> (3,2,3). 3. 3L से 8L में डालें -> (6,2,0). 4. 5L से 3L में डालें -> (6,0,2). 5. 8L से 5L में डालें -> (1,5,2). 6. 5L से 3L में डालें -> (1,4,3). अब 5L वाले डिब्बे में ठीक 4 लीटर दूध है। कुल 6 बार उड़ेला गया।"
+            },
+            // Q13
+            {
+                type: 'mcq',
+                q_en: "In how many ways can a menu be made from 5 dishes, if the menu contains either 3 or 4 dishes?",
+                q_hi: "5 व्यंजनों (dishes) में से एक मेनू कितने तरीकों से बनाया जा सकता है, यदि मेनू में 3 या 4 व्यंजन हों?",
+                img: '',
+                o_en: ["2", "3", "7", "15"],
+                o_hi: ["2", "3", "7", "15"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "We use combinations because the order of dishes does not matter. Ways to select 3 dishes out of 5 = $^5C_3$ = 10. Ways to select 4 dishes out of 5 = $^5C_4$ = 5. Total ways = 10 + 5 = 15.",
+                exp_hi: "हम संयोजनों (combinations) का उपयोग करते हैं क्योंकि व्यंजनों के क्रम से कोई फर्क नहीं पड़ता। 5 में से 3 व्यंजन चुनने के तरीके = $^5C_3$ = 10. 5 में से 4 व्यंजन चुनने के तरीके = $^5C_4$ = 5. कुल तरीके = 10 + 5 = 15."
+            },
+            // Q14
+            {
+                type: 'mcq',
+                q_en: "SCRIPT: DIRECTOR :: ?? : CHEF. Choose the most appropriate option from the following to fill the blank.",
+                q_hi: "SCRIPT: DIRECTOR :: ?? : CHEF. रिक्त स्थान की पूर्ति के लिए निम्नलिखित में से सबसे उपयुक्त विकल्प चुनें।",
+                img: '',
+                o_en: ["MENU", "RECIPE", "RESTAURANT", "MEAL"],
+                o_hi: ["MENU", "RECIPE", "RESTAURANT", "MEAL"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "An analogy question. A 'Director' uses a 'Script' as the instructional foundation to direct a movie. Similarly, a 'Chef' uses a 'Recipe' as the instructional foundation to cook a dish.",
+                exp_hi: "एक सादृश्यता (analogy) का प्रश्न। एक 'निर्देशक' (Director) फिल्म निर्देशित करने के लिए 'स्क्रिप्ट' (Script) का उपयोग आधार के रूप में करता है। उसी प्रकार, एक 'शेफ' (Chef) भोजन पकाने के लिए 'रेसिपी' (Recipe) का उपयोग आधार के रूप में करता है।"
+            },
+            // Q15
+            {
+                type: 'mcq',
+                q_en: "The sum of the two positive integers is 14. Then their product CANNOT be divisible by",
+                q_hi: "दो धनात्मक पूर्णांकों का योग 14 है। तो उनका गुणनफल (product) किससे विभाज्य (divisible) नहीं हो सकता है?",
+                img: '',
+                o_en: ["12", "13", "14", "49"],
+                o_hi: ["12", "13", "14", "49"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Possible pairs summing to 14 and their products: (1,13)->13, (2,12)->24, (3,11)->33, (4,10)->40, (5,9)->45, (6,8)->48, (7,7)->49. Check the options: 24 & 48 are divisible by 12. 13 is divisible by 13. 49 is divisible by 49. None of the possible products are divisible by 14.",
+                exp_hi: "14 योग वाले जोड़े और उनके गुणनफल: (1,13)->13, (2,12)->24, (3,11)->33, (4,10)->40, (5,9)->45, (6,8)->48, (7,7)->49. विकल्पों की जाँच करें: 24 और 48, 12 से विभाज्य हैं। 13, 13 से विभाज्य है। 49, 49 से विभाज्य है। कोई भी गुणनफल 14 से विभाज्य नहीं है।"
+            },
+            // Q16
+            {
+                type: 'mcq',
+                q_en: "The time seen in a mirror placed opposite a numberless analog (with hands) wall clock is 4h 55min. What approximately is the correct time?",
+                q_hi: "बिना नंबर वाली एनालॉग (सुइयों वाली) दीवार घड़ी के विपरीत रखे दर्पण (mirror) में देखा गया समय 4h 55min है। सही समय लगभग क्या है?",
+                img: '',
+                o_en: ["4 h 55 min", "5 h 05 min", "7 h 05 min", "1 h 35 min"],
+                o_hi: ["4 h 55 min", "5 h 05 min", "7 h 05 min", "1 h 35 min"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "To find the actual time from a mirror image of a clock, subtract the mirror time from 11:60 (which is 12:00). Actual Time = 11:60 - 4:55 = 7:05. Thus, the correct time is 7 h 05 min.",
+                exp_hi: "घड़ी की दर्पण छवि से वास्तविक समय ज्ञात करने के लिए, दर्पण के समय को 11:60 (जो 12:00 है) से घटाएं। वास्तविक समय = 11:60 - 4:55 = 7:05. अतः सही समय 7 h 05 min है।"
+            },
+            // Q17 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The above figures show population pyramids to four countries A, B, C and D. The country showing the most stable population is",
+                q_hi: "उपरोक्त चित्र चार देशों A, B, C और D के जनसंख्या पिरामिड दिखाते हैं। सबसे स्थिर (stable) जनसंख्या दर्शाने वाला देश कौन सा है?",
+                img: 'https://iili.io/BsuhDj1.png',
+                o_en: ["C", "A", "B", "D"],
+                o_hi: ["C", "A", "B", "D"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "A stable population pyramid is characterized by a nearly rectangular or dome shape, indicating that the birth rate and death rate are low and roughly equal, with a consistent number of people across most age groups. Pyramid 'C' represents this dome-like, stable structure perfectly.",
+                exp_hi: "एक स्थिर जनसंख्या पिरामिड की विशेषता लगभग आयताकार या गुंबद (dome) का आकार होती है, जो यह दर्शाता है कि जन्म दर और मृत्यु दर कम और लगभग बराबर हैं, और अधिकांश आयु समूहों में लोगों की संख्या समान है। पिरामिड 'C' इस स्थिर संरचना को पूर्ण रूप से दर्शाता है।"
+            },
+            // Q18
+            {
+                type: 'mcq',
+                q_en: "For every 5 chocolates that Ramesh gets, Suresh gets 3 chocolates. Geeta gets 3 chocolates for every 2 chocolates that Suresh gets. If Geeta has 18 chocolates, then the sum of chocolates with Ramesh and Suresh is",
+                q_hi: "रमेश को मिलने वाली प्रत्येक 5 चॉकलेट के लिए, सुरेश को 3 चॉकलेट मिलने वाली प्रत्येक 2 चॉकलेट के लिए गीता को 3 चॉकलेट मिलती हैं। यदि गीता के पास 18 चॉकलेट हैं, तो रमेश और सुरेश के पास मौजूद चॉकलेटों का योग क्या है?",
+                img: '',
+                o_en: ["16", "30", "32", "38"],
+                o_hi: ["16", "30", "32", "38"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Given R:S = 5:3 and G:S = 3:2. Since Geeta (G) has 18 chocolates, Suresh (S) has = (2/3) * 18 = 12 chocolates. Since Suresh has 12, Ramesh (R) has = (5/3) * 12 = 20 chocolates. Sum of Ramesh and Suresh = 20 + 12 = 32.",
+                exp_hi: "दिया गया है R:S = 5:3 और G:S = 3:2। चूंकि गीता (G) के पास 18 चॉकलेट हैं, सुरेश (S) के पास = (2/3) * 18 = 12 चॉकलेट हैं। चूंकि सुरेश के पास 12 हैं, रमेश (R) के पास = (5/3) * 12 = 20 चॉकलेट हैं। रमेश और सुरेश का योग = 20 + 12 = 32."
+            },
+            // Q19
+            {
+                type: 'mcq',
+                q_en: "A truck from a post office is sent to collect post from a plane as per schedule. The plane lands ahead of schedule, therefore its contents are transported by a rickshaw. The rickshaw meets the truck 30 minutes after the arrival of plane, and the post is transferred. The truck returns to the post office 20 minutes early. How early did the plane arrive? (Assume all transactions are instantaneous).",
+                q_hi: "एक डाकघर से एक ट्रक को अनुसूची (schedule) के अनुसार विमान से डाक लेने के लिए भेजा जाता है। विमान समय से पहले उतर जाता है, इसलिए इसकी सामग्री को रिक्शा द्वारा ले जाया जाता है। रिक्शा विमान के आगमन के 30 मिनट बाद ट्रक से मिलता है, और डाक स्थानांतरित कर दी जाती है। ट्रक 20 मिनट जल्दी डाकघर लौट आता है। विमान कितनी जल्दी आ गया था?",
+                img: '',
+                o_en: ["10 minutes", "20 minutes", "30 minutes", "40 minutes"],
+                o_hi: ["10 मिनट", "20 मिनट", "30 मिनट", "40 मिनट"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "The truck saved 20 minutes on its round trip, meaning it saved 10 minutes each way. This implies the truck met the rickshaw 10 minutes BEFORE it was scheduled to reach the airport. The plane arrived, and the rickshaw travelled for 30 minutes before meeting the truck. Thus, the plane arrived 30 mins (rickshaw travel time) + 10 mins (time saved by truck) = 40 minutes ahead of schedule.",
+                exp_hi: "ट्रक ने अपनी राउंड ट्रिप (round trip) में 20 मिनट बचाए, जिसका अर्थ है कि उसने प्रत्येक तरफ 10 मिनट बचाए। इसका मतलब है कि ट्रक निर्धारित समय से 10 मिनट पहले ही रिक्शा से मिल गया। विमान आया, और रिक्शा 30 मिनट तक चला तब जाकर ट्रक से मिला। इस प्रकार, विमान अनुसूची से 30 मिनट (रिक्शा यात्रा का समय) + 10 मिनट (ट्रक द्वारा बचाया गया समय) = 40 मिनट पहले आ गया।"
+            },
+            // Q20
+            {
+                type: 'mcq',
+                q_en: "A bird keeps flying continuously between two trains, that are following each other on a straight track. The train behind is slower than the one ahead by 1.5 km/h. If the speed of the bird is 20 km/h. what distance would the bird cover in an hour?",
+                q_hi: "एक पक्षी सीधी पटरी पर एक-दूसरे के पीछे आ रही दो ट्रेनों के बीच लगातार उड़ता रहता है। पीछे वाली ट्रेन आगे वाली ट्रेन से 1.5 किमी/घंटा धीमी है। यदि पक्षी की गति 20 किमी/घंटा है, तो पक्षी एक घंटे में कितनी दूरी तय करेगा?",
+                img: '',
+                o_en: ["20 km", "30 km", "50 km", "60 km"],
+                o_hi: ["20 किमी", "30 किमी", "50 किमी", "60 किमी"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "This is a simple trick question. Regardless of the speeds of the trains or the complex path the bird takes flying back and forth, the bird flies continuously for exactly 1 hour at a constant speed of 20 km/h. Therefore, Distance = Speed × Time = 20 km/h × 1 h = 20 km.",
+                exp_hi: "यह एक ट्रिकी प्रश्न है। ट्रेनों की गति या पक्षी द्वारा आगे-पीछे उड़ने के जटिल रास्ते से कोई फर्क नहीं पड़ता, पक्षी 20 किमी/घंटा की निरंतर गति से ठीक 1 घंटे तक लगातार उड़ता है। इसलिए, दूरी = गति × समय = 20 किमी/घंटा × 1 घंटा = 20 किमी।"
+            }
+        ]; 
+    
+  var cQ=0, uA=[], qS=[], tInt;
+ var currentLang = "en"; // Default Language
+ 
+ // Language Toggle Function
+ function toggleLang() {
+     var btn = document.getElementById('lang-btn');
+     if (currentLang === "en") {
+         currentLang = "hi";
+         btn.innerText = "E/A English";
+     } else {
+         currentLang = "en";
+         btn.innerText = "A/अ Hindi";
+     }
+     lQ(cQ); // Reload current question
+ }
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(1800); // Changed to 30 Minutes (1800 seconds)
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    
+    // Setting Question Text based on Language
+    var qText = (currentLang === "en") ? q.q_en : q.q_hi;
+    document.getElementById('qt').innerHTML=qText;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    // Setting Options based on Language
+    var oH='';
+    var opts = (currentLang === "en") ? q.o_en : q.o_hi;
+    for(var j=0; j<opts.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + opts[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+                function sav() {
+            var sel = getSelected();
+            if (sel !== null) { 
+                // NAYA CODE: Check karein ki kitne attempt ho chuke hain
+                if (uA[cQ] === null) { 
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("max attempted.");
+                        return; // Isse aage nahi badhega
+                    }
+                }
+                uA[cQ] = sel; 
+                uS(cQ, 'ans'); 
+            } 
+            else { 
+                uS(cQ, 'n-ans'); 
+            }
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+        function rev() {
+            var sel = getSelected();
+            if (sel !== null) {
+                // NAYA CODE: Yahan bhi 15 question ki limit check hogi
+                if (uA[cQ] === null) {
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("Aap maximum 15 questions hi attempt kar sakte hain! Kripya kisi purane answer ko 'Clear Response' karein.");
+                        return; 
+                    }
+                }
+                uA[cQ] = sel; 
+            }
+            uS(cQ, 'rev');
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0;
+    var ms = 30; // 🔥 NAYA CODE: Total marks strictly 30 par fix kar diya hai (15 Qs * 2 Marks)
+    
+    for(var i=0; i<qs.length; i++){
+        // ms+=qs[i].m; <-- Is line ko hata diya gaya hai taaki 40 na bane
+        if(uA[i]===null) {
+            u++;
+        } else {
+            if(uA[i] === qs[i].a) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // DATA SAVING LOGIC (GOOGLE SHEETS & FIREBASE)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "General Aptitude test 1"; 
+            var currentDate = new Date().toLocaleString();
+            
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+            });
+
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) { console.log("Database connection error."); }
+        }
+    } catch(e) { console.log("Login check error: ", e); }
+
+    // ==========================================================
+    // DETAILED REPORT GENERATION (WITH SOLUTIONS INCLUDED)
+    // ==========================================================
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis & Solutions:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var isCorrect = (uA[j] === qs[j].a);
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
+        var opts = (currentLang === "en") ? qs[j].o_en : qs[j].o_hi;
+        var yA = (uA[j]===null) ? "None" : opts[uA[j]];
+        var cA = opts[qs[j].a];
+        var explanation = (currentLang === "en") ? qs[j].exp_en : qs[j].exp_hi;
+        var qText = (currentLang === "en") ? qs[j].q_en : qs[j].q_hi;
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qText+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366; margin-bottom: 10px;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                        "<div style='background:#eef2f5; padding:15px; border-radius:5px; border-left:4px solid #28a745;'>" +
+                            "<span style='color:#155724; font-size:15px;'><b>💡 Explanation/Solution:</b><br><br>"+explanation+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
+  

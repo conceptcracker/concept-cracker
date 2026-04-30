@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET PART A  </title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+
+<script src="../calculator.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+ 
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>30 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Questions (Q.1 to Q.20) yo can attempt only 15 question:</b> +2 Marks for correct, -0.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+            <li>You can toggle between English and Hindi using the button in the header.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header>
+    <h2>Physics Mock Test</h2>
+    <div style="display:flex; align-items:center;">
+        <button id="lang-btn" onclick="toggleLang()" style="background:#ff9800; color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; margin-right:15px; font-weight:bold;">A/अ Hindi</button>
+        <div>Time Left: <span id="time">30:00</span></div>
+    </div>
+</header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tcsToggle()">🖩 Scientific Calculator</button>
+        
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+<script>
+            // --- CSIR-NET JUNE 2024: PART A (Q1 to Q20) ---
+        var qs = [
+            // Q1
+            {
+                type: 'mcq',
+                q_en: "Canals A and B join to form canal C, all having semi-circular cross-sections of radii which are in the ratio 3:4:5, respectively. Assume smooth merger of A and B, and ignore the possibility of flooding. If the speed s of water is the same and uniform in both A and B then the speed of water flowing in C is",
+                q_hi: "नहर A और B मिलकर नहर C बनाती हैं, सभी के अनुप्रस्थ-काट (cross-sections) अर्ध-वृत्ताकार हैं जिनकी त्रिज्याओं का अनुपात क्रमशः 3:4:5 है। A और B के सुचारू विलय (smooth merger) को मान लें, और बाढ़ की संभावना को अनदेखा करें। यदि पानी की गति s, A और B दोनों में समान और एकसमान है, तो C में बहने वाले पानी की गति क्या है?",
+                img: '',
+                o_en: ["s", "7s/5", "2s", "5s/7"],
+                o_hi: ["s", "7s/5", "2s", "5s/7"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "By the equation of continuity, Total Volume flow rate in = Volume flow rate out. $A_A v_A + A_B v_B = A_C v_C$. Area of a semi-circle is proportional to $r^2$. Let areas be $9k$, $16k$, and $25k$. $(9k)s + (16k)s = (25k)v_C \\implies 25ks = 25k v_C \\implies v_C = s$.",
+                exp_hi: "निरंतरता के समीकरण (Equation of Continuity) से: $A_A v_A + A_B v_B = A_C v_C$। अर्धवृत्त का क्षेत्रफल $r^2$ के समानुपाती होता है। माना क्षेत्रफल $9k$, $16k$, और $25k$ हैं। $(9k)s + (16k)s = (25k)v_C \\implies 25ks = 25k v_C \\implies v_C = s$।"
+            },
+            // Q2
+            {
+                type: 'mcq',
+                q_en: "A patient requires administration of 500 ml of an intravenous fluid in 1 hour. What is the approximate drip rate (number of drops per minute) at which the fluid should be administered, if the volume of a drop is 0.05 ml?",
+                q_hi: "एक मरीज को 1 घंटे में 500 मिलीलीटर (ml) अंतःशिरा (intravenous) द्रव चढ़ाने की आवश्यकता है। यदि एक बूंद का आयतन 0.05 मिलीलीटर है, तो द्रव को किस अनुमानित ड्रिप दर (प्रति मिनट बूंदों की संख्या) पर चढ़ाया जाना चाहिए?",
+                img: '',
+                o_en: ["76", "152", "167", "332"],
+                o_hi: ["76", "152", "167", "332"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Total volume = 500 ml. Volume of 1 drop = 0.05 ml. Total drops required = $500 / 0.05 = 10,000$ drops. Total time = 1 hour = 60 minutes. Drip rate = $10,000 / 60 = 166.66$ drops/min, which is approximately 167.",
+                exp_hi: "कुल आयतन = 500 ml। 1 बूंद का आयतन = 0.05 ml। कुल आवश्यक बूंदें = $500 / 0.05 = 10,000$ बूंदें। कुल समय = 1 घंटा = 60 मिनट। ड्रिप दर = $10,000 / 60 = 166.66$ बूंदें/मिनट, जो कि लगभग 167 है।"
+            },
+            // Q3
+            {
+                type: 'mcq',
+                q_en: "A large number of birds, half of which belong to specie A and the other half of specie B, rest on a tree where they are distributed randomly across the branches. In a random sample of 5 birds from the tree, what is the probability that at least one is from specie A?",
+                q_hi: "बड़ी संख्या में पक्षी, जिनमें से आधे प्रजाति A के हैं और शेष आधे प्रजाति B के हैं, एक पेड़ पर आराम करते हैं जहां वे शाखाओं पर बेतरतीब (randomly) ढंग से वितरित होते हैं। पेड़ से 5 पक्षियों के यादृच्छिक नमूने में, इसकी क्या प्रायिकता है कि कम से कम एक पक्षी प्रजाति A का हो?",
+                img: '',
+                o_en: ["0.03125", "0.15625", "0.84375", "0.96875"],
+                o_hi: ["0.03125", "0.15625", "0.84375", "0.96875"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Probability(at least one A) = 1 - Probability(none is A) = 1 - Probability(all 5 are B). Since half the birds are species B, P(B) = 1/2. P(all 5 are B) = $(1/2)^5 = 1/32 = 0.03125$. Therefore, P(at least one A) = $1 - 0.03125 = 0.96875$.",
+                exp_hi: "प्रायिकता (कम से कम एक A) = 1 - प्रायिकता (कोई भी A नहीं है) = 1 - प्रायिकता (सभी 5 B हैं)। चूंकि आधे पक्षी B हैं, P(B) = 1/2। सभी 5 के B होने की प्रायिकता = $(1/2)^5 = 1/32 = 0.03125$। इसलिए, कम से कम एक A होने की प्रायिकता = $1 - 0.03125 = 0.96875$।"
+            },
+            // Q4
+            {
+                type: 'mcq',
+                q_en: "How many three-digit numbers exist whose first and last digits add up to 9?",
+                q_hi: "ऐसी कितनी तीन-अंकीय संख्याएँ मौजूद हैं जिनके पहले और अंतिम अंकों का योग 9 है?",
+                img: '',
+                o_en: ["90", "81", "80", "72"],
+                o_hi: ["90", "81", "80", "72"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "Let the three-digit number be $d_1 d_2 d_3$. Given $d_1 + d_3 = 9$. Since it's a 3-digit number, $d_1$ cannot be 0. So $d_1$ can range from 1 to 9. The pairs for $(d_1, d_3)$ are (1,8), (2,7), ..., (9,0). There are 9 such pairs. For each pair, the middle digit $d_2$ can be any digit from 0 to 9 (10 possibilities). Total numbers = $9 \\times 10 = 90$.",
+                exp_hi: "मान लें तीन-अंकीय संख्या $d_1 d_2 d_3$ है। दिया गया है $d_1 + d_3 = 9$। चूँकि यह 3-अंकीय संख्या है, $d_1$, 0 नहीं हो सकता। $(d_1, d_3)$ के जोड़े: (1,8), (2,7), ..., (9,0) (कुल 9 जोड़े)। मध्य अंक $d_2$, 0 से 9 तक कुछ भी (10 विकल्प) हो सकता है। कुल संख्याएँ = $9 \\times 10 = 90$।"
+            },
+            // Q5
+            {
+                type: 'mcq',
+                q_en: "On a one-way road, broken lines consisting of 2.5 m length segments separated by 2.5 m gaps are painted along the length of the road to demarcate 3 lanes, and continuous lines are painted along both the borders. What is the total length of the painted lines (in m) over a 250 m stretch of the road?",
+                q_hi: "एक वन-वे सड़क पर, 3 लेन की सीमा तय करने के लिए सड़क की लंबाई के साथ 2.5 मीटर लंबे खंड (segment) और 2.5 मीटर के अंतराल (gap) वाली टूटी हुई (broken) रेखाएँ चित्रित की गई हैं, और दोनों किनारों (borders) के साथ निरंतर (continuous) रेखाएँ चित्रित की गई हैं। सड़क के 250 मीटर के हिस्से में चित्रित रेखाओं की कुल लंबाई (मीटर में) क्या है?",
+                img: '',
+                o_en: ["500", "625", "750", "1000"],
+                o_hi: ["500", "625", "750", "1000"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "To demarcate 3 lanes, 2 dividing broken lines are needed. Along with 2 continuous border lines, there are 4 lines total. Length of 2 continuous border lines = $2 \\times 250 = 500$ m. For a broken line, paint covers exactly half the length (2.5m paint, 2.5m gap). Length of paint for 1 broken line = $250 / 2 = 125$ m. For 2 broken lines = 250 m. Total painted length = $500 + 250 = 750$ m.",
+                exp_hi: "3 लेन बनाने के लिए 2 बीच की टूटी रेखाएँ (broken lines) चाहिए। 2 किनारों की निरंतर रेखाएँ (continuous lines) मिलाकर कुल 4 रेखाएँ हैं। निरंतर रेखाओं की पेंट की लंबाई = $2 \\times 250 = 500$ m। टूटी रेखा में पेंट और खाली जगह बराबर (2.5m) है, इसलिए एक रेखा का पेंट = $250 / 2 = 125$ m। 2 टूटी रेखाओं का पेंट = 250 m। कुल पेंट = $500 + 250 = 750$ m।"
+            },
+            // Q6
+            {
+                type: 'mcq',
+                q_en: "A record player stylus moves along a spiral groove cut on an annular portion of a disc with inner radius 4 cm and outer radius 10 cm. If the record turns 100 times when playing, the stylus travels approximately",
+                q_hi: "एक रिकॉर्ड प्लेयर का स्टाइलस एक डिस्क के वलयाकार (annular) हिस्से पर कटे सर्पिल (spiral) खांचे (groove) के साथ घूमता है, जिसकी आंतरिक त्रिज्या 4 सेमी और बाहरी त्रिज्या 10 सेमी है। यदि बजते समय रिकॉर्ड 100 बार घूमता है, तो स्टाइलस लगभग कितनी दूरी तय करता है?",
+                img: '',
+                o_en: ["2.2 m", "4.4 m", "22 m", "44 m"],
+                o_hi: ["2.2 m", "4.4 m", "22 m", "44 m"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "The path is an Archimedean spiral. The distance traveled can be approximated by taking the average circumference multiplied by the number of turns. Average radius $r_{avg} = (4 + 10) / 2 = 7$ cm. Average circumference = $2 \\pi r_{avg} = 2 \\times (22/7) \\times 7 = 44$ cm. Total distance for 100 turns = $44 \\times 100 = 4400$ cm = 44 m.",
+                exp_hi: "रास्ता एक आर्किमिडीयन सर्पिल (spiral) है। तय की गई दूरी का अनुमान औसत परिधि (circumference) को चक्रों की संख्या से गुणा करके लगाया जा सकता है। औसत त्रिज्या $r_{avg} = (4 + 10) / 2 = 7$ सेमी। औसत परिधि = $2 \\pi r_{avg} = 2 \\times (22/7) \\times 7 = 44$ सेमी। 100 चक्रों के लिए कुल दूरी = $44 \\times 100 = 4400$ सेमी = 44 मीटर।"
+            },
+            // Q7
+            {
+                type: 'mcq',
+                q_en: "In how many distinct ways can 128 identical marbles be arranged in a complete rectangular grid (disregarding the orientation of the grid)?",
+                q_hi: "128 समान कंचों (marbles) को एक पूर्ण आयताकार ग्रिड (rectangular grid) में कितने अलग-अलग तरीकों से व्यवस्थित किया जा सकता है (ग्रिड के ओरिएंटेशन को अनदेखा करते हुए)?",
+                img: '',
+                o_en: ["7", "6", "5", "4"],
+                o_hi: ["7", "6", "5", "4"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "We need to find the number of factor pairs $(L, W)$ of 128 such that $L \\times W = 128$. Since orientation doesn't matter, $(L, W)$ is the same as $(W, L)$, so we only count pairs where $L \\le W$. The pairs are $(1, 128), (2, 64), (4, 32),$ and $(8, 16)$. Hence, there are exactly 4 distinct rectangular arrangements.",
+                exp_hi: "हमें 128 के ऐसे गुणनखंड जोड़े (factor pairs) $(L, W)$ ढूँढने हैं जहाँ $L \\times W = 128$ हो। चूँकि ओरिएंटेशन (दिशा) का कोई महत्व नहीं है, इसलिए $(L, W)$ और $(W, L)$ समान हैं। ऐसे जोड़े: $(1, 128), (2, 64), (4, 32),$ और $(8, 16)$ हैं। अतः कुल 4 अलग-अलग व्यवस्थाएँ (arrangements) संभव हैं।"
+            },
+            // Q8 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "Areas and populations of four states S1, S2, S3 and S4 are shown. Their arrangement in decreasing order of population density would be",
+                q_hi: "चार राज्यों S1, S2, S3 और S4 के क्षेत्रफल और जनसंख्या दर्शाए गए हैं। जनसंख्या घनत्व (population density) के घटते क्रम में उनकी व्यवस्था क्या होगी?",
+                img: 'https://iili.io/BsuY41t.png',
+                o_en: ["S4, S3, S1, S2", "S1, S2, S3, S4", "S4, S1, S3, S2", "S2, S1, S3, S4"],
+                o_hi: ["S4, S3, S1, S2", "S1, S2, S3, S4", "S4, S1, S3, S2", "S2, S1, S3, S4"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "Population density = Population / Area. From the graphs: For S4, density $\\approx 90/80 > 1$. For S3, density $\\approx 70/120 \\approx 0.58$. For S1, density $\\approx 110/300 \\approx 0.36$. For S2, density $\\approx 25/130 \\approx 0.19$. Decreasing order is S4 > S3 > S1 > S2.",
+                exp_hi: "जनसंख्या घनत्व = जनसंख्या / क्षेत्रफल। ग्राफ के अनुमान से: S4 के लिए घनत्व $\\approx 90/80 > 1$। S3 के लिए $\\approx 70/120 \\approx 0.58$। S1 के लिए $\\approx 110/300 \\approx 0.36$। S2 के लिए $\\approx 25/130 \\approx 0.19$। घटता हुआ क्रम: S4 > S3 > S1 > S2 होगा।"
+            },
+            // Q9
+            {
+                type: 'mcq',
+                q_en: "The population of a town is increasing at a uniform rate. If its population was 90,000 and 96,000 in 2022 and 2023 respectively, what would be its population in 2024?",
+                q_hi: "एक कस्बे की जनसंख्या एकसमान दर (uniform rate) से बढ़ रही है। यदि 2022 और 2023 में इसकी जनसंख्या क्रमशः 90,000 और 96,000 थी, तो 2024 में इसकी जनसंख्या क्या होगी?",
+                img: '',
+                o_en: ["102,000", "102,400", "102,720", "102,960"],
+                o_hi: ["102,000", "102,400", "102,720", "102,960"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "A uniform rate in population growth implies constant percentage (geometric) growth. Growth multiplier $r = 96000 / 90000 = 16/15$. Population in 2024 = Population in 2023 $\\times$ r = $96000 \\times (16/15) = 6400 \\times 16 = 102,400$.",
+                exp_hi: "जनसंख्या वृद्धि में 'एकसमान दर' का अर्थ अक्सर निरंतर प्रतिशत वृद्धि (geometric growth) होता है। वृद्धि गुणांक (multiplier) $r = 96000 / 90000 = 16/15$। 2024 में जनसंख्या = 2023 की जनसंख्या $\\times$ r = $96000 \\times (16/15) = 102,400$।"
+            },
+            // Q10 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The graph shows observations and a regression line of the number of progeny on the tail length of male birds. Which of the following can be inferred from the graph?",
+                q_hi: "ग्राफ नर पक्षियों की पूंछ की लंबाई पर संततियों (progeny) की संख्या के अवलोकन (observations) और एक प्रतिगमन रेखा (regression line) को दर्शाता है। ग्राफ से निम्नलिखित में से क्या अनुमान लगाया जा सकता है?",
+                img: 'https://iili.io/BsuaO67.png',
+                o_en: ["Producing less progeny decreases the tail length of the males.", "Males cannot have a tail length lesser than 10 mm.", "Males with longer tails tend to father more progeny.", "For a male with a 25 mm tail, the expected number of progeny is 4."],
+                o_hi: ["कम संतति पैदा करने से नर की पूंछ की लंबाई कम हो जाती है।", "नरों की पूंछ की लंबाई 10 मिमी से कम नहीं हो सकती।", "लंबी पूंछ वाले नर अधिक संततियों के पिता बनते हैं।", "25 मिमी पूंछ वाले नर के लिए, अपेक्षित संतति संख्या 4 है।"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "The regression line $y = 0.309x - 2.89$ has a positive slope, meaning there is a positive correlation between tail length (x-axis) and the number of progeny (y-axis). Therefore, males with longer tails tend to father more progeny.",
+                exp_hi: "प्रतिगमन रेखा (regression line) $y = 0.309x - 2.89$ का ढलान (slope) सकारात्मक है, जिसका अर्थ है कि पूंछ की लंबाई (x-अक्ष) और संतति की संख्या (y-अक्ष) के बीच सकारात्मक संबंध है। इसलिए, लंबी पूंछ वाले नर अधिक संततियों के पिता बनते हैं।"
+            },
+            // Q11 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The squares in the following grid are filled with numbers 1 to 9, without repetition, such that the numbers in the squares forming the top and bottom rows add to 20 and 14 respectively and those forming the column to 23. What is the value of A?",
+                q_hi: "निम्नलिखित ग्रिड के वर्गों को 1 से 9 तक की संख्याओं से बिना दोहराए (without repetition) भरा गया है, जिससे ऊपर और नीचे की पंक्तियों को बनाने वाले वर्गों की संख्याओं का योग क्रमशः 20 और 14 हो जाता है और स्तंभ (column) को बनाने वालों का योग 23 हो जाता है। A का मान क्या है?",
+                img: 'https://iili.io/BsucBAG.png',
+                o_en: ["4", "6", "7", "8"],
+                o_hi: ["4", "6", "7", "8"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Total sum of numbers 1 to 9 = 45. Let top row sum be $S_{top}=20$, bottom row sum be $S_{bot}=14$. The sum of all 9 squares = Top Row + Bottom Row + remaining middle column squares. So, $45 = 20 + 14 + C_{mid} \\implies C_{mid} = 11$. The entire central column consists of '5', $C_{mid}$, and 'A'. Sum of column = $5 + 11 + A = 23 \\implies 16 + A = 23 \\implies A = 7$.",
+                exp_hi: "1 से 9 तक की संख्याओं का कुल योग = 45. ऊपरी पंक्ति का योग = 20, निचली पंक्ति का योग = 14. सभी 9 वर्गों का योग = ऊपरी पंक्ति + निचली पंक्ति + बचे हुए मध्य कॉलम के वर्ग। $45 = 20 + 14 + C_{mid} \\implies C_{mid} = 11$. पूरे मध्य कॉलम का योग = $5 + 11 + A = 23 \\implies 16 + A = 23 \\implies A = 7$."
+            },
+            // Q12
+            {
+                type: 'mcq',
+                q_en: "Among A, B, C, D, E and F, D is taller than B but shorter than F. E is taller than B, but shorter than C. B is not the shortest of all. Then A is",
+                q_hi: "A, B, C, D, E और F में से, D, B से लंबा है लेकिन F से छोटा है। E, B से लंबा है, लेकिन C से छोटा है। B सभी में सबसे छोटा नहीं है। तो A क्या है?",
+                img: '',
+                o_en: ["the shortest of all", "the tallest of all", "taller than E, but shorter than C", "taller than C, but shorter than F"],
+                o_hi: ["सभी में सबसे छोटा", "सभी में सबसे लंबा", "E से लंबा, लेकिन C से छोटा", "C से लंबा, लेकिन F से छोटा"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "We are given: F > D > B and C > E > B. This shows that out of 6 people, F, D, C, and E are all taller than B. Therefore, B can only be the 5th tallest (or 2nd shortest). Since B is explicitly stated to NOT be the shortest, the only person left to be shorter than B is A. Hence, A is the shortest.",
+                exp_hi: "दिया गया है: F > D > B और C > E > B। इसका मतलब 6 लोगों में से 4 लोग (F, D, C, E) B से लंबे हैं। अतः B दूसरा सबसे छोटा व्यक्ति हो सकता है। चूँकि यह स्पष्ट रूप से कहा गया है कि B सबसे छोटा नहीं है, तो B से छोटा केवल A ही बचा है। अतः A सबसे छोटा है।"
+            },
+            // Q13
+            {
+                type: 'mcq',
+                q_en: "An egg tray has 30 cavities to hold eggs in 5 rows and 6 columns. Each cavity is surrounded by 4 raised corners shared by adjacent cavities. How many raised corners does the egg tray have?",
+                q_hi: "एक अंडे की ट्रे (egg tray) में 5 पंक्तियों (rows) और 6 स्तंभों (columns) में अंडे रखने के लिए 30 गुहाएं (cavities) हैं। प्रत्येक गुहा 4 उभरे हुए कोनों से घिरी होती है जो आसन्न (adjacent) गुहाओं द्वारा साझा किए जाते हैं। अंडे की ट्रे में कितने उभरे हुए कोने (raised corners) हैं?",
+                img: '',
+                o_en: ["30", "36", "42", "48"],
+                o_hi: ["30", "36", "42", "48"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "The cavities form a $5 \\times 6$ grid of squares. The raised corners represent the intersections (vertices) of the grid lines forming these squares. For a grid of $R$ rows and $C$ columns of squares, the number of vertices is $(R+1) \\times (C+1)$. Thus, $(5+1) \\times (6+1) = 6 \\times 7 = 42$ corners.",
+                exp_hi: "गुहाएं (cavities) वर्गों का $5 \\times 6$ ग्रिड बनाती हैं। उभरे हुए कोने इन वर्गों को बनाने वाली ग्रिड रेखाओं के चौराहों (vertices) का प्रतिनिधित्व करते हैं। $R$ पंक्तियों और $C$ स्तंभों के ग्रिड के लिए, कोनों (vertices) की संख्या $(R+1) \\times (C+1)$ होती है। इस प्रकार, $(5+1) \\times (6+1) = 6 \\times 7 = 42$ कोने होंगे।"
+            },
+            // Q14
+            {
+                type: 'mcq',
+                q_en: "Among 1000 squirrel babies, 200 have three stripes on their back, 500 have two stripes on their back and the rest have four stripes on their back. While 90% of the three-striped babies survive to adulthood, only 80% of the two-striped and 70% of the four-striped babies survive to adulthood. The fraction of four-striped squirrels among the adults is nearest to",
+                q_hi: "गिलहरी के 1000 बच्चों में से, 200 की पीठ पर तीन धारियाँ (stripes) हैं, 500 की पीठ पर दो धारियाँ हैं और शेष की पीठ पर चार धारियाँ हैं। जबकि तीन-धारी वाले 90% बच्चे वयस्क होने तक जीवित रहते हैं, दो-धारी वाले केवल 80% और चार-धारी वाले 70% बच्चे वयस्क होने तक जीवित रहते हैं। वयस्कों में चार-धारी वाली गिलहरियों का अंश (fraction) किसके निकटतम है?",
+                img: '',
+                o_en: ["0.21", "0.3", "0.266", "0.288"],
+                o_hi: ["0.21", "0.3", "0.266", "0.288"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Number of 4-striped babies = $1000 - (200+500) = 300$. Surviving adults: 3-striped = $90\\%$ of 200 = 180; 2-striped = $80\\%$ of 500 = 400; 4-striped = $70\\%$ of 300 = 210. Total adults = $180 + 400 + 210 = 790$. Fraction of 4-striped adults = $210 / 790 \\approx 0.2658$, which is nearest to 0.266.",
+                exp_hi: "4-धारी वाले बच्चों की संख्या = $1000 - (200+500) = 300$। जीवित वयस्क: 3-धारी = $200$ का $90\\% = 180$; 2-धारी = $500$ का $80\\% = 400$; 4-धारी = $300$ का $70\\% = 210$। कुल वयस्क = $180 + 400 + 210 = 790$। 4-धारी वयस्कों का अंश = $210 / 790 \\approx 0.2658$, जो 0.266 के सबसे करीब है।"
+            },
+            // Q15
+            {
+                type: 'mcq',
+                q_en: "A referendum on a proposal involved 7000 participants. Among the participants 3600 were women and the rest were men. 2900 participants, of whom 1300 were women, voted against while 3000 participants voted in favour. 400 women abstained. The ratio of the number of men that did not vote to the total number of participants is",
+                q_hi: "एक प्रस्ताव पर जनमत संग्रह (referendum) में 7000 प्रतिभागियों ने भाग लिया। प्रतिभागियों में 3600 महिलाएं थीं और बाकी पुरुष थे। 2900 प्रतिभागियों ने, जिनमें 1300 महिलाएं थीं, विरोध में मतदान किया, जबकि 3000 प्रतिभागियों ने पक्ष में मतदान किया। 400 महिलाओं ने मतदान नहीं किया (abstained)। मतदान न करने वाले पुरुषों की संख्या और प्रतिभागियों की कुल संख्या का अनुपात क्या है?",
+                img: '',
+                o_en: ["11:70", "17:35", "1:10", "8:70"],
+                o_hi: ["11:70", "17:35", "1:10", "8:70"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Total participants = 7000. Total Men = $7000 - 3600 = 3400$. Women who voted in favour = Total Women (3600) - Women against (1300) - Women abstained (400) = 1900. Total voted in favour = 3000, so Men who voted in favour = $3000 - 1900 = 1100$. Men against = Total against (2900) - Women against (1300) = 1600. Men abstained (did not vote) = Total Men (3400) - Men favour (1100) - Men against (1600) = 700. Ratio = $700 / 7000 = 1/10$, i.e., 1:10.",
+                exp_hi: "कुल प्रतिभागी = 7000. कुल पुरुष = $7000 - 3600 = 3400$. पक्ष में वोट देने वाली महिलाएं = 3600 - 1300 (विरोध) - 400 (मतदान नहीं) = 1900. कुल पक्ष में वोट = 3000, तो पक्ष में वोट देने वाले पुरुष = $3000 - 1900 = 1100$. विरोध में वोट देने वाले पुरुष = $2900 - 1300 = 1600$. मतदान न करने वाले पुरुष = $3400 - 1100 - 1600 = 700$. अनुपात = $700 / 7000 = 1:10$."
+            },
+            // Q16
+            {
+                type: 'mcq',
+                q_en: "A rectangular tray of 30 cm × 60 cm size is used for baking circular biscuits. The diameter of each biscuit is 3 cm before baking, which increases by 10% on baking. What is the maximum number of biscuits that can be baked in the tray such that the base of each biscuit is in contact with the tray?",
+                q_hi: "30 सेमी × 60 सेमी आकार की एक आयताकार ट्रे का उपयोग गोल बिस्कुट पकाने के लिए किया जाता है। बेक करने से पहले प्रत्येक बिस्कुट का व्यास 3 सेमी होता है, जो बेक करने पर 10% बढ़ जाता है। ट्रे में अधिकतम कितने बिस्कुट बेक किए जा सकते हैं ताकि प्रत्येक बिस्कुट का आधार ट्रे के संपर्क में रहे?",
+                img: '',
+                o_en: ["171", "162", "180", "200"],
+                o_hi: ["171", "162", "180", "200"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Diameter after baking = $3 + 10\\%$ of $3 = 3 + 0.3 = 3.3$ cm. To avoid overlap after baking, each biscuit needs a $3.3 \\times 3.3$ cm square space on the tray. Number of biscuits along the length = floor(60 / 3.3) = 18. Number along the width = floor(30 / 3.3) = 9. Max biscuits = $18 \\times 9 = 162$.",
+                exp_hi: "बेक होने के बाद व्यास (Diameter) = $3 + 10\\% = 3.3$ सेमी। ओवरलैप से बचने के लिए, प्रत्येक बिस्कुट को $3.3 \\times 3.3$ सेमी की जगह चाहिए। लंबाई के साथ बिस्कुट की संख्या = floor(60 / 3.3) = 18। चौड़ाई के साथ = floor(30 / 3.3) = 9। अधिकतम बिस्कुट = $18 \\times 9 = 162$।"
+            },
+            // Q17
+            {
+                type: 'mcq',
+                q_en: "If 32XY6 is divisible by 9, X and Y being even decimal digits, then X =",
+                q_hi: "यदि संख्या 32XY6, 9 से विभाज्य है, जहाँ X और Y सम दशमलव अंक (even decimal digits) हैं, तो X का मान क्या है?",
+                img: '',
+                o_en: ["2", "4", "6", "8"],
+                o_hi: ["2", "4", "6", "8"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "For a number to be divisible by 9, the sum of its digits must be a multiple of 9. Sum = $3+2+X+Y+6 = 11 + X + Y$. X and Y are even digits (0, 2, 4, 6, 8). The maximum value of $X+Y$ is $8+8=16$. For $11+X+Y$ to be a multiple of 9, $X+Y$ must be 7 (which is odd, not possible) or 16. So $X+Y=16$, which is only possible if $X=8$ and $Y=8$.",
+                exp_hi: "9 से विभाज्यता का नियम है कि अंकों का योग 9 का गुणज (multiple) होना चाहिए। योग = $3+2+X+Y+6 = 11 + X + Y$। X और Y सम अंक (0,2,4,6,8) हैं। $X+Y$ का अधिकतम मान $8+8=16$ है। $11+X+Y$ को 9 का गुणज (18 या 27) बनाने के लिए $X+Y$ को 7 (जो संभव नहीं है क्योंकि योग सम होना चाहिए) या 16 होना चाहिए। अतः $X=8$ और $Y=8$।"
+            },
+            // Q18
+            {
+                type: 'mcq',
+                q_en: "In a class of 70 students, 20% of girls have spectacles and 40% of boys have spectacles. If the total number of students having spectacle is 23, the number of boys in the class is",
+                q_hi: "70 छात्रों की एक कक्षा में, 20% लड़कियों के पास चश्मा है और 40% लड़कों के पास चश्मा है। यदि चश्मा रखने वाले छात्रों की कुल संख्या 23 है, तो कक्षा में लड़कों की संख्या कितनी है?",
+                img: '',
+                o_en: ["45", "35", "18", "25"],
+                o_hi: ["45", "35", "18", "25"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "Let Boys = B, Girls = G. Total: $B + G = 70$. Equation for spectacles: $0.4B + 0.2G = 23$. Multiply by 5: $2B + G = 115$. Subtract the first equation from this: $(2B + G) - (B + G) = 115 - 70 \\implies B = 45$.",
+                exp_hi: "माना लड़के = B, लड़कियां = G. कुल छात्र: $B + G = 70$। चश्मे वाले छात्र: $0.4B + 0.2G = 23$। इसे 5 से गुणा करें: $2B + G = 115$। अब पहले समीकरण को इसमें से घटाएँ: $(2B + G) - (B + G) = 115 - 70 \\implies B = 45$।"
+            },
+            // Q19 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The two graphs show the change in price of two commodities C1 and C2 over 8 weeks. Which of the statements is correct?",
+                q_hi: "दो ग्राफ 8 हफ्तों में दो वस्तुओं C1 और C2 की कीमत में परिवर्तन को दर्शाते हैं। कौन सा कथन सही है?",
+                img: 'https://iili.io/BsulFsV.png',
+                o_en: ["C1 has higher fluctuation than C2", "Average price of C1 is lower than that of C2", "The largest change in a week is shown by C2", "C1 shows a tendency of reduction"],
+                o_hi: ["C1 में C2 की तुलना में अधिक उतार-चढ़ाव (fluctuation) है", "C1 की औसत कीमत C2 की तुलना में कम है", "एक सप्ताह में सबसे बड़ा परिवर्तन C2 द्वारा दिखाया गया है", "C1 में कमी की प्रवृत्ति (tendency of reduction) दिखती है"],
+                a: 2, m: 2, n: 0.5,
+                exp_en: "Observing the graphs, C2 drops from 85 to 65 between Week 1 and 2 (a change of 20 units). C1's maximum change in a single week is from 64 to 82 (change of 18 units) between Week 5 and 6. Hence, C2 shows the largest single-week change.",
+                exp_hi: "ग्राफ को देखने पर, C2 सप्ताह 1 और 2 के बीच 85 से 65 (20 यूनिट का परिवर्तन) तक गिरता है। C1 का एक सप्ताह में अधिकतम परिवर्तन 64 से 82 (18 यूनिट का परिवर्तन) है। इसलिए, C2 एक सप्ताह में सबसे बड़ा परिवर्तन दर्शाता है।"
+            },
+            // Q20
+            {
+                type: 'mcq',
+                q_en: "Suppose that the increase in a population can be modelled as $(dN/dt) = rN(K-N)/K$ where N is the size of the population, K is the carrying capacity, r is the per capita growth rate and t is time. Which of the following statements is correct?",
+                q_hi: "मान लें कि जनसंख्या में वृद्धि को $(dN/dt) = rN(K-N)/K$ के रूप में मॉडल किया जा सकता है जहां N जनसंख्या का आकार है, K वहन क्षमता (carrying capacity) है, r प्रति व्यक्ति विकास दर है और t समय है। निम्नलिखित में से कौन सा कथन सही है?",
+                img: '',
+                o_en: ["When $N\\approx0$, the change in population N is nearly exponential.", "When $N=K$, the population goes extinct as dN/dt goes to zero.", "When $N\\approx0$, the population growth dN/dt is maximum.", "When $N\\approx K/4$, the population growth dN/dt is maximum."],
+                o_hi: ["जब $N\\approx0$, जनसंख्या N में परिवर्तन लगभग घातांकीय (exponential) होता है।", "जब $N=K$, जनसंख्या विलुप्त हो जाती है क्योंकि dN/dt शून्य हो जाता है।", "जब $N\\approx0$, जनसंख्या वृद्धि dN/dt अधिकतम होती है।", "जब $N\\approx K/4$, जनसंख्या वृद्धि dN/dt अधिकतम होती है।"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "This is the logistic growth equation. When $N$ is very small ($N \\approx 0$), $(K-N)/K \\approx 1$. So, the equation becomes $dN/dt \\approx rN$, which is the standard differential equation for exponential growth.",
+                exp_hi: "यह लॉजिस्टिक ग्रोथ समीकरण (logistic growth equation) है। जब $N$ बहुत छोटा होता है ($N \\approx 0$), तो $(K-N)/K \\approx 1$ हो जाता है। इसलिए, समीकरण $dN/dt \\approx rN$ बन जाता है, जो कि घातांकीय वृद्धि (exponential growth) का मानक अवकल समीकरण (differential equation) है।"
+            }
+        ];
+    
+    
+    
+    var cQ=0, uA=[], qS=[], tInt;
+ var currentLang = "en"; // Default Language
+ 
+ // Language Toggle Function
+ function toggleLang() {
+     var btn = document.getElementById('lang-btn');
+     if (currentLang === "en") {
+         currentLang = "hi";
+         btn.innerText = "E/A English";
+     } else {
+         currentLang = "en";
+         btn.innerText = "A/अ Hindi";
+     }
+     lQ(cQ); // Reload current question
+ }
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(1800); // Changed to 30 Minutes (1800 seconds)
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    
+    // Setting Question Text based on Language
+    var qText = (currentLang === "en") ? q.q_en : q.q_hi;
+    document.getElementById('qt').innerHTML=qText;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    // Setting Options based on Language
+    var oH='';
+    var opts = (currentLang === "en") ? q.o_en : q.o_hi;
+    for(var j=0; j<opts.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + opts[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+                function sav() {
+            var sel = getSelected();
+            if (sel !== null) { 
+                // NAYA CODE: Check karein ki kitne attempt ho chuke hain
+                if (uA[cQ] === null) { 
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("max attempted.");
+                        return; // Isse aage nahi badhega
+                    }
+                }
+                uA[cQ] = sel; 
+                uS(cQ, 'ans'); 
+            } 
+            else { 
+                uS(cQ, 'n-ans'); 
+            }
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+        function rev() {
+            var sel = getSelected();
+            if (sel !== null) {
+                // NAYA CODE: Yahan bhi 15 question ki limit check hogi
+                if (uA[cQ] === null) {
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("Aap maximum 15 questions hi attempt kar sakte hain! Kripya kisi purane answer ko 'Clear Response' karein.");
+                        return; 
+                    }
+                }
+                uA[cQ] = sel; 
+            }
+            uS(cQ, 'rev');
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0;
+    var ms = 30; // 🔥 NAYA CODE: Total marks strictly 30 par fix kar diya hai (15 Qs * 2 Marks)
+    
+    for(var i=0; i<qs.length; i++){
+        // ms+=qs[i].m; <-- Is line ko hata diya gaya hai taaki 40 na bane
+        if(uA[i]===null) {
+            u++;
+        } else {
+            if(uA[i] === qs[i].a) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // DATA SAVING LOGIC (GOOGLE SHEETS & FIREBASE)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "General Aptitude test 1"; 
+            var currentDate = new Date().toLocaleString();
+            
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+            });
+
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) { console.log("Database connection error."); }
+        }
+    } catch(e) { console.log("Login check error: ", e); }
+
+    // ==========================================================
+    // DETAILED REPORT GENERATION (WITH SOLUTIONS INCLUDED)
+    // ==========================================================
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis & Solutions:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var isCorrect = (uA[j] === qs[j].a);
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
+        var opts = (currentLang === "en") ? qs[j].o_en : qs[j].o_hi;
+        var yA = (uA[j]===null) ? "None" : opts[uA[j]];
+        var cA = opts[qs[j].a];
+        var explanation = (currentLang === "en") ? qs[j].exp_en : qs[j].exp_hi;
+        var qText = (currentLang === "en") ? qs[j].q_en : qs[j].q_hi;
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qText+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366; margin-bottom: 10px;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                        "<div style='background:#eef2f5; padding:15px; border-radius:5px; border-left:4px solid #28a745;'>" +
+                            "<span style='color:#155724; font-size:15px;'><b>💡 Explanation/Solution:</b><br><br>"+explanation+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>

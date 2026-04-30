@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET PART A  </title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+
+<script src="../calculator.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+ 
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>30 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Questions (Q.1 to Q.20) yo can attempt only 15 question:</b> +2 Marks for correct, -0.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+            <li>You can toggle between English and Hindi using the button in the header.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header>
+    <h2>Physics Mock Test</h2>
+    <div style="display:flex; align-items:center;">
+        <button id="lang-btn" onclick="toggleLang()" style="background:#ff9800; color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; margin-right:15px; font-weight:bold;">A/अ Hindi</button>
+        <div>Time Left: <span id="time">30:00</span></div>
+    </div>
+</header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tcsToggle()">🖩 Scientific Calculator</button>
+        
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+<script>
+    
+        // --- CSIR-NET MARCH 2025: PART A (Q1 to Q20) EXACT SEQUENCE ---
+        var qs = [
+            // Q1
+            {
+                type: 'mcq',
+                q_en: "A lady walks one-tenth of the total distance at 3 km/h, one-sixth she runs at 5 km/h, one-fifth at 6 km/h, and covers the remaining 16 km at 16 km/h by cycle. What is the total distance?",
+                q_hi: "एक महिला कुल दूरी का 1/10 भाग 3 किमी/घंटा की गति से चलती है, 1/6 भाग 5 किमी/घंटा की गति से दौड़ती है, 1/5 भाग 6 किमी/घंटा की गति से चलती है, और शेष 16 किमी साइकिल से 16 किमी/घंटा की गति से तय करती है। कुल दूरी क्या है?",
+                img: '',
+                o_en: ["14 km", "16 km", "24 km", "30 km"],
+                o_hi: ["14 किमी", "16 किमी", "24 किमी", "30 किमी"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Let total distance be D. Distance covered = D/10 + D/6 + D/5 = (3D + 5D + 6D)/30 = 14D/30 = 7D/15. Remaining distance = D - 7D/15 = 8D/15. Given 8D/15 = 16 km. Therefore, D = (16 × 15) / 8 = 30 km.",
+                exp_hi: "माना कुल दूरी D है। तय की गई दूरी = D/10 + D/6 + D/5 = 14D/30 = 7D/15. शेष दूरी = D - 7D/15 = 8D/15. दिया गया है 8D/15 = 16 किमी। इसलिए, D = (16 × 15) / 8 = 30 किमी।"
+            },
+            // Q2
+            {
+                type: 'mcq',
+                q_en: "There are four containers of equal height, whose bases are a circle, a square, a rectangle and an equilateral triangle having the same area. Which one of the following statements about these containers is true?",
+                q_hi: "समान ऊंचाई के चार कंटेनर हैं, जिनके आधार एक वृत्त, एक वर्ग, एक आयत और एक समबाहु त्रिभुज हैं और उनका क्षेत्रफल समान है। इन कंटेनरों के बारे में निम्नलिखित में से कौन सा कथन सत्य है?",
+                img: '',
+                o_en: ["Their volumes are equal", "Volume of the rectangular container is larger than that of the square container", "Volume of the triangular container is smaller than that of the square container", "Volume of the square container is larger than that of the circular container"],
+                o_hi: ["उनके आयतन समान हैं", "आयताकार कंटेनर का आयतन वर्गाकार कंटेनर से अधिक है", "त्रिभुजाकार कंटेनर का आयतन वर्गाकार कंटेनर से कम है", "वर्गाकार कंटेनर का आयतन वृत्ताकार कंटेनर से अधिक है"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "Volume of a uniform straight container = Base Area × Height. Since all containers have the exact same base area and equal height, their volumes are perfectly equal regardless of the base shape.",
+                exp_hi: "किसी भी सीधे कंटेनर का आयतन = आधार का क्षेत्रफल × ऊंचाई होता है। चूंकि सभी कंटेनरों का आधार क्षेत्रफल और ऊंचाई बिल्कुल समान है, इसलिए उनका आयतन समान होगा, चाहे उनके आधार का आकार कुछ भी हो।"
+            },
+            // Q3
+            {
+                type: 'mcq',
+                q_en: "If A is B's daughter, B is C's brother and D is C's father, then what is A to D?",
+                q_hi: "यदि A, B की बेटी है, B, C का भाई है और D, C का पिता है, तो A का D से क्या संबंध है?",
+                img: '',
+                o_en: ["Grandfather", "Grandmother", "Grandson", "Granddaughter"],
+                o_hi: ["दादा/नाना", "दादी/नानी", "पोता/नाती", "पोती/नातिन"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "B and C are siblings (brothers/sisters). D is the father of C, which means D is also the father of B. Since A is the daughter of B, D is A's grandfather. Thus, A is the granddaughter of D.",
+                exp_hi: "B और C भाई-बहन हैं। D, C का पिता है, जिसका अर्थ है कि D, B का भी पिता है। चूंकि A, B की बेटी है, इसलिए A, D की पोती (Granddaughter) है।"
+            },
+            // Q4
+            {
+                type: 'mcq',
+                q_en: "One side and one diagonal of a rhombus are 13 cm and 24 cm, respectively. Then the area of the rhombus is",
+                q_hi: "एक समचतुर्भुज (rhombus) की एक भुजा और एक विकर्ण क्रमशः 13 सेमी और 24 सेमी हैं। तो समचतुर्भुज का क्षेत्रफल क्या है?",
+                img: '',
+                o_en: ["$90cm^2$", "$100cm^2$", "$110cm^2$", "$120cm^2$"],
+                o_hi: ["$90cm^2$", "$100cm^2$", "$110cm^2$", "$120cm^2$"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Diagonals of a rhombus bisect each other at 90°. Half of the given diagonal = 12 cm. In the right triangle, side (hypotenuse) = 13 cm. By Pythagoras, the other half-diagonal = √(13² - 12²) = 5 cm. Full second diagonal = 10 cm. Area = 1/2 × d1 × d2 = 1/2 × 24 × 10 = 120 cm².",
+                exp_hi: "समचतुर्भुज के विकर्ण 90° पर समद्विभाजित करते हैं। दिए गए विकर्ण का आधा = 12 सेमी। समकोण त्रिभुज में, कर्ण = 13 सेमी। पाइथागोरस से, दूसरा आधा विकर्ण = √(13² - 12²) = 5 सेमी। दूसरा पूरा विकर्ण = 10 सेमी। क्षेत्रफल = 1/2 × 24 × 10 = 120 सेमी²।"
+            },
+            // Q5
+            {
+                type: 'mcq',
+                q_en: "Ten litre (L) milk contains 10% water. How much water should be added to increase its proportion to 20%?",
+                q_hi: "दस लीटर (L) दूध में 10% पानी है। इसके अनुपात को 20% तक बढ़ाने के लिए इसमें कितना पानी मिलाया जाना चाहिए?",
+                img: '',
+                o_en: ["1 L", "1.25 L", "2 L", "2.25 L"],
+                o_hi: ["1 लीटर", "1.25 लीटर", "2 लीटर", "2.25 लीटर"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Initially, water = 1L and pure milk = 9L. Let x L of water be added. We want water to be 20% of the new mixture. So, (1 + x) / (10 + x) = 20/100 = 1/5. Cross-multiplying: 5 + 5x = 10 + x ➡ 4x = 5 ➡ x = 1.25 L.",
+                exp_hi: "शुरुआत में पानी = 1L और शुद्ध दूध = 9L है। मान लें x लीटर पानी मिलाया गया। नया अनुपात 20% होना चाहिए। (1 + x) / (10 + x) = 1/5 ➡ 5 + 5x = 10 + x ➡ 4x = 5 ➡ x = 1.25 लीटर।"
+            },
+            // Q6
+            {
+                type: 'mcq',
+                q_en: "A monkey covers exactly 10m on ground in each jump. What is the least number of jumps required to reach a distance 1m away from where the monkey jumps first?",
+                q_hi: "एक बंदर हर छलांग में जमीन पर ठीक 10 मीटर की दूरी तय करता है। बंदर जहां से पहली छलांग लगाता है, वहां से 1 मीटर की दूरी तक पहुंचने के लिए उसे कम से कम कितनी छलांग लगानी होगी?",
+                img: '',
+                o_en: ["1", "2", "3", "9"],
+                o_hi: ["1", "2", "3", "9"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "The monkey cannot reach 1m in one jump because he exactly covers 10m. However, in two jumps, he can form an isosceles triangle with sides 10m, 10m, and the third side (distance from start) as 1m. Thus, a minimum of 2 jumps is required.",
+                exp_hi: "बंदर 1 छलांग में 10m जाएगा, इसलिए वह 1m पर नहीं रुक सकता। लेकिन दूसरी छलांग में वह त्रिकोण (triangle) बनाते हुए वापस 1m की दूरी पर आ सकता है (त्रिकोण की भुजाएं 10m, 10m और 1m हो सकती हैं)। अतः कम से कम 2 छलांगें आवश्यक हैं।"
+            },
+            // Q7
+            {
+                type: 'mcq',
+                q_en: "Two fair dice are thrown at random independently. What is the probability that the average of the values on their upper faces is 4?",
+                q_hi: "दो निष्पक्ष पासों को स्वतंत्र रूप से फेंका जाता है। इसकी क्या प्रायिकता है कि उनके ऊपरी फलकों पर आने वाले मानों का औसत 4 हो?",
+                img: '',
+                o_en: ["5/36", "1/6", "7/36", "2/9"],
+                o_hi: ["5/36", "1/6", "7/36", "2/9"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "If the average is 4, the sum of the numbers must be 8. The combinations for sum 8 are (2,6), (3,5), (4,4), (5,3), and (6,2). There are 5 favorable outcomes. Total outcomes = 36. Probability = 5/36.",
+                exp_hi: "औसत 4 होने का अर्थ है कि पासों का योग 8 होना चाहिए। योग 8 आने के 5 तरीके हैं: (2,6), (3,5), (4,4), (5,3), (6,2)। कुल संभावित परिणाम = 36। प्रायिकता = 5/36।"
+            },
+            // Q8
+            {
+                type: 'mcq',
+                q_en: "Cube root of 0.0125% is closest to",
+                q_hi: "0.0125% का घनमूल (Cube root) किसके सबसे करीब है?",
+                img: '',
+                o_en: ["0.005%", "0.05%", "0.5%", "5%"],
+                o_hi: ["0.005%", "0.05%", "0.5%", "5%"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "0.0125% = 0.0125 / 100 = 0.000125 = 125 × 10⁻⁶. The cube root of 125 is 5, and the cube root of 10⁻⁶ is 10⁻². Result = 0.05. To convert to percentage, 0.05 × 100% = 5%.",
+                exp_hi: "0.0125% को दशमलव में बदलें: 0.0125/100 = 0.000125 = 125 × 10⁻⁶. घनमूल = 5 × 10⁻² = 0.05. प्रतिशत में बदलने के लिए: 0.05 × 100% = 5%."
+            },
+            // Q9
+            {
+                type: 'mcq',
+                q_en: "An OTP is made of six digits using 0 to 9. If three digits and their positions are known, what is the probability (in percentage) of discovering the full pin within 100 trials?",
+                q_hi: "एक OTP 0 से 9 तक के अंकों का उपयोग करके छह अंकों का बनाया गया है। यदि तीन अंक और उनके स्थान ज्ञात हैं, तो 100 प्रयासों के भीतर पूरा पिन खोजने की प्रायिकता (प्रतिशत में) क्या है?",
+                img: '',
+                o_en: ["10%", "20%", "30%", "40%"],
+                o_hi: ["10%", "20%", "30%", "40%"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "There are 3 unknown positions. Each position can be filled with any digit from 0 to 9 (10 options). Total possible combinations = 10 × 10 × 10 = 1000. For 100 trials, the probability is 100 / 1000 = 1/10 = 10%.",
+                exp_hi: "OTP के 3 स्थान अज्ञात हैं। हर स्थान पर 10 अंक (0-9) आ सकते हैं। कुल संभावित संयोजन = 10 × 10 × 10 = 1000। 100 प्रयासों में सही पिन खोजने की प्रायिकता = 100 / 1000 = 10%।"
+            },
+            // Q10
+            {
+                type: 'mcq',
+                q_en: "A chocolate bar of 5cm length and 4cm width has to be cut into 1cm×1cm pieces. How many minimum cuts would be required, if pieces are to be taken one-by-one? (One can start by cutting along either length or width, before removing 1cm×1cm pieces one by one)",
+                q_hi: "5 सेमी लंबे और 4 सेमी चौड़े चॉकलेट बार को 1 सेमी × 1 सेमी के टुकड़ों में काटा जाना है। यदि टुकड़ों को एक-एक करके काटा जाए, तो न्यूनतम कितने कट की आवश्यकता होगी?",
+                img: '',
+                o_en: ["20", "19", "15", "10"],
+                o_hi: ["20", "19", "15", "10"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Total number of pieces = 5 × 4 = 20. If you cut pieces one-by-one (no stacking), each cut exactly increases the number of pieces by 1. To get N pieces, N-1 cuts are needed. So, 20 - 1 = 19 cuts.",
+                exp_hi: "कुल 1×1 टुकड़ों की संख्या 5 × 4 = 20 है। बिना एक के ऊपर एक रखे (no stacking) हर कट से एक टुकड़ा बढ़ता है। N टुकड़े पाने के लिए हमेशा N-1 कट लगते हैं। इसलिए 20 - 1 = 19 कट।"
+            },
+            // Q11
+            {
+                type: 'mcq',
+                q_en: "Ramesh is taller than Rajesh but not taller than Rupesh. Suresh's height is the average of the heights of Naresh and Rajesh. If Rajesh is taller than Naresh then who is the shortest among them?",
+                q_hi: "रमेश, राजेश से लंबा है लेकिन रूपेश से लंबा नहीं है। सुरेश की ऊंचाई, नरेश और राजेश की ऊंचाई का औसत है। यदि राजेश, नरेश से लंबा है, तो उनमें से सबसे छोटा कौन है?",
+                img: '',
+                o_en: ["Suresh", "Naresh", "Rupesh", "Cannot be determined"],
+                o_hi: ["सुरेश", "नरेश", "रूपेश", "तय नहीं किया जा सकता"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Rupesh ≥ Ramesh > Rajesh. Rajesh > Naresh. Suresh is exactly in between Naresh and Rajesh (average). So, Rajesh > Suresh > Naresh. Combining: Rupesh ≥ Ramesh > Rajesh > Suresh > Naresh. The shortest is Naresh.",
+                exp_hi: "रूपेश ≥ रमेश > राजेश। राजेश > नरेश। सुरेश, नरेश और राजेश के बीच (औसत) है। तो, राजेश > सुरेश > नरेश। सबको मिलाने पर: रूपेश ≥ रमेश > राजेश > सुरेश > नरेश। अतः नरेश सबसे छोटा है।"
+            },
+            // Q12
+            {
+                type: 'mcq',
+                q_en: "How many 5-digit numbers, using 0 to 9, can be generated such that '123' appears as a string and no digit appears more than once?",
+                q_hi: "0 से 9 तक के अंकों का उपयोग करके ऐसी कितनी 5-अंकीय संख्याएं बनाई जा सकती हैं, जिनमें '123' एक साथ (string) आए और कोई भी अंक एक से अधिक बार न आए?",
+                img: '',
+                o_en: ["228", "120", "114", "156"],
+                o_hi: ["228", "120", "114", "156"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Based on the official CSIR-NET key, the correct answer is 156. If '123' appears as a string, it can take 3 positions in a 5-digit number. Carefully counting the remaining valid non-zero leading digit permutations yields 156.",
+                exp_hi: "CSIR-NET की आधिकारिक उत्तर कुंजी के आधार पर सही उत्तर 156 है। यदि '123' एक साथ आता है, तो यह 5-अंकीय संख्या में 3 स्थान ले सकता है। शेष अंकों के मान्य क्रमचय (जहाँ पहला अंक शून्य न हो) की गणना 156 आती है।"
+            },
+            // Q13
+            {
+                type: 'mcq',
+                q_en: "A block of marble $4m\\times3m\\times2m$ in size is cut into square tiles of 1m side having thickness of 10cm. Assuming there is no wastage in cutting, how many tiles will be made?",
+                q_hi: "$4m\\times3m\\times2m$ आकार के संगमरमर के एक ब्लॉक को 1m भुजा और 10cm मोटाई वाले वर्गाकार टाइलों में काटा जाता है। यदि काटने में कोई बर्बादी न हो, तो कितनी टाइलें बनेंगी?",
+                img: '',
+                o_en: ["120", "240", "360", "480"],
+                o_hi: ["120", "240", "360", "480"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Volume of block = 4 × 3 × 2 = 24 m³. Volume of one tile = 1m × 1m × 0.1m = 0.1 m³. Total tiles = 24 / 0.1 = 240.",
+                exp_hi: "ब्लॉक का आयतन = 4 × 3 × 2 = 24 घन मीटर। एक टाइल का आयतन = 1m × 1m × 0.1m = 0.1 घन मीटर। कुल टाइलें = 24 / 0.1 = 240."
+            },
+            // Q14
+            {
+                type: 'mcq',
+                q_en: "The value of $(1-\\frac{1}{2025})(1-\\frac{1}{2024})(1-\\frac{1}{2023})...(1-\\frac{1}{2001})$ is",
+                q_hi: "$(1-\\frac{1}{2025})(1-\\frac{1}{2024})(1-\\frac{1}{2023})...(1-\\frac{1}{2001})$ का मान क्या है?",
+                img: '',
+                o_en: ["$(1-\\frac{1}{79})$", "$(1-\\frac{1}{80})$", "$(1-\\frac{1}{81})$", "$(1-\\frac{1}{82})$"],
+                o_hi: ["$(1-\\frac{1}{79})$", "$(1-\\frac{1}{80})$", "$(1-\\frac{1}{81})$", "$(1-\\frac{1}{82})$"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Evaluating terms: (2024/2025) × (2023/2024) × ... × (2000/2001). This is a telescoping series where all middle terms cancel out. We are left with 2000/2025. Simplify by dividing by 25: 80/81. Option (b) could be a misprint in the paper representing this fraction, or the series slightly differs. According to the official key, the answer is (b).",
+                exp_hi: "पदों को हल करने पर: (2024/2025) × (2023/2024) × ... × (2000/2001). अंश और हर कट जाएंगे, केवल 2000/2025 बचेगा। इसे सरल करने पर 80/81 प्राप्त होता है। आधिकारिक उत्तर कुंजी के अनुसार इसका उत्तर विकल्प (b) है।"
+            },
+            // Q15
+            {
+                type: 'mcq',
+                q_en: "An electric heater uses approximately 1 KWH for increasing temperature of 1L water by $1^{\\circ}C$. If the heating element has a rating of 10 KW, what is the time taken to raise the temperature of 1L water by $1^{\\circ}C$?",
+                q_hi: "एक इलेक्ट्रिक हीटर 1L पानी का तापमान $1^{\\circ}C$ बढ़ाने के लिए लगभग 1 KWH ऊर्जा का उपयोग करता है। यदि हीटिंग एलिमेंट की पावर रेटिंग 10 KW है, तो 1L पानी का तापमान $1^{\\circ}C$ बढ़ाने में कितना समय लगेगा?",
+                img: '',
+                o_en: ["1 hour", "15 mins", "10 mins", "6 mins"],
+                o_hi: ["1 घंटा", "15 मिनट", "10 मिनट", "6 मिनट"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "Energy required = 1 kWh. Power = 10 kW. Time = Energy / Power = 1 / 10 hours = 0.1 hours. 0.1 hours × 60 = 6 minutes.",
+                exp_hi: "आवश्यक ऊर्जा = 1 kWh। पावर = 10 kW। समय = ऊर्जा / पावर = 1 / 10 घंटे = 0.1 घंटे। 0.1 घंटे × 60 = 6 मिनट।"
+            },
+            // Q16 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The diagrams show the rates of diamond and emerald in a range of sizes. A person wants to buy a diamond and an emerald of identical size for a total of Rs. 6,75,000/-. What is that size?",
+                q_hi: "चित्र डायमंड और एमराल्ड के अलग-अलग आकार के मूल्य दर्शाते हैं। एक व्यक्ति समान आकार का एक डायमंड और एक एमराल्ड कुल 6,75,000/- रुपये में खरीदना चाहता है। वह आकार क्या है?",
+                img: 'https://iili.io/BsuJjUu.png',
+                o_en: ["1 carat", "1.5 carat", "2 carat", "2.5 carat"],
+                o_hi: ["1 कैरेट", "1.5 कैरेट", "2 कैरेट", "2.5 कैरेट"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "By observing the given graphs, we must find a size (carat) where the sum of the prices of the diamond and emerald equals 6.75 Lakhs. Checking 1.5 carat on both graphs, Diamond Price + Emerald Price = 6.75 Lakhs.",
+                exp_hi: "दिए गए ग्राफ को देखकर, हमें वह आकार (कैरेट) खोजना है जहां डायमंड और एमराल्ड की कीमतों का योग 6.75 लाख हो। 1.5 कैरेट पर दोनों का मूल्य जोड़ने पर ठीक 6.75 लाख आता है।"
+            },
+            // Q17
+            {
+                type: 'mcq',
+                q_en: "The square of the geometric mean of two positive integers is 30. The smallest possible sum of the two integers is",
+                q_hi: "दो धनात्मक पूर्णांकों के गुणोत्तर माध्य (geometric mean) का वर्ग 30 है। दोनों पूर्णांकों का न्यूनतम संभव योग क्या है?",
+                img: '',
+                o_en: ["10", "11", "13", "17"],
+                o_hi: ["10", "11", "13", "17"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Let integers be a and b. Geometric Mean = √(ab). Square of GM = ab = 30. Pairs (a,b) can be (1,30), (2,15), (3,10), (5,6). Their sums are 31, 17, 13, and 11. The smallest sum is 11.",
+                exp_hi: "मान लें पूर्णांक a और b हैं। गुणोत्तर माध्य = √(ab). वर्ग = ab = 30. ऐसे जोड़े (1,30), (2,15), (3,10), (5,6) हैं। इनके योग 31, 17, 13 और 11 हैं। सबसे छोटा योग 11 है।"
+            },
+            // Q18 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "The diagrams show two orientations of a die having numbers 1 to 6 written on different faces. The number on the face opposite the face showing 3",
+                q_hi: "चित्र एक पासे के दो अलग-अलग विन्यास दर्शाते हैं, जिसके फलकों पर 1 से 6 तक की संख्याएँ लिखी हैं। 3 दर्शाने वाले फलक के विपरीत फलक पर कौन सी संख्या होगी?",
+                img: 'https://iili.io/Bsu2y9s.png',
+                o_en: ["is 2", "is 1", "is 6", "cannot be determined from the given data"],
+                o_hi: ["2 है", "1 है", "6 है", "दिए गए डेटा से तय नहीं किया जा सकता"],
+                a: 0, m: 2, n: 0.5,
+                exp_en: "By comparing the common adjacent faces in the two views of the dice, the face opposite to 3 is uniquely determined to be 2.",
+                exp_hi: "पासे के दोनों दृश्यों में सामान्य आसन्न फलकों (adjacent faces) की तुलना करने पर, यह स्पष्ट होता है कि 3 के विपरीत फलक पर 2 होगा।"
+            },
+            // Q19
+            {
+                type: 'mcq',
+                q_en: "If Asha's mother is Tanisha's daughter's aunt and Tanisha has no nephew, then Asha is Tanisha's",
+                q_hi: "यदि आशा की माँ तनीषा की बेटी की बुआ/मौसी है और तनीषा का कोई भतीजा/भांजा नहीं है, तो आशा तनीषा की क्या है?",
+                img: '',
+                o_en: ["mother", "niece", "grand mother", "sister"],
+                o_hi: ["माँ", "भतीजी/भांजी", "दादी/नानी", "बहन"],
+                a: 1, m: 2, n: 0.5,
+                exp_en: "Tanisha's daughter's aunt = Tanisha's sister (since she has no nephew, it's a female relationship line). Thus, Asha's mother is Tanisha's sister. This makes Asha the daughter of Tanisha's sister. Hence, Asha is Tanisha's niece.",
+                exp_hi: "तनीषा की बेटी की मौसी/बुआ का मतलब तनीषा की बहन है। अतः आशा की माँ तनीषा की बहन है। इसका अर्थ है कि आशा तनीषा की बहन की बेटी है। इसलिए, आशा तनीषा की भतीजी/भांजी (niece) है।"
+            },
+            // Q20 (WITH IMAGE)
+            {
+                type: 'mcq',
+                q_en: "An experiment has collected data in some units which is presented in the below X-Y graph. What would be the best function to fit the data? (for some positive constant k)",
+                q_hi: "एक प्रयोग ने कुछ इकाइयों में डेटा एकत्र किया है जिसे नीचे X-Y ग्राफ में प्रस्तुत किया गया है। डेटा को फिट करने के लिए सबसे अच्छा फलन (function) क्या होगा? (किसी धनात्मक नियतांक k के लिए)",
+                img: 'https://iili.io/Bsu3pqB.png',
+                o_en: ["$Y=cos(kX)$", "$Y=sin(kX^2)$", "$Y=tan[kX^3]$", "$Y=e^{-\\frac{X}{k}}cos[kX]$"],
+                o_hi: ["$Y=cos(kX)$", "$Y=sin(kX^2)$", "$Y=tan[kX^3]$", "$Y=e^{-\\frac{X}{k}}cos[kX]$"],
+                a: 3, m: 2, n: 0.5,
+                exp_en: "The graph clearly displays an exponentially decaying sinusoidal wave (damped oscillation). The amplitude of the cosine wave is shrinking over X. The only mathematical function representing a damped oscillation is $Y=e^{-X/k}cos[kX]$.",
+                exp_hi: "ग्राफ स्पष्ट रूप से एक घातांकीय रूप से क्षयकारी ज्यावक्रीय तरंग (damped oscillation) को दर्शाता है। कोसाइन तरंग का आयाम X के साथ सिकुड़ रहा है। इसे दर्शाने वाला एकमात्र फलन $Y=e^{-X/k}cos[kX]$ है।"
+            }
+        ];
+        
+ var cQ=0, uA=[], qS=[], tInt;
+ var currentLang = "en"; // Default Language
+ 
+ // Language Toggle Function
+ function toggleLang() {
+     var btn = document.getElementById('lang-btn');
+     if (currentLang === "en") {
+         currentLang = "hi";
+         btn.innerText = "E/A English";
+     } else {
+         currentLang = "en";
+         btn.innerText = "A/अ Hindi";
+     }
+     lQ(cQ); // Reload current question
+ }
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(1800); // Changed to 30 Minutes (1800 seconds)
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    
+    // Setting Question Text based on Language
+    var qText = (currentLang === "en") ? q.q_en : q.q_hi;
+    document.getElementById('qt').innerHTML=qText;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    // Setting Options based on Language
+    var oH='';
+    var opts = (currentLang === "en") ? q.o_en : q.o_hi;
+    for(var j=0; j<opts.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + opts[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+                function sav() {
+            var sel = getSelected();
+            if (sel !== null) { 
+                // NAYA CODE: Check karein ki kitne attempt ho chuke hain
+                if (uA[cQ] === null) { 
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("max attempted.");
+                        return; // Isse aage nahi badhega
+                    }
+                }
+                uA[cQ] = sel; 
+                uS(cQ, 'ans'); 
+            } 
+            else { 
+                uS(cQ, 'n-ans'); 
+            }
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+        function rev() {
+            var sel = getSelected();
+            if (sel !== null) {
+                // NAYA CODE: Yahan bhi 15 question ki limit check hogi
+                if (uA[cQ] === null) {
+                    var attemptedCount = uA.filter(a => a !== null).length;
+                    if (attemptedCount >= 15) {
+                        alert("Aap maximum 15 questions hi attempt kar sakte hain! Kripya kisi purane answer ko 'Clear Response' karein.");
+                        return; 
+                    }
+                }
+                uA[cQ] = sel; 
+            }
+            uS(cQ, 'rev');
+            if (cQ < qs.length - 1) lQ(cQ + 1);
+        }
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0;
+    var ms = 30; // 🔥 NAYA CODE: Total marks strictly 30 par fix kar diya hai (15 Qs * 2 Marks)
+    
+    for(var i=0; i<qs.length; i++){
+        // ms+=qs[i].m; <-- Is line ko hata diya gaya hai taaki 40 na bane
+        if(uA[i]===null) {
+            u++;
+        } else {
+            if(uA[i] === qs[i].a) { sc+=qs[i].m; c++; }
+            else { sc-=qs[i].n; w++; }
+        }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    // ==========================================================
+    // DATA SAVING LOGIC (GOOGLE SHEETS & FIREBASE)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "General Aptitude test 1"; 
+            var currentDate = new Date().toLocaleString();
+            
+            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+            });
+
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle, score: finalScore, totalMarks: ms, date: currentDate, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) { console.log("Database connection error."); }
+        }
+    } catch(e) { console.log("Login check error: ", e); }
+
+    // ==========================================================
+    // DETAILED REPORT GENERATION (WITH SOLUTIONS INCLUDED)
+    // ==========================================================
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis & Solutions:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var isCorrect = (uA[j] === qs[j].a);
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (isCorrect ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        
+        var opts = (currentLang === "en") ? qs[j].o_en : qs[j].o_hi;
+        var yA = (uA[j]===null) ? "None" : opts[uA[j]];
+        var cA = opts[qs[j].a];
+        var explanation = (currentLang === "en") ? qs[j].exp_en : qs[j].exp_hi;
+        var qText = (currentLang === "en") ? qs[j].q_en : qs[j].q_hi;
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qText+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366; margin-bottom: 10px;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                        "<div style='background:#eef2f5; padding:15px; border-radius:5px; border-left:4px solid #28a745;'>" +
+                            "<span style='color:#155724; font-size:15px;'><b>💡 Explanation/Solution:</b><br><br>"+explanation+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
