@@ -144,7 +144,7 @@ function toast(msg) {
       if (!x || typeof x.q !== 'string' || !x.q.trim()) { errs.push('Question ' + n + ': question text (q) is missing.'); return; }
       if (!Array.isArray(x.o) || x.o.length < 2) { errs.push('Question ' + n + ': options (o) must be a list of at least 2.'); return; }
       if (!Number.isInteger(x.a) || x.a < 0 || x.a >= x.o.length) { errs.push('Question ' + n + ': correct answer (a) must be a number from 0 to ' + (x.o.length - 1) + '.'); return; }
-      out.push({ q: x.q, o: x.o.map(String), a: x.a, m: typeof x.m === 'number' ? x.m : 3, n: typeof x.n === 'number' ? x.n : 1, img: x.img || '', exp: x.exp || '' });
+      out.push({ q: x.q, qHi: x.qHi || '', o: x.o.map(String), a: x.a, m: typeof x.m === 'number' ? x.m : 3, n: typeof x.n === 'number' ? x.n : 1, img: x.img || '', exp: x.exp || '' });
     });
     const t = tests.find(z => z.id === $('#qSel').value);
     const max = out.reduce((a, q) => a + q.m, 0);
