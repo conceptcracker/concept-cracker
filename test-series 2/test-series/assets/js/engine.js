@@ -17,6 +17,7 @@
   var LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
   var S = null;          // live test state
   var tick = null;       // timer interval
+  var LANG = (function () { try { return localStorage.getItem('bts:lang') || 'en'; } catch (e) { return 'en'; } })(); // 'en' or 'hi'
 
   /* ---------- helpers ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -165,6 +166,7 @@
       '<header class="tb"><div class="l"><button class="icon-btn pal-toggle" id="palBtn" aria-label="Question palette">\u2630</button>' +
       '<span class="ttl">' + esc(T.name) + '</span></div>' +
       '<div class="timer" id="timer">--:--:--</div>' +
+      '<button class="btn btn-ghost btn-sm" id="langBtn">' + (LANG === 'hi' ? 'English' : 'हिंदी') + '</button>' +
       '<button class="btn btn-orange btn-sm" id="submitBtn">Submit</button></header>' +
       (secs.length > 1 ? '<nav class="sec-tabs" id="tabs"></nav>' : '') +
       '<div class="test-body"><main class="qpane" id="qpane"></main><aside class="palette" id="palette"></aside></div>' +
@@ -182,6 +184,11 @@
     $('#submitBtn').onclick = confirmSubmit;
     $('#palBtn').onclick = function () { togglePalette(true); };
     $('#scrim').onclick = function () { togglePalette(false); };
+    $('#langBtn').onclick = function () {
+      LANG = LANG === 'hi' ? 'en' : 'hi';
+      try { localStorage.setItem('bts:lang', LANG); } catch (e) {}
+      renderTest();
+    };
 
     renderTabs(); renderQ(); renderPalette(); startTimer();
   }
@@ -213,7 +220,7 @@
       (secs.length > 1 ? '<span class="tag">' + esc(secs[secOf(i)].name) + '</span>' : '') +
       '<span class="tag mk">+' + mk(q) + ' / \u2212' + ng(q) + '</span>' +
       (S.mark[i] ? '<span class="tag rv">Marked for review</span>' : '') + '</div>' +
-      '<div class="q-text">' + q.q + '</div>' +
+      '<div class="q-text">' + (LANG === 'hi' && q.qHi ? q.qHi : q.q) + '</div>' +
       (q.img ? '<img class="q-img" src="' + esc(q.img) + '" alt="Question figure">' : '') +
       '<div class="opts">' + q.o.map(function (o, k) {
         return '<button class="opt' + (sel === k ? ' sel' : '') + '" data-k="' + k + '"><span class="l">' + LETTERS[k] + '</span><span class="t">' + o + '</span></button>';
@@ -354,7 +361,7 @@
         html += '<article class="sol"><div class="q-head"><span class="q-num">Question ' + (i + 1) + '</span>' +
           (secs.length > 1 ? '<span class="tag">' + esc(secs[secOf(i)].name) + '</span>' : '') + label +
           (res.mark && res.mark[i] ? '<span class="tag rv">Marked</span>' : '') + '</div>' +
-          '<div class="q-text">' + q.q + '</div>' +
+          '<div class="q-text">' + (LANG === 'hi' && q.qHi ? q.qHi : q.q) + '</div>' +
           (q.img ? '<img class="q-img" src="' + esc(q.img) + '" alt="Question figure">' : '') +
           '<div class="opts">' + q.o.map(function (o, k) {
             var cls = k === q.a ? ' right' : (k === yours ? ' wrong' : '');
