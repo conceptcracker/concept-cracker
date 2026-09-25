@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Assistant Professor Test Series rules ----------
+    // (If you already have rules, paste only the functions + "match" blocks
+    //  below INSIDE your existing "match /databases/{database}/documents { }".)
+
+    function signedIn() { return request.auth != null; }
+
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/aptest_admins/$(request.auth.uid));
+    }
+
+    function isApproved() {
+      return signedIn() &&
+        get(/databases/$(database)/documents/aptest_users/$(request.auth.uid)).data.approved == true;
+    }
+
+    // Admin list: created by hand in the Firebase console, never from the website
+    match /aptest_admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Candidate profiles (a candidate can NOT approve himself)
+    match /aptest_users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid
+                    && request.resource.data.approved == false;
+      allow update: if signedIn() &&
+                    ((request.auth.uid == uid && request.resource.data.approved == resource.data.approved)
+                     || isAdmin());
+      allow delete: if isAdmin();
+
+      // Test results of that candidate
+      match /results/{rid} {
+        allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+        allow create: if signedIn() && request.auth.uid == uid && isApproved();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Small info about each test (question count, marks) - fine for any logged-in user
+    match /aptest_meta/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // The real questions + answers: ONLY approved candidates (and admin) can read
+    match /aptest_tests/{id} {
+      allow read: if isApproved() || isAdmin();
+      allow write: if isAdmin();
+    }
+  }
+}

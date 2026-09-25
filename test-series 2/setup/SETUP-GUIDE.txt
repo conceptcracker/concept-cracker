@@ -1,0 +1,71 @@
+ASSISTANT PROFESSOR TEST SERIES - LOGIN + APPROVAL SETUP
+=========================================================
+
+Kaise kaam karta hai
+--------------------
+1. Candidate "Login / Sign up" se account banata hai (email+password ya Google).
+2. Usse profile form bharna hota hai (naam, mobile, city, qualification...).
+3. Aap Admin panel me "Waiting" list me uska naam dekhte ho aur "Approve" dabate ho.
+4. Jab tak approve nahi, wo test nahi de sakta.
+5. Approved candidate ke saare results uski profile me "My results" section me dikhte hain.
+   Aap Admin panel me har candidate ke results bhi dekh sakte ho.
+
+Security: questions website ki files me NAHI hain. Wo Firebase (Firestore) me private
+rakhe jate hain aur Firestore rules ki wajah se sirf approved candidate hi unhe padh sakta hai.
+(Isliye questions-to-upload folder ko website par upload mat karna.)
+
+
+SETUP (ek baar karna hai)
+-------------------------
+STEP 1 - Firebase project
+   console.firebase.google.com -> apna project kholo (jo aapki website me use ho raha hai wahi chalega).
+   Naye collections ke naam "aptest_" se shuru hote hain, isliye purane data se kuch nahi takrayega.
+
+STEP 2 - Login methods on karo
+   Build -> Authentication -> Sign-in method
+     - Email/Password  -> Enable
+     - Google          -> Enable (optional, but candidates ko easy padta hai)
+   Authentication -> Settings -> Authorized domains -> apni website ka domain add karo
+   (jaise  mywebsite.com). Ye na kiya to login me "unauthorized domain" error aayega.
+
+STEP 3 - Firestore database
+   Build -> Firestore Database -> Create database (agar pehle se nahi hai). Production mode.
+   Phir "Rules" tab -> setup/firestore.rules ka content paste karo -> Publish.
+   (Agar aapke pehle se rules hain to unhe delete mat karna. Sirf naye functions aur match blocks
+    apne rules ke andar jodo. Agar aapke rules me pehle se isAdmin() naam ka function hai to
+    naye wale ka naam badal dena.)
+
+STEP 4 - Config paste karo
+   Project settings (gear icon) -> General -> Your apps -> Web app (</>) -> Config.
+   Wo config test-series/assets/js/firebase-config.js me paste kar do
+   (file me instructions likhe hain).
+
+STEP 5 - Website par upload
+   "test-series" folder apni website me upload karo. Kholo:  test-series/index.html
+   Dhyan rahe: website http/https par honi chahiye (file se seedha kholne par Firebase login nahi chalega).
+
+STEP 6 - Khud ko Admin banao
+   a) Website par apne email se Sign up karo aur profile bhar do.
+   b) Firebase Console -> Authentication -> Users -> apni row ka "User UID" copy karo.
+   c) Firestore Database -> Start collection -> Collection ID:  aptest_admins
+      Document ID: (apna User UID paste karo)   Field: role   Type: string   Value: admin   -> Save.
+   d) Website par logout/login karo. Ab upar corner ke menu me "Admin panel" dikhega.
+
+STEP 7 - Questions upload karo
+   Admin panel -> Questions tab -> test chuno -> file choose karo (.js) -> "Check questions" -> "Publish".
+   questions-to-upload folder me 3 sample files hain (Full Length 1, GS 1, Physics 1) taaki test kar sako.
+   Naye questions mujhe bhejo, main is format me bana dunga.
+
+STEP 8 - Candidates ko approve karo
+   Admin panel -> Candidates -> "Waiting" list -> Approve.
+   Galti se approve ho gaya ho to "Revoke" dabao.
+
+
+Kuch zaroori baatein
+--------------------
+- Firebase ka free (Spark) plan is kaam ke liye kaafi hai.
+- Password reset link "Forgot password?" se candidate khud mangwa sakta hai.
+- Candidate ka progress har device par sync hota hai (results Firebase me save hote hain).
+- Agar internet chala jaye aur test submit ho, result baad me automatically save ho jata hai.
+- Result candidate ke browser se hi save hota hai; ye practice/mock test ke liye theek hai
+  (official exam jaisa tamper-proof nahi).
