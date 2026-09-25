@@ -18,6 +18,43 @@
   var S = null;          // live test state
   var tick = null;       // timer interval
   var LANG = (function () { try { return localStorage.getItem('bts:lang') || 'en'; } catch (e) { return 'en'; } })(); // 'en' or 'hi'
+  var backWarn = 0;      // count of back-button attempts during a live test
+
+  /* ---------- fullscreen ---------- */
+  function enterFullscreen() {
+    try {
+      var el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } catch (e) {}
+  }
+  function exitFullscreen() {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+      else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } catch (e) {}
+  }
+
+  /* ---------- back-button guard ---------- */
+  function onPopState() {
+    if (!S) return;
+    try { history.pushState({ bts: 1 }, '', location.href); } catch (e) {}
+    backWarn++;
+    if (backWarn >= 3) {
+      toast('Back button used too many times. Submitting the test now.');
+      finish(true);
+    } else {
+      toast('Warning ' + backWarn + '/3: do not use the back button, or the test will auto-submit.');
+    }
+  }
+  function armBackGuard() {
+    backWarn = 0;
+    try { history.pushState({ bts: 1 }, '', location.href); } catch (e) {}
+    window.addEventListener('popstate', onPopState);
+  }
+  function disarmBackGuard() {
+    window.removeEventListener('popstate', onPopState);
+  }
 
   /* ---------- helpers ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -152,12 +189,12 @@
 
     var b;
     if ((b = $('#start'))) b.onclick = startTest;
-    if ((b = $('#resume'))) b.onclick = function () { S = saved; renderTest(); };
+    if ((b = $('#resume'))) b.onclick = function () { S = saved; enterFullscreen(); armBackGuard(); renderTest(); };
     if ((b = $('#restart'))) b.onclick = function () { if (confirm('Discard your saved progress and start a fresh attempt?')) startTest(); };
     if ((b = $('#last'))) b.onclick = function () { showResult(atts[0]); };
   }
 
-  function startTest() { S = newState(); persist(); renderTest(); }
+  function startTest() { S = newState(); persist(); enterFullscreen(); armBackGuard(); renderTest(); }
 
   /* ---------- live test ---------- */
   function renderTest() {
@@ -280,6 +317,8 @@
 
   function finish(auto) {
     clearInterval(tick);
+    disarmBackGuard();
+    exitFullscreen();
     if (!S) return;
     var now = Date.now();
     var res = evaluate(S.ans);
