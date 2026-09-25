@@ -18,7 +18,7 @@
   var S = null;          // live test state
   var tick = null;       // timer interval
   var LANG = (function () { try { return localStorage.getItem('bts:lang') || 'en'; } catch (e) { return 'en'; } })(); // 'en' or 'hi'
-  var backWarn = 0;      // count of back-button attempts during a live test
+  var violations = 0;    // count of back-button / tab-switch attempts during a live test
 
   /* ---------- fullscreen ---------- */
   function enterFullscreen() {
@@ -35,26 +35,39 @@
     } catch (e) {}
   }
 
-  /* ---------- back-button guard ---------- */
+  /* ---------- integrity guard: back button + tab/window switch ---------- */
+  function registerViolation(msg) {
+    if (!S) return;
+    violations++;
+    if (violations >= 3) {
+      toast('Too many warnings. Submitting the test now.');
+      finish(true);
+    } else {
+      toast(msg + ' (Warning ' + violations + '/3, test auto-submits after 3)');
+    }
+  }
   function onPopState() {
     if (!S) return;
     try { history.pushState({ bts: 1 }, '', location.href); } catch (e) {}
-    backWarn++;
-    if (backWarn >= 3) {
-      toast('Back button used too many times. Submitting the test now.');
-      finish(true);
-    } else {
-      toast('Warning ' + backWarn + '/3: do not use the back button, or the test will auto-submit.');
-    }
+    registerViolation('Back button used.');
   }
-  function armBackGuard() {
-    backWarn = 0;
+  function onVisibilityChange() {
+    if (!S) return;
+    if (document.hidden) return;   // only act when they come back
+    enterFullscreen();
+    registerViolation('You switched away from the test.');
+  }
+  function armIntegrityGuard() {
+    violations = 0;
     try { history.pushState({ bts: 1 }, '', location.href); } catch (e) {}
     window.addEventListener('popstate', onPopState);
+    document.addEventListener('visibilitychange', onVisibilityChange);
   }
-  function disarmBackGuard() {
+  function disarmIntegrityGuard() {
     window.removeEventListener('popstate', onPopState);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
   }
+
 
   /* ---------- helpers ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -189,12 +202,12 @@
 
     var b;
     if ((b = $('#start'))) b.onclick = startTest;
-    if ((b = $('#resume'))) b.onclick = function () { S = saved; enterFullscreen(); armBackGuard(); renderTest(); };
+    if ((b = $('#resume'))) b.onclick = function () { S = saved; enterFullscreen(); armIntegrityGuard(); renderTest(); };
     if ((b = $('#restart'))) b.onclick = function () { if (confirm('Discard your saved progress and start a fresh attempt?')) startTest(); };
     if ((b = $('#last'))) b.onclick = function () { showResult(atts[0]); };
   }
 
-  function startTest() { S = newState(); persist(); enterFullscreen(); armBackGuard(); renderTest(); }
+  function startTest() { S = newState(); persist(); enterFullscreen(); armIntegrityGuard(); renderTest(); }
 
   /* ---------- live test ---------- */
   function renderTest() {
@@ -317,7 +330,7 @@
 
   function finish(auto) {
     clearInterval(tick);
-    disarmBackGuard();
+    disarmIntegrityGuard();
     exitFullscreen();
     if (!S) return;
     var now = Date.now();
