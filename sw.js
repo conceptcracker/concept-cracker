@@ -1,4 +1,4 @@
-const CACHE = 'concept-cracker-v1';
+const CACHE = 'concept-cracker-v2';
 const ASSETS = [
   '/concept-cracker/',
   '/concept-cracker/index.html',
@@ -21,16 +21,24 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Network first (naya content dikhe), offline ho to cache se
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
+  const req = e.request;
+  const url = new URL(req.url);
+  // Only handle our own site's files. Firebase / Firestore / Google / CDN
+  // requests go straight to the network so data is never served stale.
+  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Network first, and always re-check with the server (skips the 10-minute
+  // GitHub Pages browser cache). Cache is used only when offline.
   e.respondWith(
-    fetch(e.request)
+    fetch(req, { cache: 'no-cache' })
       .then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy));
+        }
         return res;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => caches.match(req))
   );
 });
