@@ -1,85 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Subject | Concept Cracker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Select Subject | Concept Cracker</title>
+<meta name="theme-color" content="#0a1230">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<style>
+:root{--navy:#0a1230;--primary:#002347;--secondary:#00509d;--orange:#ff6a00;--accent:#ff9800;--bg:#f5f7fb;--text:#1d2840;--muted:#5b6785}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
-    <style>
-        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
-        header { background: var(--primary); color: white; padding: 20px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .logo { font-size: 22px; font-weight: bold; letter-spacing: 1px; }
-        .logo span { color: var(--accent); }
-        
-        .profile-btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; margin-right:10px; }
-        .logout-btn { background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        
-        .page-title { text-align: center; margin: 40px 0 20px; font-size: 28px; color: var(--primary); }
-        .grid-container { padding: 0 5% 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .sub-card { background: var(--white); padding: 30px 20px; border-radius: 15px; text-align: center; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary); transition: 0.3s; display: block; }
-        .sub-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 4px solid var(--accent); }
-        .sub-card i { font-size: 40px; color: var(--secondary); margin-bottom: 15px; }
-        .sub-card h3 { font-size: 18px; margin: 0; }
-        .special-card { border-top: 4px solid var(--accent); background: #fffcf5; }
-        .special-card i { color: var(--accent); }
-    </style>
+nav{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(10,18,48,.08)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:.5px}
+.logo img{width:38px;height:38px;border-radius:50%}
+.logo span{color:var(--orange)}
+.nav-right{display:flex;align-items:center;gap:26px}
+.nav-right>a{font-weight:500;font-size:15px;transition:.25s}
+.nav-right>a:hover{color:var(--orange)}
+#auth-nav{display:flex;align-items:center;gap:10px}
+.btn-nav{background:var(--navy);color:#fff!important;padding:10px 22px;border-radius:50px;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;font-family:inherit}
+.btn-nav:hover{background:var(--orange)}
+.logout-btn{background:#fdecee;color:#dc3545;border:0;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:16px;transition:.25s}
+.logout-btn:hover{background:#dc3545;color:#fff}
+
+.head{position:relative;overflow:hidden;color:#fff;text-align:center;padding:56px 24px 80px;background:radial-gradient(800px 420px at 85% 0%,rgba(255,106,0,.28),transparent 60%),radial-gradient(600px 400px at 0% 100%,rgba(0,80,157,.5),transparent 60%),linear-gradient(135deg,#050b24,#0a1a45)}
+.head::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:26px 26px}
+.head>*{position:relative}
+.back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;margin-bottom:18px}
+.back:hover{color:#ffb74d}
+.head h1{font-size:clamp(28px,4.6vw,44px);margin:6px 0 10px;font-weight:800;line-height:1.15}
+.head h1 em{font-style:normal;background:linear-gradient(90deg,#ff9800,#ff6a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{margin:0 auto;max-width:520px;color:rgba(255,255,255,.78);line-height:1.7}
+
+.search{position:relative;max-width:520px;margin:-28px auto 40px;padding:0 20px;z-index:2}
+.search i{position:absolute;left:38px;top:50%;transform:translateY(-50%);color:#98a2b8}
+.search input{width:100%;padding:16px 20px 16px 50px;border:1px solid #e3e8f2;border-radius:50px;font:500 15px 'Poppins',sans-serif;color:var(--text);box-shadow:0 12px 30px rgba(10,18,48,.1);background:#fff}
+.search input:focus{outline:2px solid rgba(255,106,0,.35);border-color:var(--orange)}
+
+.sec-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin:0 0 6px}
+.sec-h{font-size:clamp(20px,2.6vw,26px);font-weight:700;color:var(--primary);margin:0 0 22px}
+.block{margin-bottom:52px}
+
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.f-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:30px 26px;border-radius:22px;color:#fff;overflow:hidden;transition:.35s;background:linear-gradient(135deg,#0a1a45,#00509d);box-shadow:0 14px 34px rgba(0,80,157,.28)}
+.f-card:nth-child(2){background:linear-gradient(135deg,#ff9800,#ff6a00);box-shadow:0 14px 34px rgba(255,106,0,.32)}
+.f-card:nth-child(3){background:linear-gradient(135deg,#050b24,#1a2a5e)}
+.f-card::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1)}
+.f-card:hover{transform:translateY(-8px)}
+.f-card i.big{font-size:30px;margin-bottom:10px}
+.f-card h3{margin:0;font-size:18px}
+.f-card small{opacity:.8;font-size:13px}
+.f-card .arrow{margin-top:12px;font-weight:600;font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.sub-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;background:#fff;border:1px solid #e9edf5;border-radius:20px;padding:28px 16px;box-shadow:0 8px 24px rgba(10,18,48,.05);transition:.3s;position:relative;overflow:hidden}
+.sub-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#ff9800,#ff6a00);transform:scaleX(0);transform-origin:left;transition:.4s}
+.sub-card:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(10,18,48,.12)}
+.sub-card:hover::after{transform:scaleX(1)}
+.ico{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;font-size:24px;color:#fff;background:linear-gradient(135deg,#00509d,#0a1a45);box-shadow:0 10px 20px rgba(0,80,157,.28)}
+.sub-card h3{margin:0;font-size:15.5px;color:var(--primary);line-height:1.4}
+.empty{display:none;text-align:center;color:var(--muted);padding:30px 0 60px}
+
+footer{background:linear-gradient(135deg,#050b24,#0a1a45);color:#fff;text-align:center;padding:36px 24px}
+footer p{margin:5px 0;opacity:.7;font-size:14px}
+.bottom-bar{display:none}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s,transform .6s}
+.reveal.show{opacity:1;transform:none}
+
+@media(max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.feat{grid-template-columns:1fr}.f-card{flex-direction:row;align-items:center;gap:16px;padding:22px}.f-card i.big{margin:0;font-size:28px}.f-card .arrow{display:none}.f-card div{flex:1}}
+@media(max-width:760px){
+ .nav-right>a{display:none}
+ .grid{grid-template-columns:repeat(2,1fr);gap:14px}
+ .sub-card{padding:22px 12px}
+ .sub-card h3{font-size:14px}
+ .btn-nav span{display:none}
+ .btn-nav{padding:10px 14px}
+ body{padding-bottom:72px}
+ .bottom-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1500;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid #e5e8ef;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+ .bottom-bar a{flex:1;text-align:center;color:#7a859f;font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px}
+ .bottom-bar a i{font-size:19px}
+ .bottom-bar a.on{color:var(--orange)}
+}
+</style>
 </head>
 <body>
 
-<header>
-    <div class="logo">CONCEPT <span>CRACKER</span></div>
-    
-    <div id="auth-nav">
-        <a href="index.html#login" class="profile-btn"><i class="fas fa-user-circle"></i> Login / Register</a>
-    </div>
+<nav>
+ <div class="wrap nav-in">
+  <a href="index.html" class="logo"><img src="icons/icon-192.png" alt="Concept Cracker logo">CONCEPT <span>CRACKER</span></a>
+  <div class="nav-right">
+   <a href="index.html">Home</a>
+   <a href="exams.html">Exams</a>
+   <div id="auth-nav"><a href="index.html#login" class="btn-nav"><i class="fas fa-user-circle"></i><span>Login / Register</span></a></div>
+  </div>
+ </div>
+</nav>
+
+<header class="head">
+ <a href="exams.html" class="back"><i class="fas fa-arrow-left"></i> All Exams</a>
+ <h1>Select <em>Subject Module</em></h1>
+ <p>Pick a subject for topic-wise practice, or jump straight into full-length and PYQ tests.</p>
 </header>
 
-<h2 class="page-title">Select Subject Module</h2>
+<div class="search"><i class="fas fa-search"></i><input id="q" type="search" placeholder="Search subject... (e.g. quantum)" autocomplete="off"></div>
 
-<div class="grid-container">
-    <a href="mathematical-physics/list.html" class="sub-card"><i class="fas fa-calculator"></i><h3>Mathematical Physics</h3></a>
-    <a href="quantum-mechenics/list.html" class="sub-card"><i class="fas fa-atom"></i><h3>Quantum Mechanics</h3></a>
-    <a href="classical-mechanics/list.html" class="sub-card"><i class="fas fa-cogs"></i><h3>Classical Mechanics</h3></a>
-    <a href="electronic/list.html" class="sub-card"><i class="fas fa-microscope"></i><h3>Electronic</h3></a>
-    <a href="electrodynamics/list.html" class="sub-card"><i class="fas fa-bolt"></i><h3>Electrodynamics</h3></a>
-    <a href="nuclear-physics/list.html" class="sub-card"><i class="fas fa-radiation"></i><h3>Nuclear & Particle Physics</h3></a>
-    <a href="thermo-physics/list.html" class="sub-card"><i class="fas fa-temperature-half"></i><h3>Thermo & Statistics</h3></a>
-    <a href="solid-state/list.html" class="sub-card"><i class="fas fa-cubes"></i><h3>Solid State Physics</h3></a>
-    <a href="atomic and molecular -physics/list.html" class="sub-card"><i class="fas fa-microscope"></i><h3>Atomic & Molecular</h3></a>
-    <a href="general aptitude-part a/list.html" class="sub-card"><i class="fas fa-calculator"></i><h3>General Aptitude</h3></a>
-    <a href="combined-test/list.html" class="sub-card special-card"><i class="fas fa-layer-group"></i><h3>Combined Mock Tests</h3></a>
-    <a href="full-length-tests/list.html" class="sub-card special-card"><i class="fas fa-file-signature"></i><h3>Full Length Mock Tests</h3></a>
-     <a href="pyqs-test/list.html" class="sub-card special-card"><i class="fas fa-file-signature"></i><h3>Csir Net Pyqs Tests</h3></a>
+<main class="wrap">
+ <div class="block" id="b-special">
+  <p class="sec-title">Test Series</p>
+  <h2 class="sec-h">Exam-style Mock Tests</h2>
+  <div class="feat" id="feat"></div>
+ </div>
+ <div class="block" id="b-sub">
+  <p class="sec-title">Topic-wise</p>
+  <h2 class="sec-h">Subject Modules</h2>
+  <div class="grid" id="grid"></div>
+ </div>
+ <div class="empty" id="empty">No subject found. Try another word.</div>
+</main>
+
+<footer>
+ <p>Concept Cracker by Yash</p>
+ <p>&copy; 2026 Concept Cracker. All Rights Reserved.</p>
+</footer>
+
+<div class="bottom-bar">
+ <a href="index.html"><i class="fas fa-house"></i>Home</a>
+ <a href="exams.html" class="on"><i class="fas fa-vial"></i>Tests</a>
+ <a href="index.html#dashboard"><i class="fas fa-book-open"></i>Notes</a>
+ <a href="index.html#login" id="bb-user"><i class="fas fa-user"></i>Login</a>
 </div>
 
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
-      authDomain: "concepts-creakres.firebaseapp.com",
-      projectId: "concepts-creakres",
-      appId: "1:882506019552:web:2a5357160294eae7afd685"
-    };
+// Naya subject jodna ho to yahan ek line add karo.
+var SPECIAL = [
+  {n:"Full Length Mock Tests", s:"Complete paper, real exam pattern", i:"fa-file-signature", l:"full-length-tests/list.html"},
+  {n:"Combined Mock Tests",   s:"Mix of multiple subjects",          i:"fa-layer-group",    l:"combined-test/list.html"},
+  {n:"CSIR NET PYQs Tests",   s:"Previous year questions",           i:"fa-clock-rotate-left", l:"pyqs-test/list.html"}
+];
+var SUBJECTS = [
+  {n:"Mathematical Physics",      i:"fa-calculator",        l:"mathematical-physics/list.html"},
+  {n:"Quantum Mechanics",         i:"fa-atom",              l:"quantum-mechenics/list.html"},
+  {n:"Classical Mechanics",       i:"fa-cogs",              l:"classical-mechanics/list.html"},
+  {n:"Electronic",                i:"fa-microchip",         l:"electronic/list.html"},
+  {n:"Electrodynamics",           i:"fa-bolt",              l:"electrodynamics/list.html"},
+  {n:"Nuclear & Particle Physics",i:"fa-radiation",         l:"nuclear-physics/list.html"},
+  {n:"Thermo & Statistics",       i:"fa-temperature-half",  l:"thermo-physics/list.html"},
+  {n:"Solid State Physics",       i:"fa-cubes",             l:"solid-state/list.html"},
+  {n:"Atomic & Molecular",        i:"fa-flask",             l:"atomic and molecular -physics/list.html"},
+  {n:"General Aptitude",          i:"fa-brain",             l:"general aptitude-part a/list.html"}
+];
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+var feat=document.getElementById('feat'), grid=document.getElementById('grid');
+SPECIAL.forEach(function(x){
+  var a=document.createElement('a'); a.className='f-card reveal'; a.href=x.l;
+  a.innerHTML='<i class="fas '+x.i+' big"></i><div><h3>'+x.n+'</h3><small>'+x.s+'</small></div><span class="arrow">Start <i class="fas fa-arrow-right"></i></span>';
+  feat.appendChild(a);
+});
+SUBJECTS.forEach(function(x){
+  var a=document.createElement('a'); a.className='sub-card reveal'; a.href=x.l; a.dataset.k=x.n.toLowerCase();
+  a.innerHTML='<div class="ico"><i class="fas '+x.i+'"></i></div><h3>'+x.n.replace('&','&amp;')+'</h3>';
+  grid.appendChild(a);
+});
 
-    auth.onAuthStateChanged((user) => {
-        const nav = document.getElementById('auth-nav');
-        if (user) {
-            nav.innerHTML = `
-                <a href="profile.html" class="profile-btn"><i class="fas fa-user-check"></i> Profile</a>
-                <button onclick="firebase.auth().signOut()" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
-            `;
-        } else {
-            nav.innerHTML = `<a href="index.html#login" class="profile-btn"><i class="fas fa-user-circle"></i> Login / Register</a>`;
-        }
-    });
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+
+document.getElementById('q').addEventListener('input',function(){
+  var v=this.value.trim().toLowerCase(),n=0;
+  document.querySelectorAll('.sub-card').forEach(function(c){
+    var show=!v||c.dataset.k.indexOf(v)>-1; c.style.display=show?'':'none'; if(show)n++;
+  });
+  document.getElementById('b-special').style.display=v?'none':'';
+  document.getElementById('b-sub').style.display=n?'':'none';
+  document.getElementById('empty').style.display=n?'none':'block';
+});
+
+// --- FIREBASE (same config as before) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+  authDomain: "concepts-creakres.firebaseapp.com",
+  projectId: "concepts-creakres",
+  appId: "1:882506019552:web:2a5357160294eae7afd685"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+auth.onAuthStateChanged((user) => {
+  const nav = document.getElementById('auth-nav');
+  const bb = document.getElementById('bb-user');
+  if (user) {
+    nav.innerHTML = '<a href="profile.html" class="btn-nav"><i class="fas fa-user-check"></i><span>Profile</span></a>' +
+      '<button onclick="firebase.auth().signOut()" class="logout-btn" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></button>';
+    bb.href = 'profile.html'; bb.innerHTML = '<i class="fas fa-user-check"></i>Profile';
+  } else {
+    nav.innerHTML = '<a href="index.html#login" class="btn-nav"><i class="fas fa-user-circle"></i><span>Login / Register</span></a>';
+    bb.href = 'index.html#login'; bb.innerHTML = '<i class="fas fa-user"></i>Login';
+  }
+});
 </script>
-
 </body>
 </html>
