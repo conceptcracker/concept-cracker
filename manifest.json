@@ -1,0 +1,15 @@
+{
+  "name": "Concept Cracker",
+  "short_name": "ConceptCracker",
+  "description": "Crack the concept, master the physics. Mock tests for UPHESC & UPSC Geoscientist.",
+  "start_url": "/concept-cracker/",
+  "scope": "/concept-cracker/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a1230",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
