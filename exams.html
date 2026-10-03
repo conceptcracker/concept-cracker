@@ -1,116 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Exam | Concept Cracker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
-        
-        /* Navbar */
-        nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; text-decoration: none; }
-        .logo span { color: var(--accent); }
-        .nav-links a { text-decoration: none; color: #444; font-weight: 500; margin-left: 30px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Select Exam | Concept Cracker</title>
+<meta name="theme-color" content="#0a1230">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root{--navy:#0a1230;--primary:#002347;--secondary:#00509d;--orange:#ff6a00;--accent:#ff9800;--bg:#f5f7fb;--text:#1d2840;--muted:#5b6785}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+a{text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
-        /* Header */
-        .header-sec { text-align: center; padding: 50px 20px 20px; }
-        .header-sec h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
-        .header-sec p { color: #666; font-size: 16px; }
+nav{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(10,18,48,.08)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:.5px}
+.logo img{width:38px;height:38px;border-radius:50%}
+.logo span{color:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:30px}
+.nav-links a{color:var(--text);font-weight:500;font-size:15px;transition:.25s}
+.nav-links a:hover,.nav-links a.on{color:var(--orange)}
+.btn-nav{background:var(--navy);color:#fff!important;padding:10px 24px;border-radius:50px;font-weight:600!important}
+.btn-nav:hover{background:var(--orange)}
 
-        /* Grid & Cards */
-        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1100px; margin: 40px auto; padding: 0 20px 50px; }
-        
-        .card { background: var(--white); width: 280px; padding: 40px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; border: 2px solid transparent; text-align: center; }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-        
-        /* Active Card */
-        .card.active { border-bottom: 5px solid var(--accent); }
-        .card.active h2 { color: var(--primary); }
-        .card.active i { color: var(--secondary); }
-        
-        /* Disabled Cards */
-        .card.disabled { opacity: 0.85; background: #fafafa; border-bottom: 5px solid #ccc; }
-        .card.disabled h2 { color: #666; }
-        .card.disabled i { color: #999; }
-        
-        .card i { font-size: 45px; margin-bottom: 15px; transition: 0.3s; }
-        .card h2 { margin: 0 0 10px 0; font-size: 22px; font-weight: bold; }
-        .card p { color: #666; font-size: 14px; margin: 0; }
-        
-        /* Ribbons */
-        .badge { position: absolute; top: 20px; right: -35px; background: #dc3545; color: white; padding: 5px 40px; font-size: 12px; font-weight: bold; transform: rotate(45deg); box-shadow: 0 2px 4px rgba(0,0,0,0.2); letter-spacing: 1px;}
-        .badge.live { background: #28a745; }
-    </style>
+.head{position:relative;overflow:hidden;color:#fff;text-align:center;padding:64px 24px 76px;background:radial-gradient(800px 420px at 85% 0%,rgba(255,106,0,.28),transparent 60%),radial-gradient(600px 400px at 0% 100%,rgba(0,80,157,.5),transparent 60%),linear-gradient(135deg,#050b24,#0a1a45)}
+.head::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:26px 26px}
+.head>*{position:relative}
+.pill{display:inline-block;background:rgba(255,152,0,.14);border:1px solid rgba(255,152,0,.4);color:#ffb74d;padding:7px 16px;border-radius:50px;font-size:13px;font-weight:600;letter-spacing:.5px}
+.head h1{font-size:clamp(28px,4.6vw,46px);margin:18px 0 10px;font-weight:800;line-height:1.15}
+.head h1 em{font-style:normal;background:linear-gradient(90deg,#ff9800,#ff6a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{margin:0 auto;max-width:560px;color:rgba(255,255,255,.78);line-height:1.7}
+
+.tabs{display:flex;justify-content:center;gap:10px;margin:-26px auto 34px;position:relative;z-index:2;flex-wrap:wrap;padding:0 16px}
+.tab{background:#fff;border:1px solid #e3e8f2;color:var(--muted);font:600 14px 'Poppins',sans-serif;padding:11px 24px;border-radius:50px;cursor:pointer;box-shadow:0 8px 22px rgba(10,18,48,.08);transition:.25s}
+.tab.on{background:linear-gradient(90deg,#ff9800,#ff6a00);color:#fff;border-color:transparent}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding-bottom:70px}
+.card{position:relative;background:#fff;border:1px solid #e9edf5;border-radius:22px;padding:34px 26px 28px;box-shadow:0 8px 26px rgba(10,18,48,.05);transition:.35s;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;gap:6px}
+.card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#ff9800,#ff6a00);transform:scaleX(0);transform-origin:left;transition:.4s}
+.card:hover{transform:translateY(-8px);box-shadow:0 22px 50px rgba(10,18,48,.12)}
+.card:hover::after{transform:scaleX(1)}
+.ico{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:26px;color:#fff;background:linear-gradient(135deg,#00509d,#0a1a45);box-shadow:0 10px 22px rgba(0,80,157,.3);margin-bottom:14px}
+.card h2{margin:0;font-size:20px;color:var(--primary)}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.status{position:absolute;top:20px;right:20px;font-size:11px;font-weight:700;letter-spacing:.8px;padding:5px 12px;border-radius:50px}
+.live .status{background:#e6f7ec;color:#1b8a3f}
+.live .status::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#28a745;margin-right:6px;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.soon{background:#fbfcfe}
+.soon .ico{background:linear-gradient(135deg,#9aa5bd,#6f7b95);box-shadow:none}
+.soon h2{color:#5b6785}
+.soon .status{background:#fff3e0;color:#e65100}
+.go{margin-top:14px;font-weight:600;font-size:14px;color:var(--secondary)}
+.soon .go{color:#98a2b8}
+.empty{display:none;text-align:center;color:var(--muted);padding:40px 0}
+
+footer{background:linear-gradient(135deg,#050b24,#0a1a45);color:#fff;text-align:center;padding:40px 24px}
+footer p{margin:6px 0;opacity:.7;font-size:14px}
+
+.bottom-bar{display:none}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.reveal.show{opacity:1;transform:none}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:50px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:3000;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){
+ .nav-links a:not(.btn-nav){display:none}
+ .grid{grid-template-columns:1fr;gap:16px}
+ .card{flex-direction:row;align-items:center;gap:16px;padding:22px 20px}
+ .ico{margin:0;flex-shrink:0;width:56px;height:56px}
+ .card .txt{flex:1;min-width:0;padding-right:4px}
+ .go{display:none}
+ .status{top:12px;right:14px}
+ .card h2{margin-top:14px}
+ body{padding-bottom:72px}
+ .bottom-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1500;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid #e5e8ef;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+ .bottom-bar a{flex:1;text-align:center;color:#7a859f;font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px}
+ .bottom-bar a i{font-size:19px}
+ .bottom-bar a.on{color:var(--orange)}
+ #toast{bottom:88px}
+}
+</style>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html" class="logo">CONCEPT <span>CRACKER</span></a>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-        </div>
-    </nav>
+<nav>
+ <div class="wrap nav-in">
+  <a href="index.html" class="logo"><img src="icons/icon-192.png" alt="Concept Cracker logo">CONCEPT <span>CRACKER</span></a>
+  <div class="nav-links">
+   <a href="index.html">Home</a>
+   <a href="index.html#contact">Contact</a>
+   <a href="index.html#login" class="btn-nav">Login</a>
+  </div>
+ </div>
+</nav>
 
-    <div class="header-sec">
-        <h1>Select Your Target Examination 🎯</h1>
-        <p>Choose your exam to access mock tests, PYQs, and premium notes.</p>
-    </div>
+<header class="head">
+ <span class="pill"><i class="fas fa-bullseye"></i>&nbsp; CHOOSE YOUR TARGET</span>
+ <h1>Select Your <em>Examination</em></h1>
+ <p>Choose your exam to access mock tests, PYQs and premium notes.</p>
+</header>
 
-    <div class="grid">
-        <div class="card active" onclick="window.location.href='subjects.html'">
-            <div class="badge live">LIVE NOW</div>
-            <i class="fas fa-atom"></i>
-            <h2>CSIR NET</h2>
-            <p>Physical Sciences</p>
-        </div>
+<div class="tabs">
+ <button class="tab on" data-f="all">All</button>
+ <button class="tab" data-f="live">Live Now</button>
+ <button class="tab" data-f="soon">Coming Soon</button>
+</div>
 
-        <div class="card disabled" onclick="alert('GATE Physics Test Series is launching soon! Stay tuned. 🚀')">
-            <div class="badge">SOON</div>
-            <i class="fas fa-microscope"></i>
-            <h2>GATE</h2>
-            <p>Physics (PH)</p>
-        </div>
+<main class="wrap">
+ <div class="grid" id="grid"></div>
+ <div class="empty" id="empty">No exams here yet.</div>
+</main>
 
-        <div class="card disabled" onclick="alert('JEST Physics Test Series is launching soon! 🚀')">
-            <div class="badge">SOON</div>
-            <i class="fas fa-satellite-dish"></i>
-            <h2>JEST</h2>
-            <p>Physics</p>
-        </div>
+<footer>
+ <p>Concept Cracker by Yash</p>
+ <p>&copy; 2026 Concept Cracker. All Rights Reserved.</p>
+</footer>
 
-               <div class="card disabled" onclick="alert('BARC  Physics Test Series is launching soon! 🚀')">
-            <div class="badge">SOON</div>
-            <i class="fas fa-flask"></i>
-            <h2>BARC/NPCIL</h2>
-            <p>SCIENTIFIC OFFICER</p>
-               </div>
-        
-        <div class="card disabled" onclick="alert('IIT JAM Physics Test Series is launching soon! 🚀')">
-            <div class="badge">SOON</div>
-            <i class="fas fa-flask"></i>
-            <h2>IIT JAM</h2>
-            <p>Physics</p>
-        </div>
-        <div class="card active" onclick="window.location.href='test-series 2/test-series/index.html'">
-            <div class="badge live">LIVE NOW</div>
-            <i class="fas fa-atom"></i>
-                        <h2>Assistant professor</h2>
-            <p>Physical Sciences</p>
-        </div>
-        
-            <div class="card active" onclick="window.location.href='subjects.html'">
-            <div class="badge live">LIVE NOW</div>
-            <i class="fas fa-satellite-dish"></i>
-                        </h2>SSC IMD</h2>
-            <p>Physical Sciences</p>
-            
-        </div>
-        
-    </div>
+<div class="bottom-bar">
+ <a href="index.html"><i class="fas fa-house"></i>Home</a>
+ <a href="exams.html" class="on"><i class="fas fa-vial"></i>Tests</a>
+ <a href="index.html#dashboard"><i class="fas fa-book-open"></i>Notes</a>
+ <a href="index.html#login"><i class="fas fa-user"></i>Login</a>
+</div>
+<div id="toast"></div>
 
+<script>
+// Naya exam jodna ho to bas yahan ek line add karo.
+// live:true => khulega, live:false => "Coming soon" message
+var EXAMS = [
+  {name:"CSIR NET", sub:"Physical Sciences", icon:"fa-atom", live:true, link:"subjects.html"},
+  {name:"Assistant Professor", sub:"Physical Sciences", icon:"fa-user-graduate", live:true, link:"test-series 2/test-series/index.html"},
+  {name:"SSC IMD", sub:"Physical Sciences", icon:"fa-satellite-dish", live:true, link:"subjects.html"},
+  {name:"GATE", sub:"Physics (PH)", icon:"fa-microscope", live:false},
+  {name:"JEST", sub:"Physics", icon:"fa-satellite-dish", live:false},
+  {name:"BARC / NPCIL", sub:"Scientific Officer", icon:"fa-flask", live:false},
+  {name:"IIT JAM", sub:"Physics", icon:"fa-flask", live:false},
+  {name:"CUET PG", sub:"Physics", icon:"fa-book-open", live:false}
+];
+
+var grid=document.getElementById('grid');
+EXAMS.forEach(function(e){
+  var d=document.createElement('div');
+  d.className='card reveal '+(e.live?'live':'soon');
+  d.dataset.s=e.live?'live':'soon';
+  d.innerHTML='<span class="status">'+(e.live?'LIVE NOW':'SOON')+'</span>'+
+    '<div class="ico"><i class="fas '+e.icon+'"></i></div>'+
+    '<div class="txt"><h2>'+e.name+'</h2><p>'+e.sub+'</p></div>'+
+    '<span class="go">'+(e.live?'Open tests <i class="fas fa-arrow-right"></i>':'Launching soon')+'</span>';
+  d.onclick=function(){ e.live ? (location.href=e.link) : toast(e.name+' Test Series is launching soon! 🚀') };
+  grid.appendChild(d);
+});
+
+var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('show');io.unobserve(x.target)}})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+    t.classList.add('on');
+    var f=t.dataset.f,n=0;
+    document.querySelectorAll('.card').forEach(function(c){
+      var show=f==='all'||c.dataset.s===f; c.style.display=show?'':'none'; if(show)n++;
+    });
+    document.getElementById('empty').style.display=n?'none':'block';
+  };
+});
+
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(window._t);window._t=setTimeout(function(){t.classList.remove('on')},2400)}
+</script>
 </body>
 </html>
