@@ -1,132 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | Concept Cracker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Profile | Concept Cracker</title>
+<meta name="theme-color" content="#0a1230">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+:root{--n:#0a1230;--p:#002347;--b:#00509d;--o:#ff6a00;--m:#5b6785}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,sans-serif;background:#f5f7fb;color:#1d2840;display:none;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(10,18,48,.08)}
+.nav-in{max-width:1180px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--p)}.logo img{width:36px;height:36px;border-radius:50%}.logo span{color:var(--o)}
+.nl{display:flex;gap:20px;align-items:center;font-size:15px;font-weight:500}.nl a:hover{color:var(--o)}
+.head{text-align:center;color:#fff;padding:40px 20px 80px;background:radial-gradient(700px 380px at 85% 0%,rgba(255,106,0,.28),transparent 60%),linear-gradient(135deg,#050b24,#0a1a45)}
+.av{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:34px;font-weight:800;background:linear-gradient(135deg,#ff9800,#ff6a00);box-shadow:0 12px 30px rgba(255,106,0,.4)}
+.head h1{margin:0;font-size:24px}.head p{margin:4px 0 0;color:rgba(255,255,255,.7);font-size:14px;word-break:break-all}
+.wrap{max-width:620px;margin:-44px auto 50px;padding:0 18px;position:relative}
+.card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(10,18,48,.07);margin-bottom:18px}
+.card h3{margin:0 0 16px;color:var(--p);font-size:17px}.card h3 i{color:var(--o);margin-right:8px}
+label{font-size:12.5px;font-weight:600;color:var(--m);display:block;margin-bottom:6px}
+input{width:100%;padding:12px 14px;border:1px solid #dde2ec;border-radius:10px;font:15px Poppins,sans-serif}
+input:focus{outline:2px solid rgba(255,106,0,.3);border-color:var(--o)}
+.btn{border:0;border-radius:50px;padding:12px 22px;font:600 14px Poppins,sans-serif;color:#fff;background:var(--n);cursor:pointer;display:inline-block}
+.btn.o{background:linear-gradient(90deg,#ff9800,#ff6a00)}.btn.out{background:#fdecee;color:#dc3545}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #eef1f6}.it:last-child{border:0}
+.it small{display:block;color:var(--m);font-size:12.5px}
+.chip{font-size:11px;font-weight:700;padding:4px 11px;border-radius:50px}
+.approved{background:#e6f7ec;color:#1b8a3f}.pending{background:#fff3e0;color:#e65100}.rejected{background:#fdecee;color:#c62828}
+.sc{font-weight:700;color:#1b8a3f;font-size:17px;white-space:nowrap}.sc small{display:inline;color:var(--m);font-weight:500;font-size:12px}
+.none{color:var(--m);font-size:14px}
+</style></head><body>
+<nav><div class="nav-in"><a href="index.html" class="logo"><img src="icons/icon-192.png" alt="">CONCEPT <span>CRACKER</span></a><div class="nl"><a href="exams.html">Exams</a></div></div></nav>
+<header class="head"><div class="av" id="av">S</div><h1 id="hn">My Profile</h1><p id="he"></p></header>
 
-    <style>
-        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; display: none; }
-        header { background: var(--primary); color: white; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .logo { font-size: 22px; font-weight: bold; }
-        .logo span { color: var(--accent); }
-        .btn-home { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; }
-        
-        .profile-container { max-width: 500px; margin: 40px auto; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-        .icon-wrapper { font-size: 60px; color: var(--secondary); margin-bottom: 20px; }
-        
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { font-weight: bold; font-size: 14px; color: #555; }
-        .form-group input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .form-group input:disabled { background: #eee; cursor: not-allowed; }
-        
-        .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-save:hover { background: var(--secondary); }
-        
-        .score-item { background:#f8f9fa; padding:15px; margin-bottom:10px; border-radius:8px; border-left:4px solid var(--secondary); display:flex; justify-content:space-between; align-items:center; text-align:left;}
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="logo">CONCEPT <span>CRACKER</span></div>
-    <a href="subjects.html" class="btn-home"><i class="fas fa-arrow-left"></i> Dashboard</a>
-</header>
-
-<div class="profile-container">
-    <div class="icon-wrapper"><i class="fas fa-user-graduate"></i></div>
-    <h2 style="color:var(--primary); margin-top:0;">My Profile</h2>
-
-    <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="p-name" placeholder="Enter your full name">
-    </div>
-    <div class="form-group">
-        <label>Registered Identity</label>
-        <input type="text" id="p-contact" disabled>
-    </div>
-    <button class="btn-save" id="save-btn" onclick="saveProfile()">Update Profile</button>
-
-    <div style="margin-top: 40px; text-align: left; border-top: 2px solid #eee; padding-top: 20px;">
-        <h3 style="color:var(--primary); margin-bottom: 15px;"><i class="fas fa-trophy" style="color:var(--accent);"></i> My Test Scores</h3>
-        <ul id="score-list" style="list-style:none; padding:0; margin:0;">
-            <li style="color:#777; font-size:14px;">Loading your scores...</li>
-        </ul>
-    </div>
+<div class="wrap">
+ <div class="card">
+  <h3><i class="fas fa-user"></i>Profile details</h3>
+  <label>Full name</label><input id="pn" placeholder="Enter your full name">
+  <div class="row"><button class="btn o" id="sv" onclick="saveProfile()">Update Profile</button><a class="btn" id="adm" href="admin.html" style="display:none"><i class="fas fa-shield-halved"></i> Admin Panel</a><button class="btn out" onclick="auth.signOut().then(function(){location.href='index.html'})"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+ </div>
+ <div class="card">
+  <h3><i class="fas fa-key"></i>My exam access</h3>
+  <div id="ac"><p class="none">Loading...</p></div>
+ </div>
+ <div class="card">
+  <h3><i class="fas fa-trophy"></i>My test scores</h3>
+  <div id="sl"><p class="none">Loading your scores...</p></div>
+ </div>
 </div>
 
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
-      authDomain: "concepts-creakres.firebaseapp.com",
-      projectId: "concepts-creakres",
-      appId: "1:882506019552:web:2a5357160294eae7afd685"
-    };
+firebase.initializeApp({apiKey:"AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",authDomain:"concepts-creakres.firebaseapp.com",projectId:"concepts-creakres",appId:"1:882506019552:web:2a5357160294eae7afd685"});
+var auth=firebase.auth(),db=firebase.firestore();db.settings({experimentalForceLongPolling:true});
+var $=function(i){return document.getElementById(i)},cu=null;
+var EXN={csir:'CSIR NET',sscimd:'SSC IMD',gate:'GATE',jest:'JEST',barc:'BARC / NPCIL',jam:'IIT JAM',cuet:'CUET PG'};
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML}
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let currentUser = null;
-
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            document.body.style.display = "block";
-            currentUser = user;
-            document.getElementById('p-contact').value = user.email || user.phoneNumber;
-            
-            // 1. Fetch User Name
-            db.collection('students').doc(user.uid).get().then((doc) => {
-                if (doc.exists && doc.data().fullName) {
-                    document.getElementById('p-name').value = doc.data().fullName;
-                }
-            });
-
-            // 2. Fetch User Scores
-            db.collection('students').doc(user.uid).collection('marks').orderBy('timestamp', 'desc').get().then(snapshot => {
-                let list = document.getElementById('score-list');
-                list.innerHTML = "";
-                if(snapshot.empty) {
-                    list.innerHTML = "<li style='color:#777; font-size:14px;'>You haven't attempted any tests yet!</li>";
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-                    list.innerHTML += `
-                    <li class="score-item">
-                        <div>
-                            <div style="font-weight:bold; color:#333;">${data.testName}</div>
-                            <div style="font-size:12px; color:#888;"><i class="far fa-calendar-alt"></i> ${data.date}</div>
-                        </div>
-                        <div style="color:green; font-weight:bold; font-size:18px;">
-                            ${data.score} <span style="font-size:12px;color:#555;">/ ${data.totalMarks}</span>
-                        </div>
-                    </li>`;
-                });
-            });
-        } else {
-            window.location.href = "index.html#login";
-        }
-    });
-
-    function saveProfile() {
-        const name = document.getElementById('p-name').value;
-        const btn = document.getElementById('save-btn');
-        if(!name) { alert("Name cannot be empty!"); return; }
-        
-        btn.innerText = "Saving...";
-        btn.disabled = true;
-        db.collection('students').doc(currentUser.uid).set({ fullName: name }, { merge: true }).then(() => {
-            alert("Profile Updated Successfully!");
-            btn.innerText = "Update Profile";
-            btn.disabled = false;
-        }).catch(err => { alert("Error updating profile."); btn.disabled = false; });
-    }
-</script>
-</body>
-</html>
+auth.onAuthStateChanged(function(u){
+  if(!u){location.href='index.html?next=profile.html#login';return}
+  cu=u;document.body.style.display='block';
+  var ident=u.email||u.phoneNumber||'';$('he').textContent=ident;
+  $('av').textContent=(u.displayName||ident||'S').trim().charAt(0).toUpperCase();
+  db.collection('students').doc(u.uid).get().then(function(d){
+    var n=(d.exists&&d.data().fullName)||u.displayName||'';$('pn').value=n;if(n){$('hn').textContent=n;$('av').textContent=n.charAt(0).toUpperCase()}
+  }).catch(function(){});
+  db.collection('cc_admins').doc(u.uid).get().then(function(d){if(d.exists)$('adm').style.display='inline-block'}).catch(function(){});
+  db.collection('cc_access').where('uid','==',u.uid).get().then(function(s){
+    $('ac').innerHTML=s.empty?'<p class="none">No access requests yet. Open any exam and tap <b>Request Access</b>.</p>':
+      s.docs.map(function(d){var x=d.data();return '<div class="it"><div><b>'+esc(EXN[x.examId]||x.examId)+'</b></div><span class="chip '+x.status+'">'+x.status.toUpperCase()+'</span></div>'}).join('');
+  }).catch(function(){$('ac').innerHTML='<p class="none">Could not load access list.</p>'});
+  db.collection('students').doc(u.uid).collection('marks').orderBy('timestamp','desc').get().then(function(s){
+    $('sl').innerHTML=s.empty?'<p class="none">You have not attempted any tests yet.</p>':
+      s.docs.map(function(d){var x=d.data();return '<div class="it"><div><b style="font-size:14.5px">'+esc(x.testName)+'</b><small><i class="far fa-calendar-alt"></i> '+esc(x.date)+'</small></div><div class="sc">'+esc(x.score)+' <small>/ '+esc(x.totalMarks)+'</small></div></div>'}).join('');
+  }).catch(function(){$('sl').innerHTML='<p class="none">Could not load scores.</p>'});
+});
+function saveProfile(){
+  var n=$('pn').value.trim(),b=$('sv');if(!n)return alert('Name cannot be empty.');
+  b.textContent='Saving...';b.disabled=true;
+  db.collection('students').doc(cu.uid).set({fullName:n},{merge:true}).then(function(){$('hn').textContent=n;$('av').textContent=n.charAt(0).toUpperCase();b.textContent='Update Profile';b.disabled=false;alert('Profile updated successfully!')})
+  .catch(function(){alert('Could not update profile.');b.textContent='Update Profile';b.disabled=false});
+}
+</script></body></html>

@@ -99,16 +99,16 @@ function show(id){['gate','inst','test','res'].forEach(function(x){$(x).style.di
 function msg(h){$('gc').innerHTML=h;show('gate')}
 var BACK='<p><a class="lnk" href="subjects.html">&larr; Back to subjects</a></p>';
 
-if(!T){msg('<h2>Test link galat hai</h2>'+BACK)}
+if(!T){msg('<h2>Invalid test link</h2>'+BACK)}
 else db.collection('cc_tests').doc(T).get().then(function(d){
-  if(!d.exists||!d.data().published) return msg('<h2>Test available nahi hai</h2>'+BACK);
+  if(!d.exists||!d.data().published) return msg('<h2>Test not available</h2>'+BACK);
   test=d.data();$('ttl').textContent=test.title;
   auth.onAuthStateChanged(function(u){user=u;u?check():loginUI()});
-}).catch(function(){msg('<h2>Test available nahi hai</h2>'+BACK)});
+}).catch(function(){msg('<h2>Test not available</h2>'+BACK)});
 
 function loginUI(){
-  msg('<h2>'+test.title+'</h2><p>Test dene ke liye ek baar login karo. Ek hi login sabhi exams me chalega.</p>'+
-  '<button class="btn" onclick="gLogin()">Continue with Google</button><p><a class="lnk" href="index.html#login">Email se login</a></p>'+BACK);
+  msg('<h2>'+test.title+'</h2><p>Please log in once to take this test. One login works for all exams.</p>'+
+  '<button class="btn" onclick="gLogin()">Continue with Google</button><p><a class="lnk" href="index.html#login">Log in with email</a></p>'+BACK);
 }
 function gLogin(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){if(e.code!=='auth/popup-closed-by-user')alert('Login error: '+e.message)})}
 
@@ -119,15 +119,15 @@ function check(){
     if(s==='approved') return load();
     db.collection('cc_admins').doc(user.uid).get().then(function(ad){
       if(ad.exists) return load();
-      if(s==='pending') msg('<h2>⏳ Approval pending</h2><p>Tumhari request mil gayi hai. Approve hote hi ye test khul jayega.</p>'+BACK);
-      else if(s==='rejected') msg('<h2>Access nahi mila</h2><p>Is exam ka access abhi approve nahi hua. Mentor se contact karo.</p><p><a class="lnk" href="https://wa.me/916376950332">WhatsApp pe poocho</a></p>'+BACK);
-      else msg('<h2>Access chahiye</h2><p>Is exam ke tests approved students ke liye hain. Request bhejo, approve hote hi test khul jayega.</p><button class="btn" onclick="reqAccess()">Request Access</button>'+BACK);
+      if(s==='pending') msg('<h2>⏳ Approval pending</h2><p>Your request has been received. This test will unlock as soon as it is approved.</p>'+BACK);
+      else if(s==='rejected') msg('<h2>Access not granted</h2><p>Your access to this exam has not been approved yet. Please contact the mentor.</p><p><a class="lnk" href="https://wa.me/916376950332">Ask on WhatsApp</a></p>'+BACK);
+      else msg('<h2>Access required</h2><p>Tests of this exam are available to approved students only. Send a request and the test will unlock once it is approved.</p><button class="btn" onclick="reqAccess()">Request Access</button>'+BACK);
     });
   }).catch(function(e){msg('<h2>Error</h2><p>'+e.message+'</p>'+BACK)});
 }
 function reqAccess(){
   db.collection('cc_access').doc(test.examId+'__'+user.uid).set({uid:user.uid,examId:test.examId,status:'pending',name:user.displayName||'',email:user.email||'',ts:firebase.firestore.FieldValue.serverTimestamp()})
-  .then(function(){msg('<h2>✅ Request bhej di</h2><p>Approve hote hi test khul jayega. Jaldi chahiye to mentor ko WhatsApp karo.</p><p><a class="lnk" href="https://wa.me/916376950332">WhatsApp</a></p>'+BACK)})
+  .then(function(){msg('<h2>✅ Request sent</h2><p>The test will unlock once it is approved. For a faster response, message the mentor on WhatsApp.</p><p><a class="lnk" href="https://wa.me/916376950332">WhatsApp</a></p>'+BACK)})
   .catch(function(e){alert(e.message)});
 }
 
@@ -137,17 +137,17 @@ function load(){
     var g={};qs.forEach(function(q){var k=q.m+'|'+q.n;g[k]=(g[k]||0)+1});
     var dur=test.durationMin||60;
     $('it').textContent=test.title;$('is').textContent=qs.length+' Questions | '+dur+' Minutes';
-    var h='<li>Total duration: <b>'+dur+' minutes</b>. Timer upar right me dikhega.</li><li>Question Palette se kisi bhi question par ja sakte ho.</li>';
+    var h='<li>Total duration: <b>'+dur+' minutes</b>. The countdown timer is shown at the top right.</li><li>Use the Question Palette to jump to any question.</li>';
     Object.keys(g).forEach(function(k){var p=k.split('|');h+='<li>'+g[k]+' questions: <b>+'+p[0]+'</b> marks correct, <b>-'+p[1]+'</b> marks wrong.</li>'});
-    h+='<li>Scientific Calculator right panel me available hai (angles in radians).</li>';
+    h+='<li>A scientific calculator is available in the right panel (angles in radians).</li>';
     $('il').innerHTML=h;show('inst');
-  }).catch(function(e){msg('<h2>Questions load nahi hue</h2><p>'+e.message+'</p>'+BACK)});
+  }).catch(function(e){msg('<h2>Could not load questions</h2><p>'+e.message+'</p>'+BACK)});
 }
 
 function startTest(){
   var p=$('pal');for(var i=0;i<qs.length;i++){(function(i){var b=document.createElement('div');b.className='bub';b.id='b-'+i;b.textContent=i+1;b.onclick=function(){lQ(i)};p.appendChild(b)})(i)}
   show('test');lQ(0);sT((test.durationMin||60)*60);
-  window.onbeforeunload=function(){return 'Test progress lost ho jayega.'};
+  window.onbeforeunload=function(){return 'Your test progress will be lost.'};
 }
 function lQ(i){
   if(qS[cQ]==='n-vis')uS(cQ,'n-ans');

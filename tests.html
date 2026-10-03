@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mock Tests | Concept Cracker</title>
+<meta name="theme-color" content="#0a1230">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+:root{--n:#0a1230;--p:#002347;--b:#00509d;--o:#ff6a00;--m:#5b6785}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,sans-serif;background:#f5f7fb;color:#1d2840;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(10,18,48,.08)}
+.nav-in{max-width:1180px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--p)}.logo img{width:36px;height:36px;border-radius:50%}.logo span{color:var(--o)}
+.nl{display:flex;gap:22px;align-items:center;font-size:15px;font-weight:500}.nl a:hover{color:var(--o)}
+.head{position:relative;overflow:hidden;color:#fff;text-align:center;padding:46px 20px 74px;background:radial-gradient(700px 380px at 85% 0%,rgba(255,106,0,.28),transparent 60%),linear-gradient(135deg,#050b24,#0a1a45)}
+.back{display:inline-block;color:rgba(255,255,255,.75);font-size:14px;margin-bottom:14px}.back:hover{color:#ffb74d}
+.head h1{margin:4px 0 8px;font-size:clamp(26px,4.4vw,38px);font-weight:800}
+.head p{margin:0;color:rgba(255,255,255,.75)}
+.box{margin:-34px auto 0;position:relative;z-index:2}
+.acc{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 10px 28px rgba(10,18,48,.08);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.acc b{display:block;font-size:15px}.acc small{color:var(--m)}
+.btn{border:0;border-radius:50px;padding:10px 22px;font:600 14px Poppins,sans-serif;color:#fff;background:linear-gradient(90deg,#ff9800,#ff6a00);cursor:pointer;display:inline-block;white-space:nowrap}
+.btn.d{background:var(--n)}.btn.lock{background:#c5ccdb;color:#6b7690;pointer-events:none}
+.chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;margin-left:6px}
+.c-approved{background:#e6f7ec;color:#1b8a3f}.c-pending{background:#fff3e0;color:#e65100}.c-rejected{background:#fdecee;color:#c62828}
+.t{background:#fff;border-radius:18px;padding:20px 22px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:14px;border:1px solid #e9edf5;box-shadow:0 6px 20px rgba(10,18,48,.05);transition:.3s}
+.t:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(10,18,48,.1)}
+.t h3{margin:0 0 4px;font-size:17px;color:var(--p)}.t p{margin:0;color:var(--m);font-size:13.5px}
+.empty{background:#fff;border-radius:18px;padding:34px 20px;text-align:center;color:var(--m);margin-bottom:14px}
+.legacy{display:block;text-align:center;margin:20px 0 50px;color:var(--b);font-weight:600;font-size:14px}
+@media(max-width:600px){.t{flex-direction:column;align-items:stretch;text-align:center}.btn{width:100%;text-align:center}.nl a:not(.keep){display:none}}
+</style></head><body>
+<nav><div class="nav-in"><a href="index.html" class="logo"><img src="icons/icon-192.png" alt="">CONCEPT <span>CRACKER</span></a><div class="nl"><a href="exams.html">Exams</a><a href="profile.html" class="keep">Profile</a></div></div></nav>
+
+<header class="head"><a class="back" id="back" href="subjects.html"><i class="fas fa-arrow-left"></i> Back to subjects</a><h1 id="h">Mock Tests</h1><p id="sb">Select a test to begin your practice</p></header>
+
+<main class="wrap box">
+ <div class="acc" id="acc"></div>
+ <div id="list"><div class="empty">Loading tests...</div></div>
+ <a class="legacy" id="legacy" style="display:none" href="#">View earlier tests for this subject <i class="fas fa-arrow-right"></i></a>
+</main>
+
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",authDomain:"concepts-creakres.firebaseapp.com",projectId:"concepts-creakres",appId:"1:882506019552:web:2a5357160294eae7afd685"});
+var auth=firebase.auth(),db=firebase.firestore();db.settings({experimentalForceLongPolling:true});
+var $=function(i){return document.getElementById(i)};
+var P=new URLSearchParams(location.search),EXAM=P.get('exam')||'csir',SUB=P.get('sub')||'';
+var EXN={csir:'CSIR NET',sscimd:'SSC IMD',gate:'GATE',jest:'JEST',barc:'BARC / NPCIL',jam:'IIT JAM',cuet:'CUET PG'};
+var SBN={'mathematical-physics':'Mathematical Physics','quantum-mechanics':'Quantum Mechanics','classical-mechanics':'Classical Mechanics','electronic':'Electronic','electrodynamics':'Electrodynamics','nuclear-physics':'Nuclear & Particle Physics','thermo-physics':'Thermo & Statistics','solid-state':'Solid State Physics','atomic-molecular':'Atomic & Molecular','general-aptitude':'General Aptitude','full-length':'Full Length Mock Tests','combined':'Combined Mock Tests','pyqs':'CSIR NET PYQs Tests'};
+// Earlier (static) test lists, kept so nothing disappears until each subject is moved to the new system
+var LEG={'mathematical-physics':'mathematical-physics/list.html','quantum-mechanics':'quantum-mechenics/list.html','classical-mechanics':'classical-mechanics/list.html','electronic':'electronic/list.html','electrodynamics':'electrodynamics/list.html','nuclear-physics':'nuclear-physics/list.html','thermo-physics':'thermo-physics/list.html','solid-state':'solid-state/list.html','atomic-molecular':'atomic and molecular -physics/list.html','general-aptitude':'general aptitude-part a/list.html','full-length':'full-length-tests/list.html','combined':'combined-test/list.html','pyqs':'pyqs-test/list.html'};
+$('h').textContent=SBN[SUB]||'Mock Tests';$('sb').textContent=(EXN[EXAM]||'')+' · Select a test to begin your practice';
+$('back').href='subjects.html?exam='+EXAM;
+if(LEG[SUB]&&(EXAM==='csir'||EXAM==='sscimd')){$('legacy').href=LEG[SUB];$('legacy').style.display='block'}
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML}
+
+var TESTS=[],user=null,status=null,isAdmin=false;
+db.collection('cc_tests').where('examId','==',EXAM).where('subjectId','==',SUB).where('published','==',true).get().then(function(s){
+  TESTS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())}).sort(function(a,b){return(a.order||0)-(b.order||0)});
+  render();
+}).catch(function(e){$('list').innerHTML='<div class="empty">Could not load tests: '+esc(e.message)+'</div>'});
+
+auth.onAuthStateChanged(function(u){
+  user=u;status=null;isAdmin=false;
+  if(!u)return render();
+  Promise.all([db.collection('cc_access').doc(EXAM+'__'+u.uid).get(),db.collection('cc_admins').doc(u.uid).get()]).then(function(r){
+    status=r[0].exists?r[0].data().status:null;isAdmin=r[1].exists;render();
+  }).catch(function(){render()});
+});
+
+function canOpen(){return isAdmin||status==='approved'}
+function render(){
+  var a=$('acc'),ex=EXN[EXAM]||EXAM;
+  if(!user)a.innerHTML='<div><b>Log in to start</b><small>One login works for all exams.</small></div><a class="btn d" href="index.html?next='+encodeURIComponent('tests.html?exam='+EXAM+'&sub='+SUB)+'#login">Login</a>';
+  else if(isAdmin)a.innerHTML='<div><b>Admin view</b><small>You can open every test.</small></div><a class="btn d" href="admin.html">Admin Panel</a>';
+  else if(status==='approved')a.innerHTML='<div><b>'+esc(ex)+' access <span class="chip c-approved">APPROVED</span></b><small>You can start any test below.</small></div>';
+  else if(status==='pending')a.innerHTML='<div><b>'+esc(ex)+' access <span class="chip c-pending">PENDING</span></b><small>Your request is waiting for approval.</small></div>';
+  else if(status==='rejected')a.innerHTML='<div><b>'+esc(ex)+' access <span class="chip c-rejected">NOT APPROVED</span></b><small>Please contact the mentor.</small></div><a class="btn d" href="https://wa.me/916376950332">WhatsApp</a>';
+  else a.innerHTML='<div><b>Request access to '+esc(ex)+'</b><small>Tests are available to approved students only.</small></div><button class="btn" onclick="reqAccess()">Request Access</button>';
+
+  $('list').innerHTML=TESTS.length?TESTS.map(function(t,i){
+    return '<div class="t"><div><h3>'+esc(t.title)+'</h3><p>'+(t.qCount||0)+' Questions | '+(t.durationMin||60)+' Minutes | '+(t.totalMarks||0)+' Marks</p></div>'+
+    (canOpen()?'<a class="btn" href="test.html?t='+t.id+'">Start Test <i class="fas fa-play"></i></a>':'<a class="btn lock"><i class="fas fa-lock"></i> Locked</a>')+'</div>'}).join('')
+    :'<div class="empty">No new tests here yet.'+($('legacy').style.display==='block'?' You can still open the earlier tests below.':'')+'</div>';
+}
+function reqAccess(){
+  db.collection('cc_access').doc(EXAM+'__'+user.uid).set({uid:user.uid,examId:EXAM,status:'pending',name:user.displayName||'',email:user.email||'',ts:firebase.firestore.FieldValue.serverTimestamp()})
+  .then(function(){status='pending';render()}).catch(function(e){alert(e.message)});
+}
+</script></body></html>

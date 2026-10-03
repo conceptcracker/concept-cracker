@@ -35,8 +35,8 @@ code{background:#eef1f6;padding:3px 8px;border-radius:6px;word-break:break-all;f
 </style></head><body>
 <header><b>CONCEPT <span>CRACKER</span> · Admin</b><button class="btn s" id="so" style="display:none" onclick="auth.signOut()">Logout</button></header>
 
-<div id="lg" class="card center" style="display:none"><h2>Admin Login</h2><p style="color:var(--m)">Sirf admin ke liye.</p><button class="btn o" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){alert(e.message)})">Continue with Google</button></div>
-<div id="no" class="card center" style="display:none"><h2>Admin access nahi hai</h2><p style="color:var(--m)">Firebase me <b>cc_admins</b> collection banao, Document ID me ye UID daalo (field: <b>role</b> = admin):</p><p><code id="uid"></code></p></div>
+<div id="lg" class="card center" style="display:none"><h2>Admin Login</h2><p style="color:var(--m)">Admins only.</p><button class="btn o" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){alert(e.message)})">Continue with Google</button></div>
+<div id="no" class="card center" style="display:none"><h2>No admin access</h2><p style="color:var(--m)">In Firebase, create a collection <b>cc_admins</b> and add a document whose Document ID is this UID (field: <b>role</b> = admin), then refresh:</p><p><code id="uid"></code></p></div>
 
 <div id="app" class="wrap" style="display:none">
  <div class="tabs"><button id="t1" class="on" onclick="tab(1)">Candidates</button><button id="t2" onclick="tab(2)">Tests &amp; Questions</button></div>
@@ -53,7 +53,7 @@ code{background:#eef1f6;padding:3px 8px;border-radius:6px;word-break:break-all;f
  <div id="p2" style="display:none">
   <div class="card">
    <h3 style="margin:0 0 4px">Add / Edit test</h3>
-   <p style="margin:0;color:var(--m);font-size:13px">Purani test file (test1.html) ya sirf <code>var qs = [...]</code> seedha upload ya paste kar sakte ho.</p>
+   <p style="margin:0;color:var(--m);font-size:13px">You can upload an old test file (e.g. test1.html) directly, or paste just <code>var qs = [...]</code>.</p>
    <div class="row">
     <div><label>Exam</label><select id="xe" onchange="mk()"></select></div>
     <div><label>Subject / Section</label><select id="xs" onchange="mk()"></select></div>
@@ -63,8 +63,8 @@ code{background:#eef1f6;padding:3px 8px;border-radius:6px;word-break:break-all;f
    <label>Title</label><input id="xt" placeholder="Mock Test 1: Classical Mechanics">
    <label>Test ID (auto)</label><input id="xi">
    <label>Questions file (.html / .js / .json)</label><input type="file" id="xf" accept=".html,.js,.json,.txt">
-   <label>...ya yahan paste / edit karo</label><textarea id="xq" spellcheck="false"></textarea>
-   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="xp" style="width:auto"> Publish (students ko dikhe)</label>
+   <label>...or paste / edit here</label><textarea id="xq" spellcheck="false"></textarea>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="xp" style="width:auto"> Publish (visible to students)</label>
    <div id="rep" class="rep"></div>
    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="chk()">1. Check</button><button class="btn o" onclick="sv()">2. Save</button><button class="btn s" style="background:#98a2b8" onclick="clr()">Clear form</button></div>
   </div>
@@ -106,10 +106,10 @@ function rR(){
     return '<div class="it"><div><b>'+esc(r.name||'(no name)')+'</b> <span class="chip '+r.status+'">'+r.status+'</span><small>'+esc(r.email)+'</small><small>'+esc(EXN[r.examId]||r.examId)+' · '+dt+'</small></div><div class="ac">'+
     (r.status!='approved'?'<button class="btn g s" onclick="sS(\''+r.id+'\',\'approved\')">Approve</button>':'')+
     (r.status!='rejected'?'<button class="btn r s" onclick="sS(\''+r.id+'\',\'rejected\')">Reject</button>':'')+
-    '<button class="btn s" style="background:#98a2b8" onclick="dR(\''+r.id+'\')">Remove</button></div></div>'}).join('')||'<p class="none">Koi request nahi.</p>';
+    '<button class="btn s" style="background:#98a2b8" onclick="dR(\''+r.id+'\')">Remove</button></div></div>'}).join('')||'<p class="none">No requests.</p>';
 }
 function sS(id,s){db.collection('cc_access').doc(id).update({status:s}).then(lR).catch(function(e){alert(e.message)})}
-function dR(id){if(confirm('Remove karna hai?'))db.collection('cc_access').doc(id).delete().then(lR)}
+function dR(id){if(confirm('Remove this request?'))db.collection('cc_access').doc(id).delete().then(lR)}
 
 // ---------- Tests ----------
 var TS=[],CK=null;
@@ -120,13 +120,13 @@ function lT(){db.collection('cc_tests').get().then(function(s){
    '<a class="btn s" style="text-decoration:none;background:var(--b)" target="_blank" href="test.html?t='+t.id+'">Preview</a>'+
    '<button class="btn s" onclick="ed(\''+t.id+'\')">Edit</button>'+
    '<button class="btn s g" onclick="tg(\''+t.id+'\','+(!t.published)+')">'+(t.published?'Unpublish':'Publish')+'</button>'+
-   '<button class="btn r s" onclick="dT(\''+t.id+'\')">Delete</button></div></div>'}).join('')||'<p class="none">Abhi koi test nahi.</p>'}).catch(function(e){alert(e.message)})}
+   '<button class="btn r s" onclick="dT(\''+t.id+'\')">Delete</button></div></div>'}).join('')||'<p class="none">No tests yet.</p>'}).catch(function(e){alert(e.message)})}
 function tg(id,v){db.collection('cc_tests').doc(id).update({published:v}).then(lT)}
-function dT(id){if(!confirm('Test aur uske questions delete ho jayenge. Pakka?'))return;var b=db.batch();b.delete(db.collection('cc_tests').doc(id));b.delete(db.collection('cc_questions').doc(id));b.commit().then(lT)}
+function dT(id){if(!confirm('This will delete the test and its questions. Continue?'))return;var b=db.batch();b.delete(db.collection('cc_tests').doc(id));b.delete(db.collection('cc_questions').doc(id));b.commit().then(lT)}
 function ed(id){
   var t=TS.filter(function(x){return x.id==id})[0];
   $('xe').value=t.examId;$('xs').value=t.subjectId;$('xo').value=t.order||1;$('xd').value=t.durationMin||60;$('xt').value=t.title;$('xi').value=id;$('xp').checked=!!t.published;
-  db.collection('cc_questions').doc(id).get().then(function(d){CK=d.data().qs;$('xq').value=JSON.stringify(CK,null,1);rep('Loaded '+CK.length+' questions. Edit karke Check, phir Save.',1)});
+  db.collection('cc_questions').doc(id).get().then(function(d){CK=d.data().qs;$('xq').value=JSON.stringify(CK,null,1);rep('Loaded '+CK.length+' questions. Edit, then Check and Save.',1)});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function clr(){CK=null;$('xq').value='';$('xt').value='';$('xp').checked=false;$('xo').value=1;mk();rep('',1)}
@@ -137,31 +137,31 @@ function parseQ(t){
   t=t.trim();
   if(/<html/i.test(t)){
     var m=t.match(/<title>([^<]*)<\/title>/i);if(m&&!$('xt').value)$('xt').value=m[1].trim();
-    var i=t.indexOf('var qs'),e=t.slice(i).search(/\n\]\s*;/);if(i<0||e<0)throw new Error('HTML me "var qs = [...]" nahi mila');
+    var i=t.indexOf('var qs'),e=t.slice(i).search(/\n\]\s*;/);if(i<0||e<0)throw new Error('Could not find "var qs = [...]" in the HTML');
     t=t.slice(i,i+e+3);
   }
   try{return JSON.parse(t)}catch(_){}
   return new Function('"use strict";var qs;'+(t.charAt(0)=='['?'qs='+t:t)+';return qs')();
 }
 function chk(){
-  var qs;try{qs=parseQ($('xq').value)}catch(e){CK=null;return rep('❌ Padh nahi paya: '+esc(e.message),0)}
-  if(!Array.isArray(qs)||!qs.length){CK=null;return rep('❌ Koi question nahi mila',0)}
+  var qs;try{qs=parseQ($('xq').value)}catch(e){CK=null;return rep('❌ Could not read: '+esc(e.message),0)}
+  if(!Array.isArray(qs)||!qs.length){CK=null;return rep('❌ No questions found',0)}
   var bad=[],out=[],tm=0;
   qs.forEach(function(q,i){var e=[];
     if(typeof q.q!='string'||!q.q)e.push('question text');
     if(!Array.isArray(q.o)||q.o.length<2)e.push('options');
-    else if(!Number.isInteger(q.a)||q.a<0||q.a>=q.o.length)e.push('answer index (a) galat');
+    else if(!Number.isInteger(q.a)||q.a<0||q.a>=q.o.length)e.push('invalid answer index (a)');
     if(!isFinite(q.m))e.push('marks (m)');if(!isFinite(q.n))e.push('negative (n)');
     if(e.length)bad.push('Q'+(i+1)+': '+e.join(', '));
     else{out.push({q:q.q,o:q.o,a:q.a,m:+q.m,n:+q.n,img:q.img||'',exp:q.exp||''});tm+=+q.m}});
-  if(bad.length){CK=null;return rep('❌ '+bad.length+' problem:<br>'+bad.slice(0,6).map(esc).join('<br>'),0)}
+  if(bad.length){CK=null;return rep('❌ '+bad.length+' problem(s):<br>'+bad.slice(0,6).map(esc).join('<br>'),0)}
   CK=out;var ne=out.filter(function(q){return !q.exp}).length;
-  rep('✅ '+out.length+' questions OK · Total marks: '+tm+(ne?' · ⚠️ '+ne+' me explanation nahi hai':''),1);
+  rep('✅ '+out.length+' questions OK · Total marks: '+tm+(ne?' · ⚠️ '+ne+' without explanation':''),1);
 }
 function sv(){
-  if(!CK)return rep('Pehle Check karo.',0);
-  var id=$('xi').value.trim();if(!/^[a-z0-9-]+$/.test(id))return alert('Test ID me sirf small letters, numbers aur - allowed hain.');
-  if(!$('xt').value.trim())return alert('Title likho.');
+  if(!CK)return rep('Run Check first.',0);
+  var id=$('xi').value.trim();if(!/^[a-z0-9-]+$/.test(id))return alert('Test ID may contain only lowercase letters, numbers and hyphens.');
+  if(!$('xt').value.trim())return alert('Please enter a title.');
   var tm=CK.reduce(function(s,q){return s+q.m},0),b=db.batch();
   b.set(db.collection('cc_tests').doc(id),{examId:$('xe').value,subjectId:$('xs').value,title:$('xt').value.trim(),durationMin:+$('xd').value||60,order:+$('xo').value||1,published:$('xp').checked,qCount:CK.length,totalMarks:tm,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
   b.set(db.collection('cc_questions').doc(id),{qs:CK});

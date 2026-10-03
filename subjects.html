@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
 :root{--navy:#0a1230;--primary:#002347;--secondary:#00509d;--orange:#ff6a00;--accent:#ff9800;--bg:#f5f7fb;--text:#1d2840;--muted:#5b6785}
 *{box-sizing:border-box}
@@ -143,31 +144,33 @@ footer p{margin:5px 0;opacity:.7;font-size:14px}
 <script>
 // Naya subject jodna ho to yahan ek line add karo.
 var SPECIAL = [
-  {n:"Full Length Mock Tests", s:"Complete paper, real exam pattern", i:"fa-file-signature", l:"full-length-tests/list.html"},
-  {n:"Combined Mock Tests",   s:"Mix of multiple subjects",          i:"fa-layer-group",    l:"combined-test/list.html"},
-  {n:"CSIR NET PYQs Tests",   s:"Previous year questions",           i:"fa-clock-rotate-left", l:"pyqs-test/list.html"}
+  {n:"Full Length Mock Tests", s:"Complete paper, real exam pattern", i:"fa-file-signature", l:"full-length"},
+  {n:"Combined Mock Tests",   s:"Mix of multiple subjects",          i:"fa-layer-group",    l:"combined"},
+  {n:"CSIR NET PYQs Tests",   s:"Previous year questions",           i:"fa-clock-rotate-left", l:"pyqs"}
 ];
 var SUBJECTS = [
-  {n:"Mathematical Physics",      i:"fa-calculator",        l:"mathematical-physics/list.html"},
-  {n:"Quantum Mechanics",         i:"fa-atom",              l:"quantum-mechenics/list.html"},
-  {n:"Classical Mechanics",       i:"fa-cogs",              l:"classical-mechanics/list.html"},
-  {n:"Electronic",                i:"fa-microchip",         l:"electronic/list.html"},
-  {n:"Electrodynamics",           i:"fa-bolt",              l:"electrodynamics/list.html"},
-  {n:"Nuclear & Particle Physics",i:"fa-radiation",         l:"nuclear-physics/list.html"},
-  {n:"Thermo & Statistics",       i:"fa-temperature-half",  l:"thermo-physics/list.html"},
-  {n:"Solid State Physics",       i:"fa-cubes",             l:"solid-state/list.html"},
-  {n:"Atomic & Molecular",        i:"fa-flask",             l:"atomic and molecular -physics/list.html"},
-  {n:"General Aptitude",          i:"fa-brain",             l:"general aptitude-part a/list.html"}
+  {n:"Mathematical Physics",      i:"fa-calculator",        l:"mathematical-physics"},
+  {n:"Quantum Mechanics",         i:"fa-atom",              l:"quantum-mechanics"},
+  {n:"Classical Mechanics",       i:"fa-cogs",              l:"classical-mechanics"},
+  {n:"Electronic",                i:"fa-microchip",         l:"electronic"},
+  {n:"Electrodynamics",           i:"fa-bolt",              l:"electrodynamics"},
+  {n:"Nuclear & Particle Physics",i:"fa-radiation",         l:"nuclear-physics"},
+  {n:"Thermo & Statistics",       i:"fa-temperature-half",  l:"thermo-physics"},
+  {n:"Solid State Physics",       i:"fa-cubes",             l:"solid-state"},
+  {n:"Atomic & Molecular",        i:"fa-flask",             l:"atomic-molecular"},
+  {n:"General Aptitude",          i:"fa-brain",             l:"general-aptitude"}
 ];
 
+var EXAM=new URLSearchParams(location.search).get('exam')||'csir';
+function lk(id){return 'tests.html?exam='+EXAM+'&sub='+id}
 var feat=document.getElementById('feat'), grid=document.getElementById('grid');
 SPECIAL.forEach(function(x){
-  var a=document.createElement('a'); a.className='f-card reveal'; a.href=x.l;
+  var a=document.createElement('a'); a.className='f-card reveal'; a.href=lk(x.l);
   a.innerHTML='<i class="fas '+x.i+' big"></i><div><h3>'+x.n+'</h3><small>'+x.s+'</small></div><span class="arrow">Start <i class="fas fa-arrow-right"></i></span>';
   feat.appendChild(a);
 });
 SUBJECTS.forEach(function(x){
-  var a=document.createElement('a'); a.className='sub-card reveal'; a.href=x.l; a.dataset.k=x.n.toLowerCase();
+  var a=document.createElement('a'); a.className='sub-card reveal'; a.href=lk(x.l); a.dataset.k=x.n.toLowerCase();
   a.innerHTML='<div class="ico"><i class="fas '+x.i+'"></i></div><h3>'+x.n.replace('&','&amp;')+'</h3>';
   grid.appendChild(a);
 });
@@ -194,11 +197,13 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 auth.onAuthStateChanged((user) => {
   const nav = document.getElementById('auth-nav');
   const bb = document.getElementById('bb-user');
   if (user) {
+    db.collection('cc_admins').doc(user.uid).get().then(d => { if (d.exists && !document.getElementById('adm')) nav.insertAdjacentHTML('afterbegin','<a id="adm" href="admin.html" class="btn-nav" style="background:var(--orange)"><i class="fas fa-shield-halved"></i><span>Admin</span></a>'); }).catch(()=>{});
     nav.innerHTML = '<a href="profile.html" class="btn-nav"><i class="fas fa-user-check"></i><span>Profile</span></a>' +
       '<button onclick="firebase.auth().signOut()" class="logout-btn" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></button>';
     bb.href = 'profile.html'; bb.innerHTML = '<i class="fas fa-user-check"></i>Profile';
