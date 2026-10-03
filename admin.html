@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Admin | Concept Cracker</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+:root{--n:#0a1230;--o:#ff6a00;--b:#00509d;--m:#5b6785}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,sans-serif;background:#f5f7fb;color:#1d2840}
+header{background:linear-gradient(135deg,#050b24,#0a1a45);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+header b{font-size:18px}header b span{color:#ff9800}
+.wrap{max-width:1000px;margin:0 auto;padding:18px}
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(10,18,48,.06);margin-bottom:16px}
+.center{max-width:480px;margin:10vh auto;text-align:center}
+.btn{border:0;border-radius:10px;padding:10px 18px;font:600 14px Poppins,sans-serif;color:#fff;cursor:pointer;background:var(--n)}
+.btn.o{background:linear-gradient(90deg,#ff9800,#ff6a00)}.btn.g{background:#28a745}.btn.r{background:#dc3545}.btn.s{padding:7px 12px;font-size:12.5px}.btn:disabled{opacity:.4}
+.tabs{display:flex;gap:8px;margin-bottom:16px}.tabs button{flex:1;padding:12px;border:0;border-radius:12px;background:#fff;font:600 14px Poppins,sans-serif;color:var(--m);cursor:pointer}
+.tabs button.on{background:linear-gradient(90deg,#ff9800,#ff6a00);color:#fff}
+input,select,textarea{width:100%;padding:11px;border:1px solid #dde2ec;border-radius:10px;font:14px Poppins,sans-serif;background:#fff}
+textarea{min-height:220px;font-family:monospace;font-size:12.5px}
+label{font-size:12.5px;font-weight:600;color:var(--m);display:block;margin:10px 0 4px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.flt{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.it{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid #eef1f6}
+.it:last-child{border:0}.it small{color:var(--m);display:block}
+.it .ac{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px}
+.pending{background:#fff3e0;color:#e65100}.approved{background:#e6f7ec;color:#1b8a3f}.rejected{background:#fdecee;color:#c62828}.pub{background:#e6f7ec;color:#1b8a3f}.draft{background:#eef1f6;color:var(--m)}
+.rep{margin:12px 0;font-size:14px;line-height:1.7}.none{color:var(--m);text-align:center;padding:20px}
+code{background:#eef1f6;padding:3px 8px;border-radius:6px;word-break:break-all;font-size:13px}
+</style></head><body>
+<header><b>CONCEPT <span>CRACKER</span> · Admin</b><button class="btn s" id="so" style="display:none" onclick="auth.signOut()">Logout</button></header>
+
+<div id="lg" class="card center" style="display:none"><h2>Admin Login</h2><p style="color:var(--m)">Sirf admin ke liye.</p><button class="btn o" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){alert(e.message)})">Continue with Google</button></div>
+<div id="no" class="card center" style="display:none"><h2>Admin access nahi hai</h2><p style="color:var(--m)">Firebase me <b>cc_admins</b> collection banao, Document ID me ye UID daalo (field: <b>role</b> = admin):</p><p><code id="uid"></code></p></div>
+
+<div id="app" class="wrap" style="display:none">
+ <div class="tabs"><button id="t1" class="on" onclick="tab(1)">Candidates</button><button id="t2" onclick="tab(2)">Tests &amp; Questions</button></div>
+
+ <div id="p1">
+  <div class="card">
+   <div class="flt"><select id="fs" onchange="rR()"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">All status</option></select>
+   <select id="fe" onchange="rR()"></select><input id="fq" type="search" placeholder="Search name / email" oninput="rR()"></div>
+   <div id="cnt" style="font-size:13px;color:var(--m);margin-bottom:6px"></div>
+   <div id="rl"></div>
+  </div>
+ </div>
+
+ <div id="p2" style="display:none">
+  <div class="card">
+   <h3 style="margin:0 0 4px">Add / Edit test</h3>
+   <p style="margin:0;color:var(--m);font-size:13px">Purani test file (test1.html) ya sirf <code>var qs = [...]</code> seedha upload ya paste kar sakte ho.</p>
+   <div class="row">
+    <div><label>Exam</label><select id="xe" onchange="mk()"></select></div>
+    <div><label>Subject / Section</label><select id="xs" onchange="mk()"></select></div>
+    <div><label>Test number</label><input id="xo" type="number" value="1" min="1" oninput="mk()"></div>
+    <div><label>Time (minutes)</label><input id="xd" type="number" value="60"></div>
+   </div>
+   <label>Title</label><input id="xt" placeholder="Mock Test 1: Classical Mechanics">
+   <label>Test ID (auto)</label><input id="xi">
+   <label>Questions file (.html / .js / .json)</label><input type="file" id="xf" accept=".html,.js,.json,.txt">
+   <label>...ya yahan paste / edit karo</label><textarea id="xq" spellcheck="false"></textarea>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="xp" style="width:auto"> Publish (students ko dikhe)</label>
+   <div id="rep" class="rep"></div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="chk()">1. Check</button><button class="btn o" onclick="sv()">2. Save</button><button class="btn s" style="background:#98a2b8" onclick="clr()">Clear form</button></div>
+  </div>
+  <div class="card"><h3 style="margin:0 0 6px">All tests</h3><div id="tl"></div></div>
+ </div>
+</div>
+
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",authDomain:"concepts-creakres.firebaseapp.com",projectId:"concepts-creakres",appId:"1:882506019552:web:2a5357160294eae7afd685"});
+var auth=firebase.auth(),db=firebase.firestore();db.settings({experimentalForceLongPolling:true});
+var $=function(i){return document.getElementById(i)};
+// Naya exam/subject jodna ho to yahan add karo: [id, naam]
+var EX=[['csir','CSIR NET'],['sscimd','SSC IMD'],['gate','GATE'],['jest','JEST'],['barc','BARC / NPCIL'],['jam','IIT JAM'],['cuet','CUET PG']];
+var SB=[['mathematical-physics','Mathematical Physics'],['quantum-mechanics','Quantum Mechanics'],['classical-mechanics','Classical Mechanics'],['electronic','Electronic'],['electrodynamics','Electrodynamics'],['nuclear-physics','Nuclear & Particle'],['thermo-physics','Thermo & Statistics'],['solid-state','Solid State'],['atomic-molecular','Atomic & Molecular'],['general-aptitude','General Aptitude'],['full-length','Full Length Tests'],['combined','Combined Tests'],['pyqs','PYQs Tests']];
+var EXN={};EX.forEach(function(e){EXN[e[0]]=e[1]});
+function opts(a,all){return (all?'<option value="">All exams</option>':'')+a.map(function(e){return '<option value="'+e[0]+'">'+e[1]+'</option>'}).join('')}
+$('fe').innerHTML=opts(EX,1);$('xe').innerHTML=opts(EX);$('xs').innerHTML=opts(SB);mk();
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML}
+function view(v){['lg','no','app'].forEach(function(x){$(x).style.display=x==v?'block':'none'});$('so').style.display=v=='lg'?'none':'inline-block'}
+function tab(n){$('p1').style.display=n==1?'block':'none';$('p2').style.display=n==2?'block':'none';$('t1').className=n==1?'on':'';$('t2').className=n==2?'on':''}
+
+auth.onAuthStateChanged(function(u){
+  if(!u)return view('lg');
+  var no=function(){view('no');$('uid').textContent=u.uid};
+  db.collection('cc_admins').doc(u.uid).get().then(function(d){if(d.exists){view('app');lR();lT()}else no()}).catch(no);
+});
+
+// ---------- Candidates ----------
+var REQ=[];
+function lR(){db.collection('cc_access').get().then(function(s){REQ=s.docs.map(function(d){var x=d.data();x.id=d.id;return x});rR()}).catch(function(e){alert(e.message)})}
+function rR(){
+  var st=$('fs').value,ex=$('fe').value,q=$('fq').value.toLowerCase();
+  var L=REQ.filter(function(r){return(!st||r.status==st)&&(!ex||r.examId==ex)&&(!q||((r.name||'')+(r.email||'')).toLowerCase().indexOf(q)>-1)})
+    .sort(function(a,b){return(b.ts?b.ts.seconds:0)-(a.ts?a.ts.seconds:0)});
+  var pend=REQ.filter(function(r){return r.status=='pending'}).length;
+  $('cnt').textContent=L.length+' shown | '+pend+' pending total';
+  $('rl').innerHTML=L.map(function(r){
+    var dt=r.ts?new Date(r.ts.seconds*1000).toLocaleDateString():'';
+    return '<div class="it"><div><b>'+esc(r.name||'(no name)')+'</b> <span class="chip '+r.status+'">'+r.status+'</span><small>'+esc(r.email)+'</small><small>'+esc(EXN[r.examId]||r.examId)+' · '+dt+'</small></div><div class="ac">'+
+    (r.status!='approved'?'<button class="btn g s" onclick="sS(\''+r.id+'\',\'approved\')">Approve</button>':'')+
+    (r.status!='rejected'?'<button class="btn r s" onclick="sS(\''+r.id+'\',\'rejected\')">Reject</button>':'')+
+    '<button class="btn s" style="background:#98a2b8" onclick="dR(\''+r.id+'\')">Remove</button></div></div>'}).join('')||'<p class="none">Koi request nahi.</p>';
+}
+function sS(id,s){db.collection('cc_access').doc(id).update({status:s}).then(lR).catch(function(e){alert(e.message)})}
+function dR(id){if(confirm('Remove karna hai?'))db.collection('cc_access').doc(id).delete().then(lR)}
+
+// ---------- Tests ----------
+var TS=[],CK=null;
+function mk(){$('xi').value=$('xe').value+'-'+$('xs').value+'-t'+($('xo').value||1)}
+function lT(){db.collection('cc_tests').get().then(function(s){
+  TS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())}).sort(function(a,b){return(a.examId+a.subjectId).localeCompare(b.examId+b.subjectId)||(a.order||0)-(b.order||0)});
+  $('tl').innerHTML=TS.map(function(t){return '<div class="it"><div><b>'+esc(t.title)+'</b> <span class="chip '+(t.published?'pub':'draft')+'">'+(t.published?'LIVE':'DRAFT')+'</span><small>'+esc(EXN[t.examId]||t.examId)+' · '+esc(t.subjectId)+' · '+(t.qCount||0)+' Qs · '+(t.totalMarks||0)+' marks · '+(t.durationMin||60)+' min</small><small>ID: '+esc(t.id)+'</small></div><div class="ac">'+
+   '<a class="btn s" style="text-decoration:none;background:var(--b)" target="_blank" href="test.html?t='+t.id+'">Preview</a>'+
+   '<button class="btn s" onclick="ed(\''+t.id+'\')">Edit</button>'+
+   '<button class="btn s g" onclick="tg(\''+t.id+'\','+(!t.published)+')">'+(t.published?'Unpublish':'Publish')+'</button>'+
+   '<button class="btn r s" onclick="dT(\''+t.id+'\')">Delete</button></div></div>'}).join('')||'<p class="none">Abhi koi test nahi.</p>'}).catch(function(e){alert(e.message)})}
+function tg(id,v){db.collection('cc_tests').doc(id).update({published:v}).then(lT)}
+function dT(id){if(!confirm('Test aur uske questions delete ho jayenge. Pakka?'))return;var b=db.batch();b.delete(db.collection('cc_tests').doc(id));b.delete(db.collection('cc_questions').doc(id));b.commit().then(lT)}
+function ed(id){
+  var t=TS.filter(function(x){return x.id==id})[0];
+  $('xe').value=t.examId;$('xs').value=t.subjectId;$('xo').value=t.order||1;$('xd').value=t.durationMin||60;$('xt').value=t.title;$('xi').value=id;$('xp').checked=!!t.published;
+  db.collection('cc_questions').doc(id).get().then(function(d){CK=d.data().qs;$('xq').value=JSON.stringify(CK,null,1);rep('Loaded '+CK.length+' questions. Edit karke Check, phir Save.',1)});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function clr(){CK=null;$('xq').value='';$('xt').value='';$('xp').checked=false;$('xo').value=1;mk();rep('',1)}
+function rep(h,ok){$('rep').innerHTML=h?'<span style="color:'+(ok?'#1b8a3f':'#c62828')+'">'+h+'</span>':''}
+$('xf').onchange=function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){$('xq').value=r.result;chk()};r.readAsText(f)};
+
+function parseQ(t){
+  t=t.trim();
+  if(/<html/i.test(t)){
+    var m=t.match(/<title>([^<]*)<\/title>/i);if(m&&!$('xt').value)$('xt').value=m[1].trim();
+    var i=t.indexOf('var qs'),e=t.slice(i).search(/\n\]\s*;/);if(i<0||e<0)throw new Error('HTML me "var qs = [...]" nahi mila');
+    t=t.slice(i,i+e+3);
+  }
+  try{return JSON.parse(t)}catch(_){}
+  return new Function('"use strict";var qs;'+(t.charAt(0)=='['?'qs='+t:t)+';return qs')();
+}
+function chk(){
+  var qs;try{qs=parseQ($('xq').value)}catch(e){CK=null;return rep('❌ Padh nahi paya: '+esc(e.message),0)}
+  if(!Array.isArray(qs)||!qs.length){CK=null;return rep('❌ Koi question nahi mila',0)}
+  var bad=[],out=[],tm=0;
+  qs.forEach(function(q,i){var e=[];
+    if(typeof q.q!='string'||!q.q)e.push('question text');
+    if(!Array.isArray(q.o)||q.o.length<2)e.push('options');
+    else if(!Number.isInteger(q.a)||q.a<0||q.a>=q.o.length)e.push('answer index (a) galat');
+    if(!isFinite(q.m))e.push('marks (m)');if(!isFinite(q.n))e.push('negative (n)');
+    if(e.length)bad.push('Q'+(i+1)+': '+e.join(', '));
+    else{out.push({q:q.q,o:q.o,a:q.a,m:+q.m,n:+q.n,img:q.img||'',exp:q.exp||''});tm+=+q.m}});
+  if(bad.length){CK=null;return rep('❌ '+bad.length+' problem:<br>'+bad.slice(0,6).map(esc).join('<br>'),0)}
+  CK=out;var ne=out.filter(function(q){return !q.exp}).length;
+  rep('✅ '+out.length+' questions OK · Total marks: '+tm+(ne?' · ⚠️ '+ne+' me explanation nahi hai':''),1);
+}
+function sv(){
+  if(!CK)return rep('Pehle Check karo.',0);
+  var id=$('xi').value.trim();if(!/^[a-z0-9-]+$/.test(id))return alert('Test ID me sirf small letters, numbers aur - allowed hain.');
+  if(!$('xt').value.trim())return alert('Title likho.');
+  var tm=CK.reduce(function(s,q){return s+q.m},0),b=db.batch();
+  b.set(db.collection('cc_tests').doc(id),{examId:$('xe').value,subjectId:$('xs').value,title:$('xt').value.trim(),durationMin:+$('xd').value||60,order:+$('xo').value||1,published:$('xp').checked,qCount:CK.length,totalMarks:tm,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  b.set(db.collection('cc_questions').doc(id),{qs:CK});
+  b.commit().then(function(){alert('Saved ✅');clr();lT()}).catch(function(e){alert('Save error: '+e.message)});
+}
+</script></body></html>

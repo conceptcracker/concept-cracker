@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test | Concept Cracker</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+:root{--n:#0a1230;--o:#ff6a00;--b:#00509d}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,sans-serif;background:#f4f6fb;color:#1d2840}
+#gate,#inst,#res{display:none;padding:16px}
+.card{max-width:640px;margin:8vh auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 14px 40px rgba(10,18,48,.1);text-align:center}
+.card h2{color:var(--n);margin:0 0 8px}.card p{color:#5b6785;line-height:1.7}
+.btn{border:0;border-radius:50px;padding:13px 26px;font:600 15px Poppins,sans-serif;color:#fff;cursor:pointer;background:linear-gradient(90deg,#ff9800,#ff6a00)}
+.btn.d{background:var(--n)}.btn.g{background:#28a745}.btn.y{background:#ffc107;color:#000}.btn.r{background:#dc3545}.btn:disabled{opacity:.45}
+a.lnk{color:var(--b);font-weight:600;font-size:14px}
+#inst .card{text-align:left;max-width:760px;margin:4vh auto}
+#inst li{margin:6px 0;line-height:1.6}
+.warn{background:#fff1f2;color:#9f1239;border-radius:12px;padding:14px;margin:18px 0;font-weight:600}
+header{background:var(--n);color:#fff;padding:12px 18px;display:none;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header b{font-size:15px}#time{background:var(--o);padding:6px 14px;border-radius:50px;font-weight:700}
+#test{display:none;gap:16px;padding:16px;max-width:1200px;margin:0 auto;grid-template-columns:1fr 300px;align-items:start}
+.left,.right{background:#fff;border-radius:18px;padding:20px;box-shadow:0 8px 26px rgba(10,18,48,.06)}
+.meta{font-weight:600;color:#5b6785;border-bottom:1px solid #e5e8ef;padding-bottom:10px;margin-bottom:14px;font-size:14px}
+.q-txt{font-size:17px;line-height:1.6;margin-bottom:14px}.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0;margin:0}
+.opts li{margin-bottom:10px}
+.opts label{display:flex;gap:12px;align-items:center;padding:13px;border:1.5px solid #dfe4ee;border-radius:12px;cursor:pointer}
+.opts label:has(input:checked){border-color:var(--o);background:#fff6ee}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btns .btn{padding:11px 18px;font-size:14px;border-radius:10px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.bub{width:36px;height:36px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #b9c1d3;background:#fff;cursor:pointer;font-size:14px}
+.bub.ans{background:#28a745;color:#fff;border-color:#28a745}.bub.n-ans{background:#dc3545;color:#fff;border-color:#dc3545}.bub.rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#2b3245;padding:10px;border-radius:12px;margin-bottom:14px}
+#cd{width:100%;padding:8px;margin-bottom:8px;text-align:right;font-size:18px;border:0;border-radius:8px}
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cg button{background:#475069;color:#fff;border:0;border-radius:8px;padding:10px 0;font-size:14px;cursor:pointer}.cg .op{background:#ff9800}
+#res .card{max-width:820px;margin:3vh auto;text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.stats div{padding:14px;background:#f6f8fc;border-radius:12px;font-weight:600}
+.det{text-align:left;padding:16px;background:#f8f9fc;border:1px solid #e3e8f2;border-radius:14px;margin-bottom:16px}
+.det .a{background:#fff;border-left:4px solid var(--n);padding:12px;border-radius:8px;margin:10px 0}
+.det .e{background:#eef8f0;border-left:4px solid #28a745;padding:12px;border-radius:8px}
+@media(max-width:820px){#test{grid-template-columns:1fr;padding:10px}.card{margin:4vh auto;padding:22px}}
+</style></head>
+<body>
+<header id="hd"><b id="ttl">Test</b><span>Time Left: <span id="time">--:--</span></span></header>
+
+<div id="gate"><div class="card" id="gc"><p>Loading...</p></div></div>
+
+<div id="inst"><div class="card">
+ <h2 style="text-align:center" id="it"></h2>
+ <p style="text-align:center;margin-top:0" id="is"></p><hr>
+ <b>Instructions</b><ol id="il"></ol>
+ <div class="warn"><label style="display:flex;gap:10px;cursor:pointer"><input type="checkbox" id="ag" style="transform:scale(1.4)" onchange="$('sb').disabled=!this.checked"> I have read and understood the instructions.</label></div>
+ <button class="btn" id="sb" style="width:100%" disabled onclick="startTest()">I am ready to begin</button>
+</div></div>
+
+<div id="test">
+ <div class="left">
+  <div class="meta">Question <span id="qn">1</span> &nbsp;|&nbsp; <span style="color:#1b8a3f">+<span id="qm"></span></span> &nbsp; <span style="color:#dc3545">-<span id="qx"></span></span></div>
+  <div id="qt" class="q-txt"></div><div id="qi"></div>
+  <ul class="opts" id="ol"></ul>
+  <div class="btns">
+   <button class="btn g" onclick="sav()">Save &amp; Next</button>
+   <button class="btn y" onclick="rev()">Mark Review &amp; Next</button>
+   <button class="btn r" onclick="clr()">Clear</button>
+  </div>
+ </div>
+ <div class="right">
+  <button class="btn d" style="width:100%;margin-bottom:12px;padding:11px" onclick="tCal()">Scientific Calculator</button>
+  <div id="calc"><input id="cd" disabled><div class="cg" id="cg"></div></div>
+  <b>Question Palette</b>
+  <div class="pal" id="pal"></div>
+  <button class="btn d" style="width:100%" onclick="finalSubmit(false)">Final Submit Test</button>
+ </div>
+</div>
+
+<div id="res"><div class="card">
+ <h2>Test Submitted Successfully!</h2>
+ <h1 style="margin:6px 0">Score: <span id="fs" style="color:#ff6a00"></span> / <span id="ms"></span></h1>
+ <div style="width:240px;margin:0 auto"><canvas id="rc"></canvas></div>
+ <div class="stats"><div style="color:#28a745">Correct: <span id="rcc"></span></div><div style="color:#dc3545">Incorrect: <span id="rci"></span></div><div style="color:#6f42c1">Unattempted: <span id="rcu"></span></div><div style="color:#007bff">Accuracy: <span id="rca"></span>%</div></div>
+ <button class="btn d" onclick="location.reload()">Take Test Again</button>
+ <div id="det" style="margin-top:28px"></div>
+</div></div>
+
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",authDomain:"concepts-creakres.firebaseapp.com",projectId:"concepts-creakres",appId:"1:882506019552:web:2a5357160294eae7afd685"});
+var auth=firebase.auth(),db=firebase.firestore();db.settings({experimentalForceLongPolling:true});
+var $=function(i){return document.getElementById(i)};
+var T=new URLSearchParams(location.search).get('t'),test,user,qs=[],cQ=0,uA=[],qS=[],tInt;
+function show(id){['gate','inst','test','res'].forEach(function(x){$(x).style.display=x==id?(x=='test'?'grid':'block'):'none'});$('hd').style.display=id=='test'?'flex':'none'}
+function msg(h){$('gc').innerHTML=h;show('gate')}
+var BACK='<p><a class="lnk" href="subjects.html">&larr; Back to subjects</a></p>';
+
+if(!T){msg('<h2>Test link galat hai</h2>'+BACK)}
+else db.collection('cc_tests').doc(T).get().then(function(d){
+  if(!d.exists||!d.data().published) return msg('<h2>Test available nahi hai</h2>'+BACK);
+  test=d.data();$('ttl').textContent=test.title;
+  auth.onAuthStateChanged(function(u){user=u;u?check():loginUI()});
+}).catch(function(){msg('<h2>Test available nahi hai</h2>'+BACK)});
+
+function loginUI(){
+  msg('<h2>'+test.title+'</h2><p>Test dene ke liye ek baar login karo. Ek hi login sabhi exams me chalega.</p>'+
+  '<button class="btn" onclick="gLogin()">Continue with Google</button><p><a class="lnk" href="index.html#login">Email se login</a></p>'+BACK);
+}
+function gLogin(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){if(e.code!=='auth/popup-closed-by-user')alert('Login error: '+e.message)})}
+
+function check(){
+  var id=test.examId+'__'+user.uid;
+  db.collection('cc_access').doc(id).get().then(function(a){
+    var s=a.exists&&a.data().status;
+    if(s==='approved') return load();
+    db.collection('cc_admins').doc(user.uid).get().then(function(ad){
+      if(ad.exists) return load();
+      if(s==='pending') msg('<h2>⏳ Approval pending</h2><p>Tumhari request mil gayi hai. Approve hote hi ye test khul jayega.</p>'+BACK);
+      else if(s==='rejected') msg('<h2>Access nahi mila</h2><p>Is exam ka access abhi approve nahi hua. Mentor se contact karo.</p><p><a class="lnk" href="https://wa.me/916376950332">WhatsApp pe poocho</a></p>'+BACK);
+      else msg('<h2>Access chahiye</h2><p>Is exam ke tests approved students ke liye hain. Request bhejo, approve hote hi test khul jayega.</p><button class="btn" onclick="reqAccess()">Request Access</button>'+BACK);
+    });
+  }).catch(function(e){msg('<h2>Error</h2><p>'+e.message+'</p>'+BACK)});
+}
+function reqAccess(){
+  db.collection('cc_access').doc(test.examId+'__'+user.uid).set({uid:user.uid,examId:test.examId,status:'pending',name:user.displayName||'',email:user.email||'',ts:firebase.firestore.FieldValue.serverTimestamp()})
+  .then(function(){msg('<h2>✅ Request bhej di</h2><p>Approve hote hi test khul jayega. Jaldi chahiye to mentor ko WhatsApp karo.</p><p><a class="lnk" href="https://wa.me/916376950332">WhatsApp</a></p>'+BACK)})
+  .catch(function(e){alert(e.message)});
+}
+
+function load(){
+  db.collection('cc_questions').doc(T).get().then(function(d){
+    qs=d.data().qs;qs.forEach(function(){uA.push(null);qS.push('n-vis')});
+    var g={};qs.forEach(function(q){var k=q.m+'|'+q.n;g[k]=(g[k]||0)+1});
+    var dur=test.durationMin||60;
+    $('it').textContent=test.title;$('is').textContent=qs.length+' Questions | '+dur+' Minutes';
+    var h='<li>Total duration: <b>'+dur+' minutes</b>. Timer upar right me dikhega.</li><li>Question Palette se kisi bhi question par ja sakte ho.</li>';
+    Object.keys(g).forEach(function(k){var p=k.split('|');h+='<li>'+g[k]+' questions: <b>+'+p[0]+'</b> marks correct, <b>-'+p[1]+'</b> marks wrong.</li>'});
+    h+='<li>Scientific Calculator right panel me available hai (angles in radians).</li>';
+    $('il').innerHTML=h;show('inst');
+  }).catch(function(e){msg('<h2>Questions load nahi hue</h2><p>'+e.message+'</p>'+BACK)});
+}
+
+function startTest(){
+  var p=$('pal');for(var i=0;i<qs.length;i++){(function(i){var b=document.createElement('div');b.className='bub';b.id='b-'+i;b.textContent=i+1;b.onclick=function(){lQ(i)};p.appendChild(b)})(i)}
+  show('test');lQ(0);sT((test.durationMin||60)*60);
+  window.onbeforeunload=function(){return 'Test progress lost ho jayega.'};
+}
+function lQ(i){
+  if(qS[cQ]==='n-vis')uS(cQ,'n-ans');
+  cQ=i;var q=qs[i];
+  $('qn').textContent=i+1;$('qm').textContent=q.m;$('qx').textContent=q.n;$('qt').innerHTML=q.q;
+  $('qi').innerHTML=q.img?'<img class="q-img" src="'+q.img+'">':'';
+  var h='';q.o.forEach(function(o,j){h+='<li><label><input type="radio" name="opt" value="'+j+'"'+(uA[i]===j?' checked':'')+'> <span>'+o+'</span></label></li>'});
+  $('ol').innerHTML=h;
+  if(window.MathJax&&MathJax.typesetPromise){MathJax.typesetClear&&MathJax.typesetClear();MathJax.typesetPromise()}
+}
+function sel(){var o=document.getElementsByName('opt');for(var i=0;i<o.length;i++)if(o[i].checked)return +o[i].value;return null}
+function uS(i,s){qS[i]=s;var b=$('b-'+i);if(b)b.className='bub '+s}
+function nxt(){if(cQ<qs.length-1)lQ(cQ+1)}
+function sav(){var s=sel();if(s!==null){uA[cQ]=s;uS(cQ,'ans')}else uS(cQ,'n-ans');nxt()}
+function rev(){uA[cQ]=sel();uS(cQ,'rev');nxt()}
+function clr(){uA[cQ]=null;var o=document.getElementsByName('opt');for(var i=0;i<o.length;i++)o[i].checked=false;uS(cQ,'n-ans')}
+function sT(t){tInt=setInterval(function(){var m=Math.floor(t/60),s=t%60;$('time').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(--t<0){clearInterval(tInt);alert('Time is UP!');finalSubmit(true)}},1000)}
+
+// calculator
+var cx='',keys=[['sin','Math.sin('],['cos','Math.cos('],['tan','Math.tan('],['ln','Math.log('],['log','Math.log10('],['exp','Math.exp('],['√','Math.sqrt('],['π','Math.PI'],['(','('],[')',')'],['^','^'],['/','/'],['7'],['8'],['9'],['*'],['4'],['5'],['6'],['-'],['1'],['2'],['3'],['+'],['0'],['.'],['C'],['=']];
+$('cg').innerHTML=keys.map(function(k,i){return '<button class="'+('/*-+=^'.indexOf(k[0])>-1?'op':'')+'" onclick="ck('+i+')">'+k[0]+'</button>'}).join('');
+function tCal(){var c=$('calc');c.style.display=c.style.display==='block'?'none':'block'}
+function ck(i){var k=keys[i];if(k[0]==='C'){cx=''}else if(k[0]==='='){try{var e=cx.replace(/\^/g,'**');if(!/^[\d+\-*\/().\s]*$/.test(e.replace(/Math\.(sin|cos|tan|log10|log|exp|sqrt|PI)/g,'')))throw 0;cx=String(Function('"use strict";return('+e+')')())}catch(_){cx='Error'}}else{if(cx==='Error')cx='';cx+=(k[1]||k[0])}$('cd').value=cx}
+
+function finalSubmit(force){
+  if(!force&&!confirm('Are you sure you want to submit the test?'))return;
+  clearInterval(tInt);window.onbeforeunload=null;show('res');
+  var sc=0,c=0,w=0,u=0,ms=0;
+  qs.forEach(function(q,i){ms+=q.m;if(uA[i]===null)u++;else if(uA[i]===q.a){sc+=q.m;c++}else{sc-=q.n;w++}});
+  $('fs').textContent=sc.toFixed(3);$('ms').textContent=ms;$('rcc').textContent=c;$('rci').textContent=w;$('rcu').textContent=u;
+  $('rca').textContent=(c+w>0?c/(c+w)*100:0).toFixed(2);
+  try{
+    var date=new Date().toLocaleString(),who=user.email||user.phoneNumber||'Student';
+    fetch('https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:who,mobile:'Attempted at: '+date,password:test.title+' | Score: '+sc.toFixed(3)+'/'+ms})});
+    db.collection('students').doc(user.uid).collection('marks').add({testName:test.title,score:sc.toFixed(3),totalMarks:ms,date:date,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(e){}
+  var h='<h3 style="color:var(--n)">Detailed Analysis &amp; Solutions</h3>';
+  qs.forEach(function(q,j){
+    var st=uA[j]===null?'<b style="color:#6c757d">[Unattempted]</b>':uA[j]===q.a?'<b style="color:green">[Correct]</b>':'<b style="color:red">[Incorrect]</b>';
+    h+='<div class="det"><b>Question '+(j+1)+':</b> '+st+'<div style="margin-top:8px">'+q.q+(q.img?'<br><img class="q-img" src="'+q.img+'">':'')+'</div>'+
+    '<div class="a"><b>Your Answer:</b> '+(uA[j]===null?'None':q.o[uA[j]])+'<br><br><b>Correct Answer:</b> '+q.o[q.a]+'</div>'+
+    (q.exp?'<div class="e"><b>💡 Explanation:</b><br><br>'+q.exp+'</div>':'')+'</div>';
+  });
+  $('det').innerHTML=h;
+  setTimeout(function(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise()},400);
+  if(window.Chart)new Chart($('rc').getContext('2d'),{type:'doughnut',data:{labels:['Correct','Incorrect','Unattempted'],datasets:[{data:[c,w,u],backgroundColor:['#28a745','#dc3545','#6c757d']}]}});
+}
+</script>
+</body></html>
