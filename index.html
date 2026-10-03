@@ -155,6 +155,10 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
 .auth-box input:focus{outline:2px solid rgba(255,106,0,.35);border-color:var(--orange)}
 .btn-main{width:100%;padding:14px;border:0;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;transition:.3s;margin-top:10px;font-family:inherit}
 .btn-login{background:var(--primary);color:#fff}.btn-login:hover{background:var(--secondary)}
+.btn-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border:1.5px solid #dde2ec;border-radius:10px;background:#fff;font:600 15px Poppins,sans-serif;color:#1d2840;cursor:pointer;transition:.25s}
+.btn-g:hover{border-color:var(--orange);box-shadow:0 6px 18px rgba(255,106,0,.15)}
+.or-line{display:flex;align-items:center;gap:10px;color:#98a2b8;font-size:12.5px;margin:16px 0 6px}
+.or-line::before,.or-line::after{content:"";flex:1;height:1px;background:#e5e8ef}
 .close-btn{position:absolute;top:12px;right:18px;color:#888;font-size:28px;cursor:pointer}
 
 /* TABLET + MOBILE */
@@ -195,10 +199,9 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
         <span class="close-btn" onclick="closeAuth()">&times;</span>
         <h2 style="color:var(--primary); margin-top:0;">Welcome Back</h2>
         
-        <div class="auth-tabs">
-            <div class="auth-tab active" onclick="switchTab('email-login')">Email</div>
-            <div class="auth-tab" onclick="switchTab('phone-login')">Mobile OTP</div>
-        </div>
+        <p style="color:#5b6785;font-size:14px;margin:0 0 18px">Ek baar login, sabhi exams me chalega.</p>
+        <button class="btn-g" type="button" onclick="googleLogin()"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg> Continue with Google</button>
+        <div class="or-line"><span>ya email se</span></div>
 
         <div id="email-login" class="auth-form active">
             <input type="email" id="login-email" placeholder="Email Address">
@@ -375,6 +378,34 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+
+    // --- COMMON HELPERS ---
+    function goNext() {
+        const n = new URLSearchParams(location.search).get('next');
+        window.location.href = (n && /^[\w\-./?=&%]+$/.test(n) && n.indexOf('//') < 0) ? n : "exams.html";
+    }
+    function ensureStudent(user, name) {
+        const ref = db.collection('students').doc(user.uid);
+        return ref.get().then(d => {
+            if (!d.exists) return ref.set({ fullName: name || user.displayName || "Student", email: user.email || "", status: "Pending" });
+        }).catch(() => {});
+    }
+    function googleLogin() {
+        const p = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(p).then(r => ensureStudent(r.user).then(goNext)).catch(err => {
+            if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') auth.signInWithRedirect(p);
+            else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') alert("Google login error: " + err.message);
+        });
+    }
+    auth.getRedirectResult().then(r => { if (r && r.user) ensureStudent(r.user).then(goNext); }).catch(() => {});
+    auth.onAuthStateChanged(u => {
+        const nb = document.querySelector('.nav-links .btn-nav'), bb = document.querySelector('.bottom-bar a:last-child');
+        if (u) {
+            if (nb) { nb.textContent = 'Profile'; nb.onclick = () => location.href = 'profile.html'; }
+            if (bb) { bb.innerHTML = '<i class="fas fa-user-check"></i>Profile'; bb.onclick = () => location.href = 'profile.html'; }
+        }
+    });
+
     // --- UI MODAL LOGIC ---
     function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
     function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
@@ -383,7 +414,7 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
         document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        const idx={'email-login':0,'phone-login':1}[tabId]; if(idx!==undefined) document.querySelectorAll('.auth-tab')[idx].classList.add('active');
+        
     }
 
     // Auto-open modal if hash exists
@@ -397,16 +428,8 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
         const p = document.getElementById('login-pass').value;
         if(!e || !p) { alert("Please enter your email and password!"); return; }
         
-        auth.signInWithEmailAndPassword(e, p).then((cred) => {
-            // LOGIN PAR CHECK: Kya Email verify hua hai?
-            if (cred.user.emailVerified === false) {
-                auth.signOut(); // Turant bahar nikal do
-                alert("🛑 EMAIL NOT VERIFIED!\n\n please verify your email, check your inbox and spam folder to verify email.");
-            } else {
-                // Verify hai toh andar aane do
-                window.location.href="exams.html"; 
-            }
-        }).catch(err => alert("Login Error: " + err.message));
+        auth.signInWithEmailAndPassword(e, p).then(() => goNext())
+        .catch(err => alert("Login Error: " + err.message));
     }
     
     function registerEmail() {
@@ -418,19 +441,7 @@ footer .copy{margin-top:26px;font-size:13px;opacity:.5}
         if(p.length < 6) { alert("Password must be at least 6 characters long."); return; }
         
         auth.createUserWithEmailAndPassword(e, p).then((cred) => {
-            // Account bante hi Verification Mail bhejo
-            cred.user.sendEmailVerification().then(() => {
-                // Database mein status 'Pending' save karo
-                db.collection('students').doc(cred.user.uid).set({ 
-                    fullName: n, 
-                    email: e,
-                    status: "Pending"
-                }).then(() => {
-                    auth.signOut(); // Account banate hi LOGOUT kar do
-                    alert("Account Created! 🎉\n\n please verify your mail, check inbox and spam folder to verify email.");
-                    switchTab('email-login'); // User ko Login screen par bhej do
-                });
-            });
+            ensureStudent(cred.user, n).then(() => goNext());
         }).catch(err => alert("Sign Up Error: " + err.message));
     }
         // --- RESET PASSWORD FUNCTION ---
