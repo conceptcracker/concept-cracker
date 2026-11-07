@@ -1,6 +1,6 @@
 // List of all test folders and tests. Used by list pages, profile and admin panel.
 export const GROUPS = [
-  { prefix: 'fl', dir: 'full-length',   short: 'Full Length',   label: 'Full Length Test', count: 8, duration: 120, expected: 120,
+  { prefix: 'fl', dir: 'full-length',   short: 'Full Length',   label: 'Full Length Test', count: 10, duration: 120, expected: 120,
     sections: [{ name: 'General Study', count: 30 }, { name: 'Physics', count: 90 }] },
   { prefix: 'gs', dir: 'general-study', short: 'General Study', label: 'GS Test',          count: 15, duration: 30,  expected: 30,
     sections: [{ name: 'General Study', count: 30 }] },
